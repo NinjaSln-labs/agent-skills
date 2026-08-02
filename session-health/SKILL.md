@@ -31,7 +31,7 @@ description: >
 
 ## 数据获取（只读命令）
 
-1. 定位当前项目会话目录（路径 → 目录名：`/` 替换为 `-`，如 `本地路径` → `-Volumes-NinjaSin-myself`）：
+1. 定位当前项目会话目录（路径 → 目录名：`/` 替换为 `-`，如 `/path/to/project` → `-path-to-project`）：
 
    ```bash
    ls -td ~/.deepcode/projects/*/ 2>/dev/null | head -3   # 找当前项目
