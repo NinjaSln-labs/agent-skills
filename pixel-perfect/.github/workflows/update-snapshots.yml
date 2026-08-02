@@ -1,0 +1,132 @@
+name: Update Visual Snapshots
+
+# Manually triggered only — never auto-update baselines in CI.
+# Silently overwriting baselines in CI defeats the purpose of visual regression testing.
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why are you updating snapshots? (required for audit trail)'
+        required: true
+        type: string
+
+permissions:
+  contents: write  # required to push updated snapshot files
+
+# Prevent concurrent runs on the same branch — parallel snapshot pushes would conflict.
+# cancel-in-progress: false — let the running job finish; cancelling mid-push could leave
+# the branch in an inconsistent state. Note: GitHub queues at most one pending run per group;
+# a third dispatch replaces the second in the queue (this is expected GitHub behavior).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  update-snapshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Guard: prevent running on tags. git push to a tag ref would overwrite the tag with
+    # snapshot changes, corrupting the release. workflow_dispatch is normally branch-only,
+    # but this check is defense-in-depth against future workflow changes.
+    if: github.ref_type == 'branch'
+
+    container:
+      # Must match the image used in visual-tests.yml to produce identical baselines.
+      image: mcr.microsoft.com/playwright:v1.50.1-noble
+      # --ipc=host: required for Chromium in Docker.
+      # Without it, renderer processes hit the 64MB /dev/shm limit and crash.
+      options: --ipc=host
+
+    steps:
+      # Validate inputs BEFORE checkout — fail fast on bad data.
+      #
+      # ⚠️ SECURITY: ${{ github.event.inputs.reason }} and ${{ github.ref_name }} are
+      # user-controlled strings. Direct interpolation in `run:` is shell injection.
+      # Always pass untrusted inputs through env: — the value is stored in memory and never
+      # participates in shell script generation.
+      # See: https://securitylab.github.com/resources/github-actions-untrusted-input/
+      #
+      # Real-world attack: Ultralytics repo was compromised via a branch named
+      # $(curl|bash) — injected directly into an unquoted ${{ github.ref_name }}.
+      - name: Validate inputs
+        env:
+          REASON: ${{ github.event.inputs.reason }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          if [ -z "${REASON// }" ]; then
+            echo "Error: reason input is empty or whitespace-only"
+            exit 1
+          fi
+          # Branch names must not contain shell metacharacters.
+          # Covers all common branch conventions: main, feature/foo, release-1.2, fix.bar
+          if ! echo "$BRANCH_NAME" | grep -qE '^[a-zA-Z0-9/_.-]+$'; then
+            echo "Error: branch name contains unsafe characters: $BRANCH_NAME"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          # actions/checkout with token sets up the git credential helper automatically.
+          # No need to manually configure git remote or credential.helper — it's handled.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Cache node_modules (workspace-relative, bind-mounted between host and container).
+      # Do NOT cache the npm store (~/.npm): inside the container it lives at /root/.npm —
+      # the container's own filesystem — NOT the bind-mounted workspace. actions/cache runs
+      # on the host and cannot see /root/.npm inside the container.
+      - name: Cache node_modules
+        id: cache-nm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.cache-nm.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Update snapshots
+        run: npx playwright test --update-snapshots
+        env:
+          CI: true
+          # BASE_URL overrides the fallback in playwright.config.ts.
+          # Set BASE_URL as a repository secret pointing to your staging/preview URL.
+          BASE_URL: ${{ secrets.BASE_URL }}
+
+      - name: Upload snapshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          # Upload current snapshot state so you can retrieve them even if the push step fails.
+          name: snapshots-${{ github.run_id }}
+          path: snapshots/
+          retention-days: 7
+
+      - name: Commit updated snapshots
+        env:
+          REASON: ${{ github.event.inputs.reason }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add snapshots/
+
+          # Only commit if there are actual changes
+          if git diff --staged --quiet; then
+            echo "No snapshot changes to commit."
+          else
+            # ⚠️ SECURITY: $REASON is free-form user input. Using it inside a double-quoted
+            # git commit -m "..." would allow command substitution via $() or backticks.
+            # printf '%s' treats the value as a literal string — no shell interpretation.
+            printf 'chore: update visual snapshots\n\nReason: %s\nTriggered by: @%s\nWorkflow run: %s\n' \
+              "$REASON" "$ACTOR" "$RUN_ID" > /tmp/commit-msg
+            git commit -F /tmp/commit-msg
+
+            # BRANCH_NAME was validated above (alphanumeric + /_.-) and comes from env:,
+            # so it is safe to use here. Quoted to prevent word splitting.
+            git push origin "HEAD:$BRANCH_NAME"
+          fi

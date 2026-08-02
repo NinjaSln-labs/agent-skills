@@ -1,0 +1,63 @@
+name: Visual Regression Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  visual-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    container:
+      # Use the official Playwright Docker image — same renderer as your baselines.
+      # ⚠️ Keep this version in sync with @playwright/test in package.json.
+      #   To check the installed version: node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)"
+      image: mcr.microsoft.com/playwright:v1.50.1-noble
+      # --ipc=host: required for Chromium in Docker.
+      # Without it, renderer processes hit the 64MB /dev/shm limit and crash.
+      options: --ipc=host
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Cache node_modules (workspace-relative, bind-mounted between host and container).
+      # Do NOT cache the npm store (~/.npm): inside the container it lives at /root/.npm —
+      # the container's own filesystem — NOT the bind-mounted workspace. actions/cache runs
+      # on the host and cannot see /root/.npm inside the container.
+      - name: Cache node_modules
+        id: cache-nm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.cache-nm.outputs.cache-hit != 'true'
+        # Always run npm ci on cache miss — it's fast when node_modules is cached (~5s vs ~60s cold).
+        run: npm ci
+
+      - name: Run visual regression tests
+        run: npx playwright test
+        env:
+          CI: true
+          # BASE_URL overrides the fallback in playwright.config.ts.
+          # Set BASE_URL as a repository secret pointing to your staging/preview URL.
+          # If not set, tests run against the baseURL fallback (http://localhost:3000).
+          BASE_URL: ${{ secrets.BASE_URL }}
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

@@ -1,0 +1,21 @@
+{
+  "id": "{{TASK_ID}}",
+  "title": "{{TITLE}}",
+  "interval_sec": 60,
+  "tick_env": "{{TICK_ENV}}",
+  "poll_command": "{{POLL_COMMAND}}",
+  "poll_adapter": "{{POLL_ADAPTER}}",
+  "poll_env": {},
+  "poll_env_quiet": {},
+  "terminal_watch": {
+    "pattern": "{{TERMINAL_PATTERN}}",
+    "progress_regex": "{{PROGRESS_REGEX}}",
+    "done_marker": "exit_code:"
+  },
+  "status_when": {
+    "done_field": "finished",
+    "done_value": true,
+    "running_if_terminal_match": true
+  },
+  "agent_prompt": "读取 reports/task_loops/{{TASK_ID}}/live.md，向用户在 Chat 发 chat_line 一行；若 status=done 执行 ./scripts/task_loop_stop.sh {{TASK_ID}}"
+}
