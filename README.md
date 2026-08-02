@@ -4,6 +4,8 @@
 
 共 **76 个技能**，覆盖：工程最佳实践、DDD、产品/PM、测试/QA、安全、UI/UX 设计、Agent 会话运维。
 
+技能全景图（按产品 0-1 阶段分类与编排路径）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
+
 ## 安装
 
 将技能目录拷贝到代理的技能发现根目录（用户级 `~/.agents/skills/` 或项目级 `.agents/skills/`）：
