@@ -83,5 +83,5 @@ description: >
 - mattpocock handoff skill：引用 artifacts 不重复、脱敏、suggested skills——「引用不复制」原则来源
 - Agent Handoff（marcusglee11）：省 token 优先坐标引用
 - YAKStack /handoff：纯文本简报五节（Who/What/Confirmed/In progress/Next）——简洁叙事启发
-- HANDOFF.md 实践（2026-08-02）：9 节 → 6 节重构——「delta+引用」批判性修正的产物（初版复制了 docs/ 内容被否，重构为引用型）
+- NeonForge HANDOFF.md 实践（2026-08-02）：9 节 → 6 节重构——「delta+引用」批判性修正的产物（初版复制了 docs/ 内容被否，重构为引用型）
 - **AI 评审反哺（2026-08-02）**：专家评审 HANDOFF.md 发现 4 项 → 技能化：版本控制坐标（§2+反模式）、接收方建议动作（§1，mattpocock suggested skills）、占位/未完成边界明示（§2+反模式）、外部依赖来源（§3+反模式，凭据索取）

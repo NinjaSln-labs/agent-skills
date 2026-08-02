@@ -18,7 +18,7 @@ metadata:
 
 # 技能描述交叉验证审计（Skill Description Audit）
 
-**范围：** 用户级个人技能（Agent Skills 标准实现，可安装到 `~/.agents/skills/` 使用）。
+**范围：** 用户级个人技能（正文以安装位置的 `SKILL.md` 为权威；消费侧通过符号链接指向真源目录，遵循技能库「派生只链不拷」约定）。
 
 ## 角色
 

@@ -64,4 +64,4 @@ description: >
 
 - project-handoff（对称技能）：交接方 6 节结构 → 接收方按同构 6 节恢复上下文；维护规则（回填/防双源/脱敏）双向共用
 - mattpocock handoff：交接文档作为下一 session 的起始上下文——接收方视角即「读文档 → 继续」
-- HANDOFF.md 实践（2026-08-02）：Deep Code → Cursor 交接——接收方需建议动作（git init/.gitignore/读 tickets/Key 索取）与环境就绪检查（4 轮 AI 评审发现的接收方需求）
+- NeonForge HANDOFF.md 实践（2026-08-02）：Deep Code → Cursor 交接——接收方需建议动作（git init/.gitignore/读 tickets/Key 索取）与环境就绪检查（4 轮 AI 评审发现的接收方需求）

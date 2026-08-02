@@ -33,8 +33,8 @@ If the environment has no WebFetch tool, fall back to curl against the same URL 
 ```bash
 # 直连优先
 curl -sL "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md"
-# 直连失败/过慢时走代理（代理地址按本机环境配置，替换为实际代理地址）
-curl -sL -x "http://<proxy-host>:<proxy-port>" "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md"
+# 直连失败/过慢时走代理（代理地址按本机环境配置；如 macOS 系统代理 127.0.0.1:6696）
+curl -sL -x "http://127.0.0.1:6696" "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md"
 ```
 
 直连与代理**取速度优先**（可先各测一次延迟再选；代理端口不固定，按本机实际配置）。

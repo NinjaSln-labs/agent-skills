@@ -13,7 +13,7 @@ description: >-
 
 为任意长任务生成 `configs/task_loop/<task_id>.json` 与可选 `scripts/task_loop_adapters/<task_id>_adapter.py`，接入通用 loop。
 
-**参考实现仓库**（⚠️ 2026-08 已迁移/打包——原路径失效；脚本按 [templates/](templates/) 模板自建即可）：
+**参考实现**：⚠️ 2026-08 原参考实现已迁移/打包（路径失效）；脚本按 [templates/](templates/) 模板自建即可。
 
 | 路径 | 说明 |
 |------|------|

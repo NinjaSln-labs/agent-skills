@@ -307,7 +307,7 @@ description: >
 
 - Addy Osmani《How to write a good spec for AI agents》：Spec 六核心领域、三档边界、致死三要素
 - write-spec（Anthropic）：PRD 骨架、Goals/Non-Goals、成功指标、AC（Given/When/Then）、MoSCoW
-- D7/A8 实践：就绪度评分、Critical/Major/Minor、权威裁决、可交付判断、防漂移
+- NeonForge D7/A8 实践：就绪度评分、Critical/Major/Minor、权威裁决、可交付判断、防漂移
 - Document Review（EveryInc）：单文档 clarity/specificity/假设/YAGNI 打分
 - Critique Review（critique.sh）：先验证声明再报告（防假阳性）
 - launch/product-marketing（coreyhaines31）：上线文档检查点、ORB 渠道、五阶段
