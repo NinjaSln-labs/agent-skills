@@ -2,7 +2,7 @@
 
 个人维护的 Agent Skill 集合，适用于支持 [Agent Skills](https://agentskills.io) 标准的 AI 编码代理（Deep Code / Claude Code / Cursor 等）。
 
-共 **80 个技能**，覆盖：工程最佳实践、DDD、产品/PM、测试/QA、安全、UI/UX 设计、Agent 会话运维。
+共 **79 个技能**，覆盖：工程最佳实践、DDD、产品/PM、测试/QA、安全、UI/UX 设计、Agent 会话运维。
 
 技能全景图（按产品 0-1 阶段分类与编排路径）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
