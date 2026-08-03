@@ -3,14 +3,14 @@ name: skill-description-audit
 description: >-
   User-level personal skill (canonical source in agent-skills). Cross-validation audit of an Agent
   Skill's SKILL.md description vs body: checks frontmatter description compliance, capability claims
-  matching the body, trigger-word sufficiency, and volatile-data externalization (reference-table
+  matching the body, body non-emptiness (except thin-allowlist), trigger-word sufficiency, and volatile-data externalization (reference-table
   layering — body must not hardcode pointing data). Generates an audit report with
   Problems/Recommendations/Acceptance-Criteria in the target skill's directory. Does not modify the
   audited SKILL.md. Use when auditing or cross-validating a skill description against SKILL.md body,
   checking Agent Skills description compliance, or generating a description audit report (problems,
   recommendations, acceptance criteria) without editing the skill.
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   standard: agentskills.io
   scope: user
   patches:
@@ -18,6 +18,7 @@ metadata:
     - "允许无问题、无改写建议（写「无」/维持现状）；禁止编造"
     - "description 标明：用户级个人技能；真源仍存 agent-skills"
     - "v1.2.0：新增数据外置检查维度（易变数据分层——正文不写死指向性数据，按稳定性定刷新频率）"
+    - "v1.3.0：正文非空硬项（thin-allowlist 例外）；旧名检查读 renames.yaml"
 ---
 
 # 技能描述交叉验证审计（Skill Description Audit）
@@ -60,7 +61,7 @@ metadata:
 进度：
 - [ ] 1. 定位并只读打开目标 SKILL.md
 - [ ] 2. 解析 frontmatter（name / description / metadata）
-- [ ] 3. 规范合规检查
+- [ ] 3. 规范合规检查（含正文非空 / thin-allowlist）
 - [ ] 4. 从正文抽取能力与强制点清单
 - [ ] 5. 数据外置检查（易变数据分层）
 - [ ] 6. description ↔ 正文交叉验证
@@ -93,6 +94,7 @@ metadata:
 | YAML | frontmatter 可解析；`description` 折叠合法 |
 | **结构** | frontmatter **闭合**（`---` 闭合存在）；description 折叠块**不吞正文**（描述到正文前结束——实测 62 技能中招，防再次发生） |
 | **语言一致性** | description 语言统一（本库规范：**英文**）；不中英混杂、不夹「中文触发：」类双语标记 |
+| **正文非空** | 第二个 `---` 之后正文长度 > 0；例外仅 `thin-allowlist.txt`（如 `grill-me`）。空正文 → **[高]**（不可执行） |
 
 缺 WHAT 或 WHEN → 至少 **[中]**。超长或空 → **[高]**。结构未闭合/吞正文 → **[高]**。语言不统一 → **[低]**（若与库规范不符则 **[中]**）。
 
@@ -204,6 +206,7 @@ metadata:
 | 结构（WHAT + WHEN） | ✅/⚠️/❌ |
 | 第三人称 | ✅/⚠️ |
 | YAML / name 与目录 | ✅/⚠️/❌ |
+| 正文非空（或 thin-allowlist）| ✅/❌ |
 
 ## 二、数据外置检查（易变数据分层）
 
@@ -298,6 +301,7 @@ metadata:
 - [ ] 假称与标志性缺失已显式判定
 - [ ] 数据外置判定已给出（外置完整 / 需外置 / 无该类数据）
 - [ ] 结构检查已执行（frontmatter 闭合 / description 不吞正文）
+- [ ] 正文非空已判定（或确认在 thin-allowlist.txt）
 - [ ] 语言一致性判定已给出（统一 / 混杂）
 - [ ] 误触发防护已评估（WHEN 过宽 → 反触发建议；名称语义/旧名残留已查）
 - [ ] 正文层旧名残留已查（改名技能审计时：正文反引号/链接/对齐表引用）

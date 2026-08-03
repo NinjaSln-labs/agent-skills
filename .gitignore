@@ -1,0 +1,17 @@
+# AppleDouble / exFAT junk
+._*
+.DS_Store
+*.AppleDouble
+
+# Editor / local
+.idea/
+.vscode/
+*.swp
+*~
+
+# Nested upstream git leftovers (should be deleted, not committed)
+**/.git/
+
+# Optional local scratch
+.tmp/
+*.local
