@@ -1,6 +1,9 @@
 ---
 name: ddd-model-review
-description: "Global model quality assessment: consistency, completeness, coupling analysis, and feedback-loop triggers. Use for domain model quality evaluation, consistency/completeness/coupling checks, or model evolution review."
+description: >-
+  Global model quality assessment: consistency, completeness, coupling analysis, and
+  feedback-loop triggers. Use when evaluating domain model quality, consistency/completeness/coupling
+  checks, or model evolution review.
 risk: safe
 source: self
 tags: "[ddd, validation, review, feedback-loop]"
