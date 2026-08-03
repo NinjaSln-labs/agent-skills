@@ -1,6 +1,6 @@
 ---
 name: ddd-discover
-description: "协作式领域发现：通过事件风暴或领域故事讲述，产出事件流、命令/事件候选、热点与歧义清单。" 使用场景：领域发现（事件/命令/聚合识别）时。
+description: "Collaborative domain discovery via event storming or domain storytelling, producing event streams, command/event candidates, hotspots, and ambiguity lists. Use when doing domain discovery (identifying events/commands/aggregates)."
 risk: safe
 source: self
 tags: "[ddd, discovery, event-storming, domain-storytelling]"
@@ -64,3 +64,4 @@ date_added: "2026-05-08"
 - 非目标：不涉及正向下单流程
 请输出事件流表、命令/事件候选、热点标注与歧义清单。
 ```
+

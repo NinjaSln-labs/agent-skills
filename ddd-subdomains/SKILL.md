@@ -1,6 +1,6 @@
 ---
 name: ddd-subdomains
-description: "识别业务能力并分类子域（Core/Supporting/Generic），产出核心域声明与所有权建议。" 使用场景：划分核心/支撑/通用子域时。
+description: "Identify business capabilities and classify subdomains (Core/Supporting/Generic), producing core-domain declarations and ownership recommendations. Use when partitioning core/supporting/generic subdomains."
 risk: safe
 source: self
 tags: "[ddd, strategic, subdomains]"

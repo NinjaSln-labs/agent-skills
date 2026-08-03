@@ -1,10 +1,14 @@
 ---
 name: skill-description-audit
-description: >
-  用户级个人技能（真源仍存 agent-skills）。对 Agent Skill 的 SKILL.md 做 description↔正文交叉验证审计：检查 frontmatter 描述是否合规、能力声明是否与正文一致、触发词是否充分、易变数据是否外置（数据外置/引用表分层——正文不写死指向性数据）；
-  在目标技能同目录生成含【问题】【建议】【验收标准】的审计报告。
-  不修改被审 SKILL.md。当用户要求审计/交叉验证/审查技能描述、skill description audit、校验 description 与正文一致性，或评估技能发现触发词时使用。
-  User-level personal skill. Use when auditing or cross-validating a skill description against SKILL.md body, checking Agent Skills description compliance, or generating a description audit report (problems, recommendations, acceptance criteria) without editing the skill.
+description: >-
+  User-level personal skill (canonical source in agent-skills). Cross-validation audit of an Agent
+  Skill's SKILL.md description vs body: checks frontmatter description compliance, capability claims
+  matching the body, trigger-word sufficiency, and volatile-data externalization (reference-table
+  layering — body must not hardcode pointing data). Generates an audit report with
+  Problems/Recommendations/Acceptance-Criteria in the target skill's directory. Does not modify the
+  audited SKILL.md. Use when auditing or cross-validating a skill description against SKILL.md body,
+  checking Agent Skills description compliance, or generating a description audit report (problems,
+  recommendations, acceptance criteria) without editing the skill.
 metadata:
   version: "1.2.0"
   standard: agentskills.io
@@ -87,8 +91,21 @@ metadata:
 | 第三人称 | 不以「我/你能」口吻写描述 |
 | `name` | ≤64；`[a-z0-9-]+`；与目录名一致（不一致标 ⚠️） |
 | YAML | frontmatter 可解析；`description` 折叠合法 |
+| **结构** | frontmatter **闭合**（`---` 闭合存在）；description 折叠块**不吞正文**（描述到正文前结束——实测 62 技能中招，防再次发生） |
+| **语言一致性** | description 语言统一（本库规范：**英文**）；不中英混杂、不夹「中文触发：」类双语标记 |
 
-缺 WHAT 或 WHEN → 至少 **[中]**。超长或空 → **[高]**。
+缺 WHAT 或 WHEN → 至少 **[中]**。超长或空 → **[高]**。结构未闭合/吞正文 → **[高]**。语言不统一 → **[低]**（若与库规范不符则 **[中]**）。
+
+### 3.5 名称语义检查（防误触发与语义漂移）
+
+审计时顺带评估 `name` 的**语义质量**（不改名——改名是用户决策，审计只报告）：
+
+| 检查项 | 判定 |
+|--------|------|
+| 单段泛名（`animation`/`research`/`launch` 类——语义指向弱、匹配易误触发）| ⚠️ **[低]** 建议改名或 description 加限定 |
+| 工具/个人绑定名（`deepcode-*`/`cursor-*`/用户名）| ⚠️ **[中]** 建议去绑定（跨工具通用） |
+| 引用已改名旧名（description/正文出现已更名的技能名）| ⚠️ **[中]** 建议更新为新名 |
+| 引用已改名旧名（description **或正文**出现已更名的技能名——正文层是 description 审计盲区，改名后必须补查）| ⚠️ **[中]** 建议更新为新名 |
 
 ### 4. 正文能力清单（审计员抽取）
 
@@ -142,6 +159,11 @@ metadata:
 - WHEN 是否包含用户口头常见说法与英文等价（若技能面向双语环境）。  
 - 是否过宽（易误激活）或过窄（标志性能力无触发词）。  
 - 双语重复：不默认判缺陷；可标 **[低]/token** 信息项。
+
+**误触发防护（2026-08 加入——deep-codebase-analysis 被「审计技能」类请求误命中 3 次的教训）：**
+
+- **WHEN 过宽**：description 含泛动词+泛领域组合（如 `analyzing source code` + `maintenance/refactoring`）会命中不相关请求 → 建议**收窄 Use when**（明确「分析什么、何时用」）+ 加**反触发**（`NOT for` / `DO NOT TRIGGER when`——指向该用哪个替代技能）。判定：WHEN 过宽缺反触发 → **[中]**（实测误命中）或 **[低]**（潜在风险）。
+- 反触发格式示例：`NOT for: single-file edits, auditing one skill's SKILL.md — those belong to code-review / skill-description-audit.`
 
 ### 7. 写报告（唯一产出）
 
@@ -246,9 +268,9 @@ metadata:
 
 | 级 | 标准 |
 |----|------|
-| **高** | 空/超长描述；标志性强制能力缺失；描述与正文核心矛盾；严重假称 |
-| **中** | 缺 WHAT 或 WHEN；重要能力缺失；输入/术语与正文明显不一致；正文写死**快变**易变数据未外置 |
-| **低** | 触发词可补强；弱覆盖；双语重复；细节未写入描述；慢变数据未外置；refreshInterval 一刀切 |
+| **高** | 空/超长描述；**frontmatter 未闭合 / description 吞正文（结构破坏）**；标志性强制能力缺失；描述与正文核心矛盾；严重假称 |
+| **中** | 缺 WHAT 或 WHEN；重要能力缺失；输入/术语与正文明显不一致；正文写死**快变**易变数据未外置；**WHEN 过宽已致误命中（缺反触发）**；**引用已改名旧名**；名称含工具/个人绑定 |
+| **低** | 触发词可补强；弱覆盖；双语重复；**语言不统一**；**单段泛名（匹配指向弱）**；WHEN 过宽仅潜在风险；细节未写入描述；慢变数据未外置；refreshInterval 一刀切 |
 | **信息** | 版本未 bump、旧报告过期、合理扩展触发等非缺陷备忘 |
 
 ## 反模式
@@ -263,6 +285,9 @@ metadata:
 - 报告写到其他目录或聊天里了事（除非用户只要口头结论——仍应默认落盘报告）
 - 漏检正文写死的易变数据（模型窗口/价格/ID——应外置 references/，防过期误导）
 - 数据外置检查只查「有没有 references/」，不核对 lastUpdated/refreshInterval/置信度机制
+- **不检查 frontmatter 闭合 / description 吞正文**（结构破坏——实测 62 技能中招，属 [高] 级缺陷）
+- **放过 WHEN 过宽导致的误触发**（应给反触发建议——deep-codebase-analysis 教训）
+- **审计改名技能时不查旧名残留**（description **和正文**引用已更名技能名——正文层盲区，product-doc-audit 的 launch 残留教训）
 
 ## 完成标准
 
@@ -272,4 +297,11 @@ metadata:
 - [ ] 报告含 **问题**、**建议**、**验收标准** 三节（内容允许为「无」/「无需改动」；有改写时建议回指问题、验收可复测）
 - [ ] 假称与标志性缺失已显式判定
 - [ ] 数据外置判定已给出（外置完整 / 需外置 / 无该类数据）
+- [ ] 结构检查已执行（frontmatter 闭合 / description 不吞正文）
+- [ ] 语言一致性判定已给出（统一 / 混杂）
+- [ ] 误触发防护已评估（WHEN 过宽 → 反触发建议；名称语义/旧名残留已查）
+- [ ] 正文层旧名残留已查（改名技能审计时：正文反引号/链接/对齐表引用）
 - [ ] 用户收到总评与报告路径
+
+
+

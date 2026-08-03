@@ -4,9 +4,18 @@
   "interval_sec": 60,
   "tick_env": "{{TICK_ENV}}",
   "poll_command": "{{POLL_COMMAND}}",
-  "poll_adapter": "{{POLL_ADAPTER}}",
+  "poll_adapter": "python3 scripts/task_loop_adapters/{{TASK_ID}}_adapter.py",
   "poll_env": {},
   "poll_env_quiet": {},
+  "progress_extract": {
+    "source": "auto",
+    "offset_field": "progress.offset",
+    "total_field": "progress.total",
+    "pct_field": "pct",
+    "stage_field": "progress.stage",
+    "stage_total_field": "progress.stage_total",
+    "regex": ""
+  },
   "terminal_watch": {
     "pattern": "{{TERMINAL_PATTERN}}",
     "progress_regex": "{{PROGRESS_REGEX}}",

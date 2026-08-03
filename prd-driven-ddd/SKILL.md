@@ -1,11 +1,14 @@
 ---
 name: prd-driven-ddd
-description: >
-  将产品设计文档（PRD、流程图、原型、状态机、规则/AC）转化为领域驱动设计模型：按上下文的通用语言/词汇表、事件风暴、限界上下文与映射、聚合/实体/值对象、领域事件与集成事件版本化（Name:vN）、读模型、PRD↔模型追溯。
-  当用户提出 DDD、领域建模、事件风暴、聚合设计、限界上下文映射、集成事件版本、读模型/CQRS、基于 PRD 的战略/战术设计，或希望停止将界面翻译为 CRUD 时使用。
-  Use when the user asks for DDD, domain modeling, event storming, aggregate design,
-  bounded context mapping, versioned integration events, read models/CQRS, or PRD-driven strategic/tactical design.
-  并支持场景驱动验证（建模后用户场景核对）与泛语言持续管理（术语→代码一致性、防漂移）。
+description: >-
+  Transform product design documents (PRDs, flowcharts, prototypes, state machines, rules/AC) into a
+  domain-driven design model: per-context ubiquitous language/glossary, event storming, bounded contexts
+  and mapping, aggregates/entities/value objects, domain events and versioned integration events
+  (Name:vN), read models, PRD-model traceability. Use when the user asks for DDD, domain modeling,
+  event storming, aggregate design, bounded context mapping, versioned integration events, read
+  models/CQRS, or PRD-driven strategic/tactical design. Also supports scenario-driven validation
+  (post-modeling user scenario checks) and continuous ubiquitous-language management (term-to-code
+  consistency, anti-drift).
 metadata:
   version: "4.5.4"
   standard: agentskills.io

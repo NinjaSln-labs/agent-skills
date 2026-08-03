@@ -1,6 +1,6 @@
 ---
 name: ddd-contexts
-description: "设计限界上下文及其通用语言：边界、职责、词汇表、团队所有权与边界 ADR。" 使用场景：定义限界上下文时。
+description: "Design bounded contexts and their ubiquitous language: boundaries, responsibilities, glossary, team ownership, and boundary ADRs. Use when defining bounded contexts."
 risk: safe
 source: self
 tags: "[ddd, strategic, bounded-context, ubiquitous-language]"

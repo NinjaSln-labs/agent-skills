@@ -166,14 +166,19 @@ docker run --rm -v $(pwd):/work -w /work \
 
 ---
 
-## Installation into Claude Code
+## Installation
+
+The skill works in any agent that loads skills from a directory of `SKILL.md` files (Claude Code, Deep Code, Cursor, etc.). Install the skill directory into your tool's skills root:
 
 ```bash
+# Claude Code (example — auto-discovers on next session start)
 git clone https://github.com/maxrihter/claude-skill-visual-regression \
   ~/.claude/skills/pixel-perfect
-```
 
-Claude Code auto-discovers the skill on next session start.
+# Other tools: copy/symlink to their skills root instead
+#   Deep Code / interoperable:  ~/.agents/skills/pixel-perfect
+#   Cursor:                     ~/.cursor/skills/pixel-perfect  (or project .cursor/skills/)
+```
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ddd-openspec-bridge
-description: "将 DDD 战术建模工件映射为 OpenSpec 结构化规范，实现从领域建模到工程实现的平滑衔接。" 使用场景：将领域建模产物桥接为 OpenSpec 规格时。
+description: "Map DDD tactical modeling artifacts into OpenSpec structured specifications for a smooth handoff from domain modeling to engineering implementation. Use when bridging domain modeling outputs to OpenSpec specs."
 risk: safe
 source: self
 tags: "[ddd, implementation, openspec, sdd]"

@@ -1,13 +1,13 @@
 ---
 name: project-intake
-description: >
-  作为交接接收方接手项目：读取 HANDOFF.md 按 6 节恢复上下文（元信息/快照/下一步/即时操作/
-  引用索引/维护规则），执行接收方建议动作（git init → .gitignore → 首次提交 / 读 tickets /
-  向用户索取凭据），环境就绪检查（构建+启动），按验证点执行并回填闭环（ticket AC + 快照同步）。
-  与 project-handoff（交接方）为对称技能。当接手另一 agent/工具交接的项目、新 session 开始需要
-  快速恢复上下文、或用户说「继续之前的工作/接着做/接管项目」时使用。
-  Use when taking over a project handed off by another agent or tool, recovering
-  project context from HANDOFF.md, or continuing work started in another session.
+description: >-
+  Take over a project as the receiving side: read HANDOFF.md and restore context by its 6 sections
+  (metadata/snapshot/next steps/immediate ops/reference index/maintenance rules), execute suggested
+  receiver actions (git init -> .gitignore -> first commit / read tickets / request credentials from
+  user), verify environment readiness (build+start), and close the loop by executing verification points
+  (ticket AC + snapshot sync). Symmetric counterpart of project-handoff. Use when taking over a project
+  handed off by another agent or tool, recovering project context from HANDOFF.md, or continuing work
+  started in another session.
 ---
 
 # 项目对接（Project Intake）

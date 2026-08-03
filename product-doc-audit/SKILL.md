@@ -1,16 +1,14 @@
 ---
 name: product-doc-audit
-description: >
-  对产品文档集（0-1 各阶段文档）做三层审计：① 对照「0-1 交付文档全景」核查文档齐全性（必需/可选）+
-  ② 每类文档按独立审计规则（类型检查点 + 按类型选取的核心审查维度）逐份审查 + ③ 按文档间对齐关系
-  做交叉验证。产出就绪度评分（0-100）、Critical/Major/Minor 分级、权威裁决、可交付判断与含
-  问题/建议/验收标准的审计报告（PRODUCT-DOC-AUDIT.md），不修改被审文档。当用户要求审计/审查/评估
-  PRD、产品设计文档、spec、领域文档、上线文档集，做就绪度评估，或问「文档是否可交付开工」
-  「文档全吗 / 能开工吗」时使用。支持项目最终验收（四层
-  go/no-go——定义/质量/发布/AI 就绪——产品交付用户前）。
-  Use when auditing or cross-validating a set of product docs (PRDs, design docs, specs,
-  domain docs, launch docs) for readiness, grading, contradiction detection, or go/no-go
-  delivery decisions.
+description: >-
+  Three-layer audit of a product documentation set (0-1 phase docs): 1) check completeness against
+  the 0-1 delivery doc panorama (required/optional), 2) audit each doc by its type-specific checkpoints
+  and core review dimensions, 3) cross-validate alignment between docs. Produces a readiness score
+  (0-100), Critical/Major/Minor grading, authority rulings, deliverability judgment, and an audit report
+  (PRODUCT-DOC-AUDIT.md) without modifying audited docs. Supports final project acceptance (four-layer
+  go/no-go: definition/quality/release/AI readiness before delivery). Use when auditing or
+  cross-validating a set of product docs (PRDs, design docs, specs, domain docs, launch docs) for
+  readiness, grading, contradiction detection, or go/no-go delivery decisions.
 ---
 
 # 产品文档审计（Product Document Audit）
@@ -156,7 +154,7 @@ description: >
 | 产品文档(D0) ↔ 领域权威(A0) | 产品门禁 ↔ 实现权威；追溯矩阵（A9）锁定 | 实现漂移（Major/Critical） |
 | 成功指标(D8) ↔ 产品目标(D0) | 北极星/指标与产品目标、V1 范围一致 | 指标与目标脱节（Major） |
 | 成功指标(D8) ↔ launch 阶段 | 分阶段验证阈值与发布阶段一致 | 无法评估（Major） |
-| product-marketing ↔ README/launch | 一话定位/ICP 一致 | 定位打架（Major） |
+| product-marketing ↔ README/product-launch | 一话定位/ICP 一致 | 定位打架（Major） |
 | 设计文档(设计层) ↔ 领域权威(A0) | BC 清单/工具面/归属/事件计数以权威为准 | 双源冲突（Major，权威裁决兜底） |
 | 审计文档(D7/A8) ↔ 被审文档 | 修复状态/裁决闭合 | 旧问题未清（信息/Major） |
 | **既有审计结论 ↔ 被审文档** | **spot-check：对既有审计（如 D7 完结/A8 闭合）关键结论抽验 2-3 点，标注「采信/需复核」，不盲信「完结/闭合」** | 盲信旧审计导致盲区（Major） |

@@ -1,6 +1,6 @@
 ---
 name: ddd-scope
-description: "将模糊需求收敛为可执行的 DDD 建模输入：问题陈述、目标/非目标、约束、术语种子与风险清单。" 使用场景：收敛模糊需求为 DDD 建模输入时。
+description: "Converge vague requirements into executable DDD modeling inputs: problem statement, goals/non-goals, constraints, term seeds, and risk list. Use when converging fuzzy requirements into DDD modeling inputs."
 risk: safe
 source: self
 tags: "[ddd, discovery, scope]"

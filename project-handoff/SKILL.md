@@ -1,14 +1,14 @@
 ---
 name: project-handoff
-description: >
-  生成/更新项目工程交接文档（HANDOFF.md）——引用型 delta 结构：交接元信息 / 当前状态快照 /
-  下一步与验证点 / 即时操作（命令+坑）/ 引用索引 / 维护规则。只记「文档集没有的增量状态」，
-  既有知识一律引用不复制（防双源）；脱敏；维护规则含更新时机与回填约定。
-  当工具切换（如 Deep Code→Cursor）、跨 session 交接、委托其他 agent 继续工程、或项目到
-  重大里程碑需要记录进度时使用。
-  Use when handing off project work to another agent or tool, generating or updating a
-  HANDOFF document for cross-session or cross-tool continuation, or capturing project
-  delta state (progress, next steps, pitfalls) without duplicating existing docs.
+description: >-
+  Generate/update a project engineering handoff document (HANDOFF.md) — reference-style delta structure:
+  handoff metadata / current state snapshot / next steps and verification points / immediate operations
+  (commands + pitfalls) / reference index / maintenance rules. Records only the delta state not already
+  in the doc set; existing knowledge is referenced, never copied (anti-dual-source); desensitized;
+  maintenance rules include update timing and backfill conventions. Use when handing off project work to
+  another agent or tool, generating or updating a HANDOFF document for cross-session or cross-tool
+  continuation, or capturing project delta state (progress, next steps, pitfalls) without duplicating
+  existing docs.
 ---
 
 # 项目交接文档（Project Handoff）

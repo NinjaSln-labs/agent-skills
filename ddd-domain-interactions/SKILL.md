@@ -1,6 +1,6 @@
 ---
 name: ddd-domain-interactions
-description: "设计构造块间的协作机制：领域事件、领域服务、仓储接口与工厂。" 使用场景：设计领域服务、仓储、领域事件或工厂时。
+description: "Design collaboration mechanisms between building blocks: domain events, domain services, repository interfaces, and factories. Use when designing domain services, repositories, domain events, or factories."
 risk: safe
 source: self
 tags: "[ddd, tactical, events, services, repositories]"

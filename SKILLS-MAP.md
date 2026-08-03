@@ -1,7 +1,7 @@
-# 技能库全景图（79 技能——产品 0-1 全阶段模式）
+# 技能库全景图（86 技能——产品 0-1 全阶段模式）
 
 - 日期：2026-08-03 · 全量审计 79/79 合规
-- 覆盖：本仓库 `agent-skills` 的 79 个技能（可安装到 `~/.agents/skills/<name>`）
+- 覆盖：本仓库 `agent-skills` 的 86 个技能（可安装到 `~/.agents/skills/<name>`）
 - 模式：**产品 0-1 全生命周期**（发现 → 定义 → 设计 → 交付 → 上线 → 运营）+ 贯穿层（质量/工程/协作/技能基建）
 
 ---
@@ -15,7 +15,7 @@
 | 技能 | 能力 |
 |------|------|
 | user-research | 用户研究（招募/访谈/证据分级）|
-| research | 通用调研（广度→深度→核实——证据链）|
+| delegated-research | 通用调研（广度→深度→核实——证据链）|
 | discovery-interview-prep | 发现访谈准备（问题设计/防引导）|
 
 #### 1.2 问题定义（4）
@@ -117,8 +117,8 @@
 | ui-ux-pro-max | UI/UX 交互设计（设计系统/一致性）|
 | web-design-guidelines | Web 设计规范（排版/色彩/可及性——WebFetch 降级）|
 | ux-heuristics | 可用性启发式审计（Nielsen 10/Krug 定律/严重度评级——wondelai v1.6.0）|
-| typography | 专业排版规则（引号/破折号/间距/层级——ENFORCEMENT+AUDIT 双模式——Butterick）|
-| animation | 设计工程与动效决策（Emil Kowalski——动画框架/组件原则/隐形细节）|
+| ui-typography | 专业排版规则（引号/破折号/间距/层级——ENFORCEMENT+AUDIT 双模式——Butterick）|
+| ui-animation | 设计工程与动效决策（Emil Kowalski——动画框架/组件原则/隐形细节）|
 
 ### ④ 交付（18）—— 计划 / 实现 / 测试 / 质量
 
@@ -162,20 +162,20 @@
 
 | 技能 | 能力 |
 |------|------|
-| grilling / grill-me | 计划/设计质询（用户触发——执行前压力测试）|
+| plan-grilling / grill-me | 计划/设计质询（用户触发——执行前压力测试）|
 
 ### ⑤ 上线（1）
 
 | 技能 | 能力 |
 |------|------|
-| launch | 产品发布（ORB 框架 + 五阶段 + Product Hunt 策略 + 清单）|
+| product-launch | 产品发布（ORB 框架 + 五阶段 + Product Hunt 策略 + 清单）|
 
 ### ⑥ 运营（2）
 
 | 技能 | 能力 |
 |------|------|
 | product-marketing | 产品营销上下文（.agents/product-marketing.md 共享语境）|
-| copywriting | 营销文案（价值主张/情感/转化——15 节）|
+| marketing-copywriting | 营销文案（价值主张/情感/转化——15 节）|
 
 ### 贯穿层（12）—— 质量 / 工程 / 协作 / 技能基建
 
@@ -183,7 +183,7 @@
 
 | 技能 | 能力 |
 |------|------|
-| skill-description-audit | 技能描述审计（description↔正文交叉验证——自审只出报告）|
+| skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护——自审只出报告）|
 | product-doc-audit | 产品文档集审计（三层 + 就绪度评分 + 四层 go/no-go 最终验收）|
 
 #### P.2 安全（4）
@@ -199,7 +199,7 @@
 
 | 技能 | 能力 |
 |------|------|
-| sin-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）|
+| core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）|
 
 #### P.4 协作（5）
 
@@ -245,7 +245,7 @@
 │ ④ 交付     4.1 计划执行(3)  4.2 工程协作(1)                   │
 │            4.3 测试链(9·L1-L5)  4.4 质量审查(3)  4.5 质询(2)   │
 ├──────────────────────────────────────────────────────────────┤
-│ ⑤ 上线     launch · ⑥ 运营  product-marketing · copywriting  │
+│ ⑤ 上线     product-launch · ⑥ 运营  product-marketing · marketing-copywriting  │
 ├──────────────────────────────────────────────────────────────┤
 │ 贯穿       P.1 审计(2)  P.2 安全(4)  P.3 规则(1)  P.4 协作(5) │
 └──────────────────────────────────────────────────────────────┘
@@ -255,13 +255,13 @@
 
 ## 四、新项目启动引导（0-1 按阶段取用）
 
-1. **启动对齐**：P.3 `sin-rules` → 1.1 `research`（调研）
+1. **启动对齐**：P.3 `core-rules` → 1.1 `delegated-research`（调研）
 2. **发现**：1.1 `user-research` / `discovery-interview-prep` → 1.2 `problem-statement` → `jobs-to-be-done` → `proto-persona` → `customer-journey-map`；竞品走 1.3 `competitive-analysis-process`（编排 ×8）
 3. **定义**：2.1 `positioning-workshop` → `positioning-statement` → 2.2 `write-spec` / `prd-development` → `prd-driven-ddd`（主入口）→ 2.3 `to-tickets`（拆解）
 4. **设计**：3.1 `prd-driven-ddd` 链式调 `ddd-scope→discover→subdomains→contexts→context-map→aggregates→domain-interactions→openspec-bridge`；3.3 `architecture-patterns` + `codebase-design`；3.4 规范三件套；3.5 视觉 `frontend-design` + `ui-ux-pro-max`
 5. **交付**：4.1 `roadmap-planning` → `writing-plans` → `executing-plans` → 4.2 按 `git-workflow` 提交 → 4.3 `ddd-qa-chain`（L1-L5）→ 4.4 `code-review` → `verification-before-completion`
 6. **验收**：P.1 `product-doc-audit`（四层 go/no-go）+ P.2 安全四件套 + 3.2 `ddd-model-review` + 4.3 `k6-performance`（性能）
-7. **上线/交接**：⑤ `launch` + ⑥ `product-marketing` → P.4 `project-handoff` → 下一位 `project-intake`
+7. **上线/交接**：⑤ `product-launch` + ⑥ `product-marketing` → P.4 `project-handoff` → 下一位 `project-intake`
 
 **规则**：阶段产物格式对齐下阶段技能（PRD 的 AC → to-tickets 的 predicates）；交付前必跑质量链。
 
@@ -286,6 +286,10 @@
 - **derisk-measurement-advisor / business-health-diagnostic / acquisition-channel-advisor**（company-intel 引用）
 - **opportunity-solution-tree**（voice-of-customer-miner 引用）
 - **refactoring**（wondel Fowler 目录——无直源——现有 code-review/codebase-design/ddd-tactical-review 组合覆盖重构操作——需要时自建）
+- **discovery-process / problem-framing-canvas / customer-journey-mapping-workshop**（prd-development 引用——发现/问题框定输入，现有 user-research / discovery-interview-prep / problem-statement / customer-journey-map 组合覆盖）
+- **epic-hypothesis**（jobs-to-be-done / prd-development 引用——epic 假设结构化，现有 to-tickets 拆解覆盖）
+- **user-story / user-story-mapping / user-story-mapping-workshop**（problem-statement / proto-persona / customer-journey-map / prd-development 引用——用户故事拆解，现有 to-tickets 覆盖）
+- **prioritization-advisor / product-strategy-session**（roadmap-planning 引用——优先级与策略前置，现有 roadmap-planning 内置 RICE 框架 + positioning-statement 覆盖）
 
 **情况说明**：引用仅为参考方向（不阻塞独立使用）；实际需要时按需接入对应技能。
 
@@ -312,7 +316,7 @@
 | **规范三件套** | 3.4（ts/react/electron）| 前端工程规范（我们栈）|
 | **QA 全家当** | 4.3 全部 9 | 全量质量验证（交付前）|
 | **验收组合** | P.1 + P.2 + 3.2 | 文档 + 安全 + 模型——最终 go/no-go |
-| **上线组合** | ⑤ launch + ⑥ product-marketing + P.4 | 发布→营销→交接 |
+| **上线组合** | ⑤ product-launch + ⑥ product-marketing + P.4 | 发布→营销→交接 |
 
 ### 7.3 薄弱子类（1 技能——单体但关键）
 
@@ -320,8 +324,8 @@
 |------|------|--------|
 | 2.3 拆解立项 | to-tickets | ⭐⭐⭐ 需求→任务（AI-ready AC）|
 | 4.2 工程协作 | git-workflow | ⭐⭐ 提交一致性 |
-| ⑤ 上线 | launch | ⭐⭐⭐ 发布全流程 |
-| P.3 规则 | sin-rules | ⭐⭐⭐ 全局底线 |
+| ⑤ 上线 | product-launch | ⭐⭐⭐ 发布全流程 |
+| P.3 规则 | core-rules | ⭐⭐⭐ 全局底线 |
 
 **说明**：薄弱子类均为单体高价值（无需扩展——多则冗余）；4.2 可考虑补 pre-commit 钩子类（mattpocock setup-pre-commit——已见未接——低优先）。
 
@@ -330,3 +334,4 @@
 - **测试侧最厚**（4.3 九技能 + P.2 四件套）——质量保证优先——符合产品交付观
 - **上线/运营最薄**（1+2）——符合现状（项目未到上线期）——上线前再评估
 - **二级语义引用 6 个**（克制保持）——需要时按需接入
+

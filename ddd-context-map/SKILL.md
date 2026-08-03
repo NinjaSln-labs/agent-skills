@@ -1,6 +1,6 @@
 ---
 name: ddd-context-map
-description: "映射限界上下文间的关系与集成策略：模式选择、契约所有权、失败模式与版本策略。" 使用场景：映射限界上下文关系、集成模式或契约所有权时。
+description: "Map relationships and integration strategies between bounded contexts: pattern selection, contract ownership, failure modes, and versioning strategy. Use when mapping bounded-context relationships, integration patterns, or contract ownership."
 risk: safe
 source: self
 tags: "[ddd, strategic, context-map, integration]"

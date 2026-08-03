@@ -9,12 +9,34 @@
 | `interval_sec` | 否 | 默认 60 |
 | `tick_env` | 否 | 自定义 `AGENT_LOOP_TICK_*`；缺省由 id 推导 |
 | `poll_command` | 是 | 本机 shell，cwd=仓库根 |
-| `poll_adapter` | 否 | `python2 scripts/task_loop_adapters/xxx.py` |
+| `poll_adapter` | 否 | `python3 scripts/task_loop_adapters/xxx.py`（无 adapter 时 poll 直接输出标准契约，见模式 A）|
+| `progress_extract` | 否 | adapter 提取规则（见下）；缺省 = 兼容旧行为（认 `prog.offset` + 文本 `offset=`）|
 | `poll_env` | 否 | poll 时注入的环境变量 |
 | `poll_env_quiet` | 否 | loop 周期 poll（`--quiet`）额外 env |
 | `terminal_watch` | 否 | 见下 |
 | `status_when` | 否 | `done_field` / `done_value` / `running_if_terminal_match` |
 | `agent_prompt` | 否 | tick 时给 Agent 的指令 |
+
+### progress_extract（adapter 提取规则）
+
+三型进度任选一，`source=auto` 先试 JSON 再试文本正则：
+
+```json
+{
+  "source": "auto",
+  "offset_field": "progress.offset",
+  "total_field": "progress.total",
+  "pct_field": "pct",
+  "stage_field": "progress.stage",
+  "stage_total_field": "progress.stage_total",
+  "regex": ""
+}
+```
+
+- 数值型：`offset_field` / `total_field`（点路径取嵌套，如 `progress.offset`）
+- 百分比型：`pct_field`（0-100）
+- 阶段型：`stage_field` / `stage_total_field`
+- 文本型：`regex` 含数字捕获组（首个=当前，次个=总数）
 
 ### terminal_watch
 
@@ -30,18 +52,39 @@
 
 ---
 
-## 模式 A：`stdout_json`（无 adapter）
+## 标准契约（adapter 输出 / poll 直出）
 
-`poll_command` 直接输出标准 JSON：
+adapter 输出与「poll 直出」（模式 A）共用同一标准 JSON：
 
 ```json
 {
-  "poll_command": "python2 scripts/my_task_status.py --json",
+  "status": "running|done|idle|error",
+  "finished": false,
+  "chat_line": "给用户的一行摘要",
+  "progress": { "offset": 5, "total": 10 },
+  "metrics": {},
+  "log_tail": ["最近日志行"]
+}
+```
+
+- `progress` 三型任选：`{offset,total}`（数值）/ `{pct}`（百分比 0-100）/ `{stage,stage_total}`（阶段）
+- poll 直出时 `chat_line` 可选（缺省由 consumer 按 progress 拼）；`status` 可选（缺省由 `finished`/进度推导）
+- adapter 对已是标准契约的输入**原样透传**（仅补缺省字段）——见 `templates/adapter.template.py`
+
+---
+
+## 模式 A：`stdout_json`（无 adapter，推荐直出）
+
+`poll_command` 直接输出标准契约 JSON：
+
+```json
+{
+  "poll_command": "python3 scripts/my_task_status.py --json",
   "poll_adapter": ""
 }
 ```
 
-`my_task_status.py` 打印契约 JSON 即可。
+`my_task_status.py` 打印标准契约 JSON（含 `progress`，可选 `chat_line`/`status`）即可——无需 adapter。
 
 ---
 
@@ -52,19 +95,11 @@
 ```json
 {
   "poll_command": "cat reports/my_task/progress.json",
-  "poll_adapter": "python2 scripts/task_loop_adapters/my_task_adapter.py"
+  "poll_adapter": "python3 scripts/task_loop_adapters/my_task_adapter.py"
 }
 ```
 
-Adapter 模板逻辑：
-
-```python
-prog = json.loads(sys.stdin.read() or '{}')
-offset = int(prog.get('offset', 0))
-total = int(prog.get('total', 1))
-finished = bool(prog.get('finished'))
-chat_line = 'offset=%d/%d (%.1f%%)' % (offset, total, 100.0 * offset / total)
-```
+adapter 用 `progress_extract` 提取（config 驱动）：`offset_field: "offset"`、`total_field: "total"` 等——**adapter 代码零改动**，只配 config。缺省（无 `progress_extract`）兼容旧逻辑：认 `prog.offset`。
 
 ---
 
@@ -75,11 +110,12 @@ chat_line = 'offset=%d/%d (%.1f%%)' % (offset, total, 100.0 * offset / total)
 ```json
 {
   "poll_command": "tail -30 /tmp/my_task.log",
-  "poll_adapter": "python2 scripts/task_loop_adapters/my_task_adapter.py"
+  "poll_adapter": "python3 scripts/task_loop_adapters/my_task_adapter.py",
+  "progress_extract": { "source": "text", "regex": "processed (\\d+)/(\\d+)" }
 }
 ```
 
-Adapter：`re.search(r'processed (\d+)/(\d+)', raw)` → 拼 `chat_line`；无法解析时 `status=idle`，`chat_line` 为最后一行。
+adapter 按 `progress_extract.regex` 抽数字组（首个=当前，次个=总数）；无法解析时 `status=idle`，`chat_line` 为最后一行。
 
 ---
 
@@ -108,7 +144,7 @@ Config：
 ```json
 {
   "poll_command": "bash scripts/my_task_fetch.sh",
-  "poll_adapter": "python2 scripts/task_loop_adapters/my_task_adapter.py",
+  "poll_adapter": "python3 scripts/task_loop_adapters/my_task_adapter.py",
   "poll_env_quiet": {"MY_TASK_SKIP_HEAVY": "1"}
 }
 ```
@@ -148,7 +184,7 @@ Config：
 | 现象 | 处理 |
 |------|------|
 | `poll_command failed` | 单独运行 poll_command；查 SSH/路径 |
-| `poll_adapter failed` | `echo '<sample>' \| python2 ..._adapter.py` |
+| `poll_adapter failed` | `echo '<sample>' \| python3 ..._adapter.py <config_path>`（config_path 为 configs/task_loop/<task_id>.json，读 progress_extract）|
 | UnicodeDecodeError | adapter/poll 用 `io.open(..., encoding='utf-8')`；路径 `u8()` |
 | Chat 无进度 | 确认 loop 在跑、`notify_on_output` pattern 匹配 `tick_env` |
 | status 一直 idle | 检查 `terminal_watch.pattern` 或 progress 里 `finished` |

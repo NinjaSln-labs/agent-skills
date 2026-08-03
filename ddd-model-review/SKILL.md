@@ -1,6 +1,6 @@
 ---
 name: ddd-model-review
-description: "全局模型质量评估：一致性、完整性、耦合分析与反馈闭环触发。使用场景：领域模型质量评估、一致性/完整性/耦合检查、模型演进回溯时。"
+description: "Global model quality assessment: consistency, completeness, coupling analysis, and feedback-loop triggers. Use for domain model quality evaluation, consistency/completeness/coupling checks, or model evolution review."
 risk: safe
 source: self
 tags: "[ddd, validation, review, feedback-loop]"

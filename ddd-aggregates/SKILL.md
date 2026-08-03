@@ -1,6 +1,6 @@
 ---
 name: ddd-aggregates
-description: "从不变量出发设计聚合边界：聚合根、实体、值对象、事务边界与跨聚合一致性策略。" 使用场景：设计聚合边界、不变量、事务边界或跨聚合一致性时。
+description: "Design aggregate boundaries from invariants: aggregate roots, entities, value objects, transaction boundaries, and cross-aggregate consistency strategies. Use when designing aggregate boundaries, invariants, transaction boundaries, or cross-aggregate consistency."
 risk: safe
 source: self
 tags: "[ddd, tactical, aggregates, invariants]"
