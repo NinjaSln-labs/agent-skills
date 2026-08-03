@@ -1,14 +1,14 @@
 ---
 name: task-loop-progress
 description: >-
-  Scaffold config + adapter for the generic long-task progress loop (generate task_loop_scaffold.py /
-  task_loop_poll.py / task_loop_start.sh from templates/). Config-driven: the adapter extracts
-  numeric/percentage/stage three-type progress via progress_extract — zero code changes per task; a
-  poll that emits the standard contract directly can omit the adapter. Supports local files, remote SSH
-  fetch scripts, stdout JSON, and terminal output matching. Requires successful poll validation before
-  start; on AGENT_LOOP_TICK, Agent must post chat_line to Chat. Use when the user asks for a task loop,
-  progress loop, AGENT_LOOP_TICK, config+adapter templates, long-task polling, hooking up loop
-  monitoring, or provides a custom poll command.
+  长任务进度 Loop · Config + Adapter 生成: scaffold config + adapter for the generic long-task
+  progress loop (generate task_loop_scaffold.py / task_loop_poll.py / task_loop_start.sh
+  from templates/). Config-driven: adapter extracts numeric/percentage/stage progress via
+  progress_extract — zero code changes per task. Supports local files, remote SSH fetch,
+  stdout JSON, and terminal matching. Requires successful poll validation before start; on
+  AGENT_LOOP_TICK, Agent must post chat_line to Chat. Use when the user asks for a task
+  loop, progress loop, AGENT_LOOP_TICK, config+adapter templates, long-task polling, or
+  provides a custom poll command.
 ---
 
 # 长任务进度 Loop · Config + Adapter 生成
@@ -62,10 +62,10 @@ description: >-
 **优先**：若参考仓库已有 `scripts/task_loop_scaffold.py`，直接执行；否则按 [templates/](templates/) 手动生成（主路径）：
 
 ```bash
-# 1) 复制模板到目标仓库
+## 1) 复制模板到目标仓库
 cp templates/config.template.json   configs/task_loop/<task_id>.json   # 按 reference.md 填空
 cp templates/adapter.template.py    scripts/task_loop_adapters/<task_id>_adapter.py  # 按 mode 改解析逻辑
-# 2) （可选）remote_fetch 模式：复制 templates/fetch.template.sh 为 scripts/<task_id>_fetch.sh 并填主机/命令
+## 2) （可选）remote_fetch 模式：复制 templates/fetch.template.sh 为 scripts/<task_id>_fetch.sh 并填主机/命令
 # 3) （可选）参考仓库有 scaffold 时可用：
 #    python3 scripts/task_loop_scaffold.py \
 #      --task-id <task_id> \

@@ -1,13 +1,13 @@
 ---
 name: ui-ux-pro-max
 description: >-
-  UI/UX design intelligence for web and mobile. Searchable local database with 84 styles,
-  192 color palettes, 74 font pairings, 192 product types, 98 UX guidelines, 104 icon
-  entries, 16 GSAP motion presets, and 25 chart types across 22 stacks (React, Next.js,
-  Vue, Nuxt, Svelte, Astro, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, Jetpack
-  Compose, Angular, Laravel, JavaFX, WPF, WinUI, Avalonia, Uno Platform, UWP, Three.js,
-  and HTML/CSS). Use when designing, building, or reviewing UI: pages, components, color
-  schemes, typography, layout, accessibility, animation, or data visualization.
+  UI/UX Pro Max design intelligence for web and mobile: searchable local database with
+  styles, color palettes, font pairings, product types, UX guidelines, icons, GSAP motion
+  presets, and chart types across major stacks (React, Next.js, Vue, Nuxt, Svelte, Astro,
+  SwiftUI, React Native, Flutter, Tailwind, shadcn/ui, and more). Use when designing,
+  building, or reviewing UI: pages, components, color schemes, typography, layout,
+  accessibility, animation, or data visualization — including design system and
+  stack-guideline steps.
 ---
 
 # UI/UX Pro Max - Design Intelligence
@@ -167,13 +167,13 @@ Do not fabricate output. Instead:
 **User request:** "Make an AI search homepage." (stack detected as Next.js from `package.json`)
 
 ```bash
-# Step 2: design system
+## Step 2: design system
 python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "AI search tool modern minimal" --design-system -p "AI Search"
 
-# Step 3: supplement
+## Step 3: supplement
 python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "search loading ui-animation" --domain ux
 
-# Step 4: stack guidelines
+## Step 4: stack guidelines
 python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "suspense streaming bundle" --stack nextjs
 ```
 

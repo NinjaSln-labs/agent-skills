@@ -1,18 +1,12 @@
 ---
 name: ui-typography
 description: >-
-  > Professional typography rules for UI design, web applications, software interfaces,
-  and all screen-based text. Enforces timeless typographic correctness that LLMs
-  consistently get wrong: proper quote marks, dashes, spacing, hierarchy, and layout.
-  ENFORCEMENT MODE: When generating ANY HTML, CSS, React, JSX, or UI code containing
-  visible text, auto-apply every rule in this skill silently — do not ask, do not explain,
-  just produce correct typography. AUDIT MODE: When reviewing or improving existing
-  interfaces or legacy code, flag violations and provide fixes. Trigger on: any
-  HTML/CSS/React artifact creation, "build a landing page", "create a component", "design
-  a UI", "fix the typography", "make this look professional", "review this layout", web
-  design, presentation design, dashboard creation, document generation, or any task
-  producing visible text for humans. Even if the user doesn't mention typography, apply
-  these rules whenever generating UI output.
+  UI Typography: professional typography rules for UI design, web apps, software
+  interfaces, and screen-based text — quotes, dashes, spacing, hierarchy, layout.
+  ENFORCEMENT MODE: when generating any HTML/CSS/React/JSX UI with visible text,
+  auto-apply silently. AUDIT MODE: when reviewing interfaces, flag violations and fixes.
+  Trigger on UI/landing/component/dashboard/document generation or "fix the typography".
+  NOT for: marketing copywriting strategy, print-only typesetting, or non-UI prose.
 ---
 
 # UI Typography Skill

@@ -1,10 +1,13 @@
 ---
 name: visual-regression-tester
 description: >-
-  Implements visual regression testing with screenshot comparison, diff detection, and CI integration
-  using Playwright or Chromatic. Use when users request "visual testing", "screenshot testing",
-  "UI regression", "visual diff", or "Chromatic setup".
+  Visual Regression Tester: screenshot comparison, diff detection, and CI integration
+  using Playwright or Chromatic/Percy. Use when users request visual testing, screenshot
+  testing, UI regression, visual diff, or Chromatic setup. Prefer pixel-perfect for free
+  local flows; use this for Chromatic/Percy platform needs.
 ---
+
+# Visual Regression Tester
 
 **Note:** Use pixel-perfect by default (free); use this skill for Chromatic/Percy platform needs.
 
@@ -20,7 +23,7 @@ npm install -D @playwright/test
 npx playwright install
 ``` ### Configuration ```typescript
 // playwright.config.ts
-import { defineConfig, devices } from '@playwright/test'; export default defineConfig({ testDir: './tests/visual', testMatch: '**/*.visual.ts', fullyParallel: true, forbidOnly: !!process.env.CI, retries: process.env.CI ? 2 : 0, workers: process.env.CI ? 1 : undefined, reporter: [ ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }], ], // Snapshot configuration snapshotDir: './tests/visual/__snapshots__', snapshotPathTemplate: '{snapshotDir}/{testFilePath}/{arg}{ext}', expect: { toHaveScreenshot: { maxDiffPixels: 100, maxDiffPixelRatio: 0.01, threshold: 0.2, animations: 'disabled', }, toMatchSnapshot: { maxDiffPixelRatio: 0.01, }, }, use: { baseURL: 'http://localhost:3000', trace: 'on-first-retry', screenshot: 'only-on-failure', video: 'retain-on-failure', }, projects: [ { name: 'Desktop Chrome', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 }, }, }, { name: 'Desktop Firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 720 }, }, }, { name: 'Mobile Safari', use: { ...devices['iPhone 13'], }, }, { name: 'Tablet', use: { viewport: { width: 768, height: 1024 }, }, }, ], webServer: { command: 'npm run start', url: 'http://localhost:3000', reuseExistingServer: !process.env.CI, timeout: 120 * 1000, },
+import { defineConfig, devices } from '@playwright/test'; export default defineConfig({ testDir: './tests/visual', testMatch: '**/*.visual.ts', fullyParallel: true, forbidOnly: !!process.env.CI, retries: process.env.CI ? 2 : 0, workers: process.env.CI ? 1 : undefined, reporter: [ ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }], ], // Snapshot configuration snapshotDir: './tests/visual/__snapshots__', snapshotPathTemplate: '{snapshotDir}/{testFilePath}/{arg}{ext}', expect: { toHaveScreenshot: { maxDiffPixels: 100, maxDiffPixelRatio: 0.01, threshold: 0.2, animations: 'disabled', }, toMatchSnapshot: { maxDiffPixelRatio: 0.01, }, }, use: { baseURL: 'http://<app-host>:<port>', trace: 'on-first-retry', screenshot: 'only-on-failure', video: 'retain-on-failure', }, projects: [ { name: 'Desktop Chrome', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 }, }, }, { name: 'Desktop Firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 720 }, }, }, { name: 'Mobile Safari', use: { ...devices['iPhone 13'], }, }, { name: 'Tablet', use: { viewport: { width: 768, height: 1024 }, }, }, ], webServer: { command: 'npm run start', url: 'http://<app-host>:<port>', reuseExistingServer: !process.env.CI, timeout: 120 * 1000, },
 });
 ``` ### Visual Test Examples ```typescript
 // tests/visual/homepage.visual.ts

@@ -1,8 +1,9 @@
 ---
 name: k6-performance
 description: >-
-  Modern load testing with k6 including thresholds, scenarios, and custom metrics Use when
-  load/performance testing with k6 (thresholds, scenarios, metrics).
+  k6 performance testing: modern load testing with thresholds, scenarios, custom metrics,
+  and env-based BASE_URL. Use when load/performance testing with k6 (thresholds,
+  scenarios, metrics).
 ---
 
 # k6 Performance Testing Skill
@@ -73,7 +74,7 @@ export const options = {
   },
 };
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000';
+const BASE_URL = __ENV.BASE_URL || 'http://<app-host>:<port>';
 
 export default function () {
   group('Homepage', () => {
@@ -433,7 +434,7 @@ k6 run --out json=results/output.json scripts/load-test.js
 k6 cloud scripts/load-test.js
 
 # With InfluxDB output
-k6 run --out influxdb=http://localhost:8086/k6 scripts/load-test.js
+k6 run --out influxdb=http://<influx-host>:8086/k6 scripts/load-test.js
 
 # Override VUs and duration
 k6 run --vus 50 --duration 5m scripts/smoke-test.js

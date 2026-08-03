@@ -1,13 +1,11 @@
 ---
 name: project-intake
 description: >-
-  Take over a project as the receiving side: read HANDOFF.md and restore context by its 6 sections
-  (metadata/snapshot/next steps/immediate ops/reference index/maintenance rules), execute suggested
-  receiver actions (git init -> .gitignore -> first commit / read tickets / request credentials from
-  user), verify environment readiness (build+start), and close the loop by executing verification points
-  (ticket AC + snapshot sync). Symmetric counterpart of project-handoff. Use when taking over a project
-  handed off by another agent or tool, recovering project context from HANDOFF.md, or continuing work
-  started in another session.
+  项目对接 (Project Intake): take over a project as the receiving side — read HANDOFF.md and
+  restore context by its 6 sections (metadata/snapshot/next steps/immediate ops/reference
+  index/maintenance rules), execute suggested receiver actions (git init → .gitignore →
+  first commit / read tickets / request credentials). Use when receiving a handoff,
+  onboarding onto an existing repo, or resuming from HANDOFF.md.
 ---
 
 # 项目对接（Project Intake）

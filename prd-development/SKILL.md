@@ -1,9 +1,12 @@
 ---
 name: prd-development
 description: >-
-  Build a structured PRD that connects problem, users, solution, and success criteria. Use
-  when turning discovery notes into an engineering-ready document for a major initiative.
+  PRD development: build a structured Product Requirements Document that connects problem,
+  users, solution, and success criteria. Use when turning discovery notes into an
+  engineering-ready document for a major initiative or feature.
 ---
+
+# PRD Development
 
 ## Purpose
 Guide product managers through structured PRD (Product Requirements Document) creation by orchestrating problem framing, user delegated-research synthesis, solution definition, and success criteria into a cohesive document. Use this to move from scattered notes and Slack threads to a clear, comprehensive PRD that aligns stakeholders, provides engineering context, and serves as a source of truth—avoiding ambiguity, scope creep, and the "build what's in my head" trap.
@@ -37,7 +40,7 @@ A PRD (Product Requirements Document) is a structured document that answers:
 ### PRD Structure (Standard Template)
 
 ```markdown
-# [Feature/Product Name] PRD
+## [Feature/Product Name] PRD
 
 ## 1. Executive Summary
 - One-paragraph overview (problem + solution + impact)

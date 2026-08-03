@@ -1,9 +1,9 @@
 ---
 name: market-landscape-scan
 description: >-
-  Map a market's segments, players, substitutes, and whitespace with cited evidence. Use
-  when entering or re-evaluating a market before sizing, positioning, or picking
-  competitors to study.
+  Market Landscape Scan: map a market's segments, players, substitutes, and whitespace
+  with cited evidence. Use when entering or re-evaluating a market before sizing,
+  positioning, or picking competitors to study.
 ---
 
 # Market Landscape Scan

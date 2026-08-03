@@ -1,14 +1,14 @@
 ---
 name: product-doc-audit
 description: >-
-  Three-layer audit of a product documentation set (0-1 phase docs): 1) check completeness against
-  the 0-1 delivery doc panorama (required/optional), 2) audit each doc by its type-specific checkpoints
-  and core review dimensions, 3) cross-validate alignment between docs. Produces a readiness score
-  (0-100), Critical/Major/Minor grading, authority rulings, deliverability judgment, and an audit report
-  (PRODUCT-DOC-AUDIT.md) without modifying audited docs. Supports final project acceptance (four-layer
-  go/no-go: definition/quality/release/AI readiness before delivery). Use when auditing or
-  cross-validating a set of product docs (PRDs, design docs, specs, domain docs, launch docs) for
-  readiness, grading, contradiction detection, or go/no-go delivery decisions.
+  产品文档审计 (Product Document Audit): three-layer audit of a product documentation set (0-1
+  phase docs): 1) completeness against the 0-1 delivery doc panorama (required/optional),
+  2) each doc by type-specific checkpoints and core review dimensions, 3) cross-validate
+  alignment. Produces readiness score (0-100), Critical/Major/Minor grading, authority
+  rulings, deliverability judgment, and PRODUCT-DOC-AUDIT.md without modifying audited
+  docs. Supports final project acceptance (four-layer go/no-go). Use when auditing or
+  cross-validating product docs (PRDs, design docs, specs, domain docs, launch docs) for
+  readiness, grading, contradictions, or go/no-go delivery decisions.
 ---
 
 # 产品文档审计（Product Document Audit）
@@ -239,7 +239,7 @@ description: >-
 ## 报告模板
 
 ```
-# 产品文档审计报告：<文档集名>
+## 产品文档审计报告：<文档集名>
 
 - 审计对象：`<文档集目录>`（N 份：…）
 - 审计日期：YYYY-MM-DD

@@ -1,6 +1,9 @@
 ---
 name: ddd-scope
-description: "Converge vague requirements into executable DDD modeling inputs: problem statement, goals/non-goals, constraints, term seeds, and risk list. Use when converging fuzzy requirements into DDD modeling inputs."
+description: >-
+  DDD scope: converge vague requirements into executable DDD modeling inputs — problem
+  statement, goals/non-goals, constraints, term seeds, and risk list. Use when converging
+  fuzzy requirements into DDD modeling inputs or defining modeling scope.
 risk: safe
 source: self
 tags: "[ddd, discovery, scope]"

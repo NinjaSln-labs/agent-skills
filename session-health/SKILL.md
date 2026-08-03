@@ -1,16 +1,13 @@
 ---
 name: session-health
 description: >-
-  Assess the health of the current AI coding tool (Deep Code / Cursor, etc.) session: context
-  compaction/condensation ratio, message count, context occupation and its absolute value (i.e.
-  per-turn history input cost), combined with work nature (whether it depends on early-session content
-  and its recorded completeness — e.g. large refactors/optimizations touching earlier changes),
-  recoverability (git commit status / handoff doc sync / runtime state), and token economics
-  (occupation absolute value x estimated remaining turns) to judge switch cost. Recommend a new session
-  only when continuation cost is high and switch cost is low; otherwise explain why continuing is better.
-  Reads tool session storage via the tool-adapter layer (read-only; never modifies session files). Use
-  when the user mentions context compaction, starting a new session, high context overhead, or long-session
-  continuation (e.g. 'go' / 'keep going'); active+passive trigger, states reasons when healthy.
+  会话健康度评估 (Session Health): assess the current AI coding tool session — context
+  compaction/condensation ratio, message count, context occupation cost, work nature,
+  recoverability (git/handoff/runtime), and token economics — to judge continue vs
+  new-session. Reads tool session storage read-only. Use when the user mentions context
+  compaction, starting a new session, high context overhead, or long-session continuation
+  (e.g. "go" / "keep going"). NOT for: auditing skill descriptions, full-codebase
+  architecture analysis, or product-doc set audits.
 ---
 # 会话健康度评估（Session Health）
 在长会话中评估「继续 vs 新开」的得失，判断是否该新开会话。**只评估不修改**任何会话文件。

@@ -1386,7 +1386,7 @@ export default defineConfig({
   retries: 0, // Accessibility violations should not be retried
   workers: 4, // Accessibility tests can run in parallel
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'http://<app-host>:<port>',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -1426,7 +1426,7 @@ export default defineConfig({
 
 ```bash
 # .env.test
-BASE_URL=http://localhost:3000
+BASE_URL=http://<app-host>:<port>
 A11Y_STRICT_MODE=true
 A11Y_FAIL_ON_MODERATE=false
 A11Y_TAGS=wcag2a,wcag2aa,wcag21a,wcag21aa

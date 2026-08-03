@@ -6,4 +6,9 @@ description: >-
   idea before committing to it.
 ---
 
-Run a `/plan-grilling` session.
+# Grill Me
+
+Thin entry point. Immediately follow **`plan-grilling`**:
+
+1. Load and execute the `plan-grilling` skill on the user's plan/decision/idea.
+2. Do not invent a separate workflow — delegate entirely to `plan-grilling`.

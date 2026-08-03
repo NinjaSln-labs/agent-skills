@@ -1,8 +1,9 @@
 ---
 name: security-scan
 description: >-
-  Scan code for security vulnerabilities including OWASP Top 10, secrets, and
-  misconfigurations. Use when you need comprehensive security analysis of a codebase.
+  Security scan: scan code for security vulnerabilities including OWASP Top 10, secrets,
+  and misconfigurations, with severity thresholds. Use when you need comprehensive
+  security analysis of a codebase.
 ---
 
 # Security Scan

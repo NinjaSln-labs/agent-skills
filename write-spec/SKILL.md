@@ -9,7 +9,7 @@ description: >-
 
 # Write Spec
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).
+> Placeholders like `$ARGUMENTS` are filled from the user invocation; no external connectors file is required for this skill.
 
 Write a feature specification or product requirements document (PRD).
 

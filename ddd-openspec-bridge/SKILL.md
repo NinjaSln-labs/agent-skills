@@ -29,7 +29,7 @@ date_added: "2026-05-11"
 - **可选**：
   - 发现阶段事件流与边界线索（来自 `ddd-discover`）
   - 模型验证报告（来自 `ddd-model-review`）
-- **执行标准**：映射逻辑必须遵循 [ddd-openspec-mapping.md](../../docs/ddd-openspec-mapping.md) 中的标准定义。
+- **执行标准**：映射逻辑必须遵循 [ddd-openspec-mapping.md](references/ddd-openspec-mapping.md) 中的标准定义。
 
 ## 流程
 
@@ -39,13 +39,13 @@ date_added: "2026-05-11"
    - 将本次变更涉及的 Capabilities 写入 What Changes；按 `ddd-subdomains` 的分类组织优先级：**Core 子域**须全量 Scenario 化，**Generic 子域**可引用已有规范或外部组件。
    - 在 Impact 中列出受影响的 Capabilities 与聚合变更清单；在 Goals 中定义成功标准（SLO / 验收指标）。
 3. **建立 Bounded-Context 目录**：按 `ddd-contexts` 的上下文目录，在 `specs/<bounded-context>/<capability>/spec.md` 下建立每个能力的规范文件。**禁止使用扁平的 `specs/domain-model/` 目录**——它会破坏限界上下文与领域目录的战略对齐。
-4. **编写 Requirement 与 Scenario**（严格遵循 [ddd-openspec-mapping.md §2.1](../../docs/ddd-openspec-mapping.md) 的映射方向）：
+4. **编写 Requirement 与 Scenario**（严格遵循 [ddd-openspec-mapping.md §2.1](references/ddd-openspec-mapping.md) 的映射方向）：
    - **Requirement** ← `ddd-domain-interactions` 中的命令与领域服务；一个 Requirement 对应**一条可独立验证的业务能力**，Scenario 数 ≤ 5 且不跨聚合根。
    - **Scenario** ← `ddd-aggregates` 中的聚合行为与不变量，以 Given/When/Then 描述；P0 级不变量必须有对应 Scenario。
    - **领域事件**作为副作用写在 Scenario 的 Then/And 子句（如 “And 发布 OrderPlaced 事件”）。
    - **业务规则优先**：Scenario 只描述业务规则与不变量，不得渗入数据库、HTTP、ORM、缓存等技术细节。
 5. **通用语言校验**：对照 `ddd-contexts` 的词汇表，确保 `proposal.md` 与所有 `spec.md` 中的术语均落在词汇表内；未收录术语必须先回写词汇表或改用同义词。
-6. **设计技术方案（`design.md`）**：整合 `ddd-context-map` 的集成模式与 `ddd-domain-interactions` 的协作机制；描述分层架构映射、跨上下文翻译（ACL）、事件发布/消费范式（Outbox 模式、幂等键、一次事务仅修改一个聚合——见 [ddd-openspec-mapping.md 附录 A](../../docs/ddd-openspec-mapping.md)）。
+6. **设计技术方案（`design.md`）**：整合 `ddd-context-map` 的集成模式与 `ddd-domain-interactions` 的协作机制；描述分层架构映射、跨上下文翻译（ACL）、事件发布/消费范式（Outbox 模式、幂等键、一次事务仅修改一个聚合——见 [ddd-openspec-mapping.md 附录 A](references/ddd-openspec-mapping.md)）。
 7. **拆解开发任务（`tasks.md`）**：按 Spec 依赖顺序（Domain Model → Repository → Application Service → API/集成）拆解任务，每个任务关联对应的 Requirement 或 Scenario 作为验收标准。
 
 ## 输出
@@ -87,4 +87,4 @@ date_added: "2026-05-11"
 请输出 proposal.md, design.md 以及 specs/booking-context/booking/spec.md 的核心 Requirement 与 Scenario 片段。
 ```
 
-> 完整的 Requirement / Scenario 写法示范见 [ddd-openspec-mapping.md §5](../../docs/ddd-openspec-mapping.md)（以“用户注册”为例的端到端最小可行示例）。
+> 完整的 Requirement / Scenario 写法示范见 [ddd-openspec-mapping.md §5](references/ddd-openspec-mapping.md)（以“用户注册”为例的端到端最小可行示例）。

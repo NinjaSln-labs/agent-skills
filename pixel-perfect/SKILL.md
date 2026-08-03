@@ -10,6 +10,8 @@ description: >-
   skill), or asks about accessibility.
 ---
 
+# Pixel Perfect
+
 **Note:** Use pixel-perfect by default (free); use visual-regression-tester when you need Chromatic/Percy platform integration.
 
 ## Step 1: Check State
@@ -20,7 +22,7 @@ Run all three commands, then use the table to choose your workflow.
 
 ls playwright.config.ts 2>/dev/null && echo "CONFIG_EXISTS" || echo "CONFIG_MISSING"
 find snapshots/ -name "*.png" 2>/dev/null | head -1 | grep -q . && echo "BASELINES_EXIST" || echo "BASELINES_MISSING"
-curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:3000 2>/dev/null | grep -q "^2" && echo "SERVER_OK" || echo "NO_SERVER"
+curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://<app-host>:<port> 2>/dev/null | grep -q "^2" && echo "SERVER_OK" || echo "NO_SERVER"
 ``` > If your dev server runs on a port other than 3000, adjust the URL in the curl command above. | Config | Baselines | Server | → Do this |
 |--------|-----------|--------|-----------|
 | CONFIG_MISSING | any | any | **→ Workflow A** (Full Setup) |
@@ -53,19 +55,19 @@ If MISSING: run `npm init -y` first. If EXISTS: skip — do not re-initialize. *
 npm install -D @playwright/test
 npx playwright install chromium
 ```
-If this fails: check `node -v` — requires v18+. **Step 3.** Ask the user: "What URL does your dev server run on? (e.g. http://localhost:3000)"
+If this fails: check `node -v` — requires v18+. **Step 3.** Ask the user: "What URL does your dev server run on? (e.g. http://<app-host>:<port>)"
 Wait for their answer. Save it — you will use it in Step 4 and in Workflow B. **Step 4.** Write the config file. Use the Read tool to load the template:
 Read file: `references/examples/playwright.config.ts`
 Write it to: `./playwright.config.ts`
-If the user's URL differs from `http://localhost:3000`, use the Edit tool to find the exact string `'http://localhost:3000'` inside `playwright.config.ts` and replace it with the user's URL. **Step 5.** Write the test file:
+If the user's URL differs from `http://<app-host>:<port>`, use the Edit tool to find the exact string `'http://<app-host>:<port>'` inside `playwright.config.ts` and replace it with the user's URL. **Step 5.** Write the test file:
 Read file: `references/examples/visual.spec.ts`
 Write it to: `./tests/visual.spec.ts` **Step 6.** Verify setup is functional:
 ```bash
 npx playwright test --list
 ```
-If this errors or prints `0 tests`: show the output to the user and stop. Do not proceed to Workflow B. **Optional:** If the project uses custom fonts, JS animations (GSAP, Framer Motion), or lazy-loaded images, also install the fixture now — see **Workflow E** Steps 1–2. **Workflow A complete** → continue to **Workflow B**. --- ## Workflow B: Capture Baseline **Precondition:** CONFIG_EXISTS + BASELINES_MISSING + SERVER_OK. (Or: just completed Workflow A.) **Exit condition:** `find snapshots/ -name "*.png" | wc -l` prints a non-zero number and snapshots are committed to git. **Step 1.** Verify the dev server responds. Use the `baseURL` from `playwright.config.ts` (default: `http://localhost:3000`). Replace the URL in the command if yours differs:
+If this errors or prints `0 tests`: show the output to the user and stop. Do not proceed to Workflow B. **Optional:** If the project uses custom fonts, JS animations (GSAP, Framer Motion), or lazy-loaded images, also install the fixture now — see **Workflow E** Steps 1–2. **Workflow A complete** → continue to **Workflow B**. --- ## Workflow B: Capture Baseline **Precondition:** CONFIG_EXISTS + BASELINES_MISSING + SERVER_OK. (Or: just completed Workflow A.) **Exit condition:** `find snapshots/ -name "*.png" | wc -l` prints a non-zero number and snapshots are committed to git. **Step 1.** Verify the dev server responds. Use the `baseURL` from `playwright.config.ts` (default: `http://<app-host>:<port>`). Replace the URL in the command if yours differs:
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+curl -s -o /dev/null -w "%{http_code}" http://<app-host>:<port>
 ```
 Expected: `200`. If not 200: STOP. Tell the user the server is not responding and ask them to start it. **Step 2.** Check if Docker is available:
 ```bash
@@ -133,7 +135,7 @@ Replace `TODO_REPLACE_WITH_KEY_SELECTOR` with the actual selector for the main c
 Read file: `.github/workflows/visual-tests.yml`
 Write it to: `./.github/workflows/visual-tests.yml` Read file: `.github/workflows/update-snapshots.yml`
 Write it to: `./.github/workflows/update-snapshots.yml` **Step 2.** Configure `BASE_URL` for CI. Ask the user:
-> "What URL should CI run visual tests against? (e.g. https://staging.example.com)" Then add it as a repository secret in GitHub (**Settings → Secrets and variables → Actions → New repository secret**, name: `BASE_URL`). The workflows already read `BASE_URL` from secrets — no edits needed. If the user has no staging URL yet (tests run against localhost only), skip this step. CI will fail at the network step until a server is available. **Key requirements:**
+> "What URL should CI run visual tests against? (e.g. https://staging.example.com)" Then add it as a repository secret in GitHub (**Settings → Secrets and variables → Actions → New repository secret**, name: `BASE_URL`). The workflows already read `BASE_URL` from secrets — no edits needed. If the user has no staging URL yet (tests run against a local app host only), skip this step. CI will fail at the network step until a server is available. **Key requirements:**
 - Baselines must be committed to git before running in CI
 - `CI=true` is set automatically by GitHub Actions
 - Both workflows use `--ipc=host` to prevent Chromium crashes in Docker

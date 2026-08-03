@@ -1,9 +1,9 @@
 ---
 name: web-design-guidelines
 description: >-
-  Review UI code for Web Interface Guidelines compliance. Use when asked to "review my
-  UI", "check accessibility", "audit design", "review UX", or "check my site against best
-  practices".
+  Review UI code for Web Interface Guidelines compliance (Vercel Labs guidelines via
+  WebFetch or curl). Use when asked to "review my UI", "check accessibility", "audit
+  design", "review UX", or "check my site against best practices".
 ---
 
 # Web Interface Guidelines

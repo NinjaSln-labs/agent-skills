@@ -5,6 +5,8 @@ description: >-
   when aligning stakeholders on a new product, feature, or strategic bet.
 ---
 
+# Press Release
+
 ## Purpose
 Create a visionary press release following Amazon's "Working Backwards" methodology to define and communicate a product or feature before building it. Use this to align stakeholders on the customer value proposition, clarify the problem being solved, and test if the product story resonates—treating the press release as a forcing function for clarity and customer-centricity.
 

@@ -6,6 +6,8 @@ description: >-
   gathered, or reading legwork delegated to a background agent.
 ---
 
+# Delegated Research
+
 Spin up a **background agent** to do the delegated-research, so you keep working while it reads.
 
 Its job:

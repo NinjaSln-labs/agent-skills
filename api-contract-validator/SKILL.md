@@ -586,7 +586,7 @@ public class ApiContractTest {
 
     @BeforeAll
     static void setup() {
-        RestAssured.baseURI = System.getProperty("api.baseUrl", "http://localhost:3000");
+        RestAssured.baseURI = System.getProperty("api.baseUrl", "http://<app-host>:<port>");
     }
 
     @Test

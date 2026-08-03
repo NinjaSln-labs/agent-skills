@@ -1,6 +1,10 @@
 ---
 name: ddd-aggregates
-description: "Design aggregate boundaries from invariants: aggregate roots, entities, value objects, transaction boundaries, and cross-aggregate consistency strategies. Use when designing aggregate boundaries, invariants, transaction boundaries, or cross-aggregate consistency."
+description: >-
+  Design DDD aggregates and aggregate boundaries from invariants: aggregate roots,
+  entities, value objects, transaction boundaries, and cross-aggregate consistency
+  strategies. Use when designing aggregate boundaries, invariants, transaction boundaries,
+  or cross-aggregate consistency.
 risk: safe
 source: self
 tags: "[ddd, tactical, aggregates, invariants]"

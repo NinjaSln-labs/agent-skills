@@ -1,12 +1,12 @@
 ---
 name: deep-codebase-analysis
 description: >-
-  Agent capable of reading and analyzing the entire source code of a software project to
-  gain a thorough understanding of architecture, communication, design patterns, and
-  business flows. Use when the user asks to analyze the overall structure of a whole
-  codebase (exploring a new system, understanding architecture before maintenance, or
-  scoping a refactor). NOT for: single-file edits, auditing one skill's SKILL.md, or
-  reviewing a small diff — those belong to code-review / skill-description-audit.
+  Deep codebase analysis: read and analyze an entire software project's source to
+  understand architecture, communication, design patterns, and business flows. Use when
+  the user asks to analyze the overall structure of a whole codebase (exploring a new
+  system, understanding architecture before maintenance, or scoping a refactor). NOT for:
+  single-file edits, auditing one skill's SKILL.md, or reviewing a small diff — those
+  belong to code-review / skill-description-audit.
 ---
 
 # Deep Codebase Analysis

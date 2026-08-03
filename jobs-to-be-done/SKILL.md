@@ -5,6 +5,8 @@ description: >-
   unmet needs, repositioning a product, or improving discovery and messaging.
 ---
 
+# Jobs To Be Done
+
 ## Purpose
 Systematically explore what customers are trying to accomplish (functional, social, emotional jobs), the pains they experience, and the gains they seek. Use this framework to uncover unmet needs, validate product ideas, and ensure your solution addresses real motivations—not just surface-level feature requests.
 

@@ -1,16 +1,17 @@
 ---
 name: skill-description-audit
 description: >-
-  User-level personal skill (canonical source in agent-skills). Cross-validation audit of an Agent
-  Skill's SKILL.md description vs body: checks frontmatter description compliance, capability claims
-  matching the body, body non-emptiness (except thin-allowlist), trigger-word sufficiency, and volatile-data externalization (reference-table
-  layering — body must not hardcode pointing data). Generates an audit report with
-  Problems/Recommendations/Acceptance-Criteria in the target skill's directory. Does not modify the
-  audited SKILL.md. Use when auditing or cross-validating a skill description against SKILL.md body,
-  checking Agent Skills description compliance, or generating a description audit report (problems,
-  recommendations, acceptance criteria) without editing the skill.
+  技能描述交叉验证审计 (Skill Description Audit). User-level personal skill (canonical source in
+  agent-skills). Cross-validation audit of an Agent Skill's SKILL.md description vs body:
+  frontmatter compliance, capability claims matching the body, body non-emptiness (except
+  thin-allowlist), trigger-word sufficiency, old-name residue via renames.yaml
+  (boundary-aware, meta-mention filtered), H1 extraction that skips fenced code, and
+  volatile-data externalization. Generates Problems/Recommendations/Acceptance-Criteria
+  report in the target skill directory. Does not modify the audited SKILL.md. Use when
+  auditing or cross-validating a skill description against SKILL.md body. NOT for:
+  auditing product doc sets (PRDs/specs/launch docs) — use product-doc-audit.
 metadata:
-  version: "1.3.0"
+  version: "1.3.3"
   standard: agentskills.io
   scope: user
   patches:
@@ -19,6 +20,9 @@ metadata:
     - "description 标明：用户级个人技能；真源仍存 agent-skills"
     - "v1.2.0：新增数据外置检查维度（易变数据分层——正文不写死指向性数据，按稳定性定刷新频率）"
     - "v1.3.0：正文非空硬项（thin-allowlist 例外）；旧名检查读 renames.yaml"
+    - "v1.3.1：description 显式写入 renames.yaml 旧名检查 + NOT for product-doc-audit"
+    - "v1.3.2：旧名检查边界匹配 + 元提及误报过滤（复合 slug / 审计反例行）"
+    - "v1.3.3：正文能力抽取跳过 fenced code（`#` 注释不当 H1）；示例主机用占位符不计本机硬编码"
 ---
 
 # 技能描述交叉验证审计（Skill Description Audit）
@@ -92,7 +96,7 @@ metadata:
 | 第三人称 | 不以「我/你能」口吻写描述 |
 | `name` | ≤64；`[a-z0-9-]+`；与目录名一致（不一致标 ⚠️） |
 | YAML | frontmatter 可解析；`description` 折叠合法 |
-| **结构** | frontmatter **闭合**（`---` 闭合存在）；description 折叠块**不吞正文**（描述到正文前结束——实测 62 技能中招，防再次发生） |
+| **结构** | frontmatter **闭合**（`---` 闭合存在）；description 折叠块**不吞正文**（描述到正文前结束——曾批量中招，防再次发生） |
 | **语言一致性** | description 语言统一（本库规范：**英文**）；不中英混杂、不夹「中文触发：」类双语标记 |
 | **正文非空** | 第二个 `---` 之后正文长度 > 0；例外仅 `thin-allowlist.txt`（如 `grill-me`）。空正文 → **[高]**（不可执行） |
 
@@ -106,14 +110,22 @@ metadata:
 |--------|------|
 | 单段泛名（`animation`/`research`/`launch` 类——语义指向弱、匹配易误触发）| ⚠️ **[低]** 建议改名或 description 加限定 |
 | 工具/个人绑定名（`deepcode-*`/`cursor-*`/用户名）| ⚠️ **[中]** 建议去绑定（跨工具通用） |
-| 引用已改名旧名（description/正文出现已更名的技能名）| ⚠️ **[中]** 建议更新为新名 |
 | 引用已改名旧名（description **或正文**出现已更名的技能名——正文层是 description 审计盲区，改名后必须补查）| ⚠️ **[中]** 建议更新为新名 |
+
+**旧名残留匹配（读 `renames.yaml`，防误报）：**
+
+1. **只认技能引用形**：精确反引号 slug `` `old` ``；路径段 `(?<![A-Za-z0-9_-])old/SKILL` 或 `../old/`；`skill(s) old`；Markdown 链 `[old](`。  
+2. **禁止子串命中**：`company-delegated-research/SKILL`、`product-launch` 等复合 slug **不**算旧名残留（勿把复合段里的 `research`/`launch` 当独立技能引用）。  
+3. **元提及过滤**：同行含「单段泛名 / 旧名 / renames.yaml / 已改名 / 语义指向弱 / 旧名残留 / 禁止子串 / 复合 slug / 反例 / 误报」等审计说明语 → **不计**残留（本技能表内反例行与本条规则说明属此类）。  
+4. 仅当存在至少一处**非元提及**的真实引用 → 报 **[中]**。
 
 ### 4. 正文能力清单（审计员抽取）
 
 从正文归纳「描述应否覆盖」的条目，优先：
 
-1. **标题/角色/何时使用** 中的核心任务  
+**抽取前先剥离 fenced code**（` ``` `…` ``` `）：围栏内行首 `# …` 是注释/示例，**不得**当作 Markdown H1/标志性能力（曾误报 `config-scan`/`secrets-scan`/`cicd-pipeline` 等）。
+
+1. **标题/角色/何时使用** 中的核心任务（仅围栏外 `#` / 首个技能标题）  
 2. **不可妥协原则 / 强制 / 必须交付**  
 3. **工作流步骤名** 与关键产出物  
 4. `metadata.patches`（若有）中的标志性约束  
@@ -131,7 +143,7 @@ metadata:
 
 | 检查项 | 通过条件 |
 |--------|----------|
-| 识别易变数据 | 扫描正文：模型窗口/价格/API 端点与 ID/版本号/外部工具行为/统计数字等**指向性数据** |
+| 识别易变数据 | 扫描正文：模型窗口/价格/API 端点与 ID/版本号/外部工具行为/统计数字等**指向性数据**；示例主机须用 `$BASE_URL` / `http://<app-host>:<port>` 等占位符——裸 `localhost`/`127.0.0.1` 计指向性 |
 | 外置状态 | 该类数据应外置 `references/` 表（每表含 `lastUpdated` + `refreshInterval` + 置信度列）；SKILL.md 仅「查表」引用 |
 | 刷新频率 | `refreshInterval` **按数据稳定性定**（快变 30 天 / 中变 60 天 / 慢变 90-180 天），不一律一刀切 |
 | 防双源 | 正文示例不写死具体数值（写死 → 建议改查表引用）；description 不含易变数值 |
@@ -288,9 +300,11 @@ metadata:
 - 报告写到其他目录或聊天里了事（除非用户只要口头结论——仍应默认落盘报告）
 - 漏检正文写死的易变数据（模型窗口/价格/ID——应外置 references/，防过期误导）
 - 数据外置检查只查「有没有 references/」，不核对 lastUpdated/refreshInterval/置信度机制
-- **不检查 frontmatter 闭合 / description 吞正文**（结构破坏——实测 62 技能中招，属 [高] 级缺陷）
+- **不检查 frontmatter 闭合 / description 吞正文**（结构破坏——曾批量中招，属 [高] 级缺陷）
 - **放过 WHEN 过宽导致的误触发**（应给反触发建议——deep-codebase-analysis 教训）
 - **审计改名技能时不查旧名残留**（description **和正文**引用已更名技能名——正文层盲区，product-doc-audit 的 launch 残留教训）
+- **旧名检查子串误报 / 把审计反例当残留**（须边界匹配 + 元提及过滤——`*-research/SKILL`、本表 `animation`/`research`/`launch` 反例行）
+- **把 fenced code 行首 `#` 当 H1**（代码注释 ≠ 标志性标题）
 
 ## 完成标准
 

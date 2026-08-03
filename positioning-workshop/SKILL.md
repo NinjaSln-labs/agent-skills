@@ -6,6 +6,8 @@ description: >-
   misaligned.
 ---
 
+# Positioning Workshop
+
 ## Purpose
 Guide product managers through discovering and articulating product positioning by asking adaptive questions about target customers, unmet needs, product category, benefits, and competitive differentiation. Use this to align stakeholders on strategic positioning before writing PRDs, product-launch plans, or marketing materials—ensuring you've made deliberate choices about who you serve, what need you address, and how you differ from alternatives.
 

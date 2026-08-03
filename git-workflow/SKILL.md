@@ -1,13 +1,13 @@
 ---
 name: git-workflow
 description: >-
-  Use when establishing branching strategies, implementing Conventional Commits, creating
-  or reviewing PRs, resolving PR review comments, merging PRs (including CI verification,
-  auto-merge queues, and post-merge cleanup), managing PR review threads, merging PRs with
-  signed commits, handling merge conflicts, integrating Git with CI/CD, setting up git
-  hooks (lefthook, captainhook, husky, pre-commit), or debugging hook-install failures in
-  git worktrees. Not for creating releases (use github-release) or diagnosing
-  BLOCKED/won't-merge PRs (use github-project).
+  Git workflow skill: branching strategies, Conventional Commits, creating or reviewing
+  PRs, resolving PR review comments, merging PRs (CI verification, auto-merge queues,
+  post-merge cleanup), PR review threads, signed commits, merge conflicts, Git+CI/CD
+  integration, git hooks (lefthook, captainhook, husky, pre-commit), and debugging
+  hook-install failures in git worktrees. Use when doing any of the above. NOT for:
+  creating releases (use github-release) or diagnosing BLOCKED/won't-merge PRs (use
+  github-project).
 ---
 
 # Git Workflow Skill

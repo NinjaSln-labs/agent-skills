@@ -9,6 +9,8 @@ description: >-
   work complete, or when asked to run full self-tests / quality checks.
 ---
 
+# Ddd Qa Chain
+
 ** 5 层自动化验证，每一层有工具、命令、门禁；全链通过才可交付。
 
 ## 何时使用

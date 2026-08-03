@@ -1,8 +1,9 @@
 ---
 name: cicd-pipeline
 description: >-
-  Configure testing in CI/CD pipelines for GitHub Actions, Jenkins, and GitLab CI Use when
-  configuring tests in CI/CD pipelines (GitHub Actions, Jenkins, GitLab).
+  Configure testing in CI/CD pipelines for GitHub Actions, Jenkins, and GitLab CI: shards,
+  parallelization, wait-on health checks, and service containers. Use when configuring
+  tests in CI/CD pipelines (GitHub Actions, Jenkins, GitLab).
 ---
 
 # CI/CD Pipeline Config Skill
@@ -169,22 +170,22 @@ jobs:
       - name: Run Database Migrations
         run: npx prisma migrate deploy
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+          DATABASE_URL: postgresql://test:test@<db-host>:5432/testdb
 
       - name: Start Application
         run: npm run start:test &
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
-          REDIS_URL: redis://localhost:6379
+          DATABASE_URL: postgresql://test:test@<db-host>:5432/testdb
+          REDIS_URL: redis://<redis-host>:6379
           PORT: 3000
 
       - name: Wait for Application
-        run: npx wait-on http://localhost:3000/health --timeout 30000
+        run: npx wait-on http://<app-host>:<port>/health --timeout 30000
 
       - name: Run API Tests
         run: npx playwright test --project=api
         env:
-          API_BASE_URL: http://localhost:3000
+          API_BASE_URL: http://<app-host>:<port>
 
       - name: Upload Results
         if: always()
@@ -219,7 +220,7 @@ jobs:
         run: npm run start:test &
 
       - name: Wait for Application
-        run: npx wait-on http://localhost:3000 --timeout 30000
+        run: npx wait-on http://<app-host>:<port> --timeout 30000
 
       - name: Run E2E Tests (Shard ${{ matrix.shard }})
         run: npx playwright test --shard=${{ matrix.shard }}
@@ -395,7 +396,7 @@ pipeline {
             steps {
                 sh 'npx playwright install --with-deps chromium'
                 sh 'npm run start:test &'
-                sh 'npx wait-on http://localhost:3000 --timeout 30000'
+                sh 'npx wait-on http://<app-host>:<port> --timeout 30000'
                 sh 'npx playwright test'
             }
             post {
@@ -500,7 +501,7 @@ e2e-tests:
   parallel: 4
   script:
     - npm run start:test &
-    - npx wait-on http://localhost:3000 --timeout 30000
+    - npx wait-on http://<app-host>:<port> --timeout 30000
     - npx playwright test --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL
   artifacts:
     when: always

@@ -2,10 +2,10 @@
 name: architecture-patterns
 description: >-
   Implement proven backend architecture patterns including Clean Architecture, Hexagonal
-  Architecture, and Domain-Driven Design. Use this skill when designing clean architecture
-  for a new microservice, when refactoring a monolith to use bounded contexts, when
-  implementing hexagonal or onion architecture patterns, or when debugging dependency
-  cycles between application layers. Use when working with this skill's domain.
+  Architecture, and Domain-Driven Design (ports/adapters, dependency rule, in-memory
+  adapters for unit tests). Use when designing clean architecture for a new microservice,
+  refactoring a monolith to bounded contexts, implementing hexagonal or onion
+  architecture, or debugging dependency cycles between application layers.
 ---
 
 # Architecture Patterns

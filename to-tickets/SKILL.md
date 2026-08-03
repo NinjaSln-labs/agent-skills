@@ -9,6 +9,8 @@ description: >-
   breakdown to a local issues folder or issue tracker.
 ---
 
+# To Tickets
+
 **Wide refactors are the exception to vertical slicing.**
 
 - **Blocked by**: which other tickets (if any) must complete first

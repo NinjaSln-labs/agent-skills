@@ -11,6 +11,8 @@ description: >-
   /event-storming:simulation.
 ---
 
+# Event Storming
+
 ## Variables
 
 Arguments: `$ARGUMENTS`

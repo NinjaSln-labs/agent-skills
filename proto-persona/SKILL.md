@@ -5,6 +5,8 @@ description: >-
   when you need a working customer profile before deeper validation.
 ---
 
+# Proto Persona
+
 ## Purpose
 Create an initial, assumption-based persona profile that synthesizes available user delegated-research, market data, and stakeholder knowledge into a working hypothesis about your target user. Use this to align teams early in product development, guide initial design decisions, and identify gaps in understanding that require validation through delegated-research.
 
