@@ -73,10 +73,10 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | competitive-research-snapshot | 竞争调研快照 |
 | customer-journey-map | 客户旅程地图 |
 | discovery-interview-prep | 发现访谈准备 |
-| grill-me / grilling | 方案拷问/质疑 |
+| grill-me / plan-grilling |
 | intelligence-collection-disciplines | 情报收集纪律 |
 | jobs-to-be-done | JTBD 框架 |
-| launch | 上线计划 |
+| product-launch |
 | market-landscape-scan | 市场格局扫描 |
 | positioning-statement / positioning-workshop | 定位陈述/工作坊 |
 | prd-development | PRD 开发 |
@@ -117,7 +117,7 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 |------|------|
 | ui-ux-pro-max | UI/UX 设计数据库（84 风格/192 色板/22 栈） |
 | web-design-guidelines | Web 界面指南合规审查 |
-| copywriting | 文案写作 |
+| marketing-copywriting |
 
 ### Agent 会话与个人效率（7）
 
@@ -125,7 +125,7 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 |------|------|
 | project-handoff | 项目交接文档 |
 | project-intake | 项目接手恢复 |
-| research | 后台调研 |
+| delegated-research |
 | session-health | 会话健康度评估 |
 | sin-rules | 全局行为规则（密码安全/权限确认/长任务反馈/会话进度） |
 | skill-description-audit | 技能描述交叉验证审计 |
@@ -146,3 +146,4 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 ## License
 
 各技能自带 `license` 字段（多为 MIT / CC-BY-SA-4.0），以各 `SKILL.md` frontmatter 为准。
+
