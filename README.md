@@ -111,13 +111,16 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | secrets-scan | 密钥泄露扫描 |
 | security-scan | 综合安全扫描（OWASP Top 10） |
 
-### UI/UX 与内容（3）
+### UI/UX 与内容（6）
 
 | 技能 | 说明 |
 |------|------|
 | ui-ux-pro-max | UI/UX 设计数据库（84 风格/192 色板/22 栈） |
 | web-design-guidelines | Web 界面指南合规审查 |
-| marketing-copywriting |
+| ui-animation | 动效设计决策（Emil Kowalski 哲学） |
+| ui-typography | 专业排版规则（引号/间距/层级） |
+| ux-heuristics | 可用性启发式审计（Nielsen 10） |
+| marketing-copywriting | 营销文案写作 |
 
 ### Agent 会话与个人效率（7）
 
@@ -125,9 +128,9 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 |------|------|
 | project-handoff | 项目交接文档 |
 | project-intake | 项目接手恢复 |
-| delegated-research |
+| delegated-research | 委托式后台调研 |
 | session-health | 会话健康度评估 |
-| sin-rules | 全局行为规则（密码安全/权限确认/长任务反馈/会话进度） |
+| core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护） |
 | skill-description-audit | 技能描述交叉验证审计 |
 | task-loop-progress | 长任务进度 Loop |
 
@@ -146,4 +149,5 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 ## License
 
 各技能自带 `license` 字段（多为 MIT / CC-BY-SA-4.0），以各 `SKILL.md` frontmatter 为准。
+
 
