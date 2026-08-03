@@ -15,3 +15,14 @@
 # Optional local scratch
 .tmp/
 *.local
+
+# Internal source-only tooling (do not publish — local paths / ops docs)
+SYNC-RELEASE.md
+sync-release.sh
+body-evaporation-gate.py
+frontmatter-safe-rewrite.py
+skill-smoke.sh
+skill-executability-smoke.py
+FRONTMATTER-SAFE.md
+thin-allowlist.txt
+renames.yaml
