@@ -22,7 +22,7 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 
 ## 技能清单
 
-### 工程实践（16）
+### 工程实践（18）
 
 | 技能 | 说明 |
 |------|------|
@@ -36,6 +36,8 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | git-workflow | Git 分支/提交/PR/合并流程 |
 | react-vite-best-practices | React + Vite 性能优化 |
 | systematic-debugging | 系统性调试（先根因后修复） |
+| problem-dive | 问题深挖（证据先行，不直接修） |
+| problem-resolution-flow | 问题处理全流程（定位→分级→调研→修复→收尾） |
 | typescript-best-practices | TypeScript 最佳实践 |
 | verification-before-completion | 完成前验证（证据先于断言） |
 | writing-plans | 编写实现计划 |
