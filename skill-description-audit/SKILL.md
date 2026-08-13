@@ -1,7 +1,7 @@
 ---
 name: skill-description-audit
 description: >-
-  技能描述交叉验证审计 (Skill Description Audit). User-level personal skill (canonical source in
+  Skill Description Audit. User-level personal skill (canonical source in
   agent-skills). Cross-validation audit of an Agent Skill's SKILL.md description vs body:
   frontmatter compliance, capability claims matching the body, body non-emptiness (except
   thin-allowlist), trigger-word sufficiency, old-name residue via renames.yaml
@@ -11,7 +11,7 @@ description: >-
   auditing or cross-validating a skill description against SKILL.md body. NOT for:
   auditing product doc sets (PRDs/specs/launch docs) — use product-doc-audit.
 metadata:
-  version: "1.3.3"
+  version: "1.4.0"
   standard: agentskills.io
   scope: user
   patches:
@@ -23,6 +23,7 @@ metadata:
     - "v1.3.1：description 显式写入 renames.yaml 旧名检查 + NOT for product-doc-audit"
     - "v1.3.2：旧名检查边界匹配 + 元提及误报过滤（复合 slug / 审计反例行）"
     - "v1.3.3：正文能力抽取跳过 fenced code（`#` 注释不当 H1）；示例主机用占位符不计本机硬编码"
+    - "v1.4.0：语言一致性标准提高——description 含中文/CJK（中英混杂或中文残留，含格式示例/头部标签）由 [低] 升 **[中]**（库规范纯英文，CJK 扫描实证）；中文原生技能例外：纯中文可，禁中英混杂（2026-08-05 project-handoff/intake 教训）"
 ---
 
 # 技能描述交叉验证审计（Skill Description Audit）
@@ -97,10 +98,10 @@ metadata:
 | `name` | ≤64；`[a-z0-9-]+`；与目录名一致（不一致标 ⚠️） |
 | YAML | frontmatter 可解析；`description` 折叠合法 |
 | **结构** | frontmatter **闭合**（`---` 闭合存在）；description 折叠块**不吞正文**（描述到正文前结束——曾批量中招，防再次发生） |
-| **语言一致性** | description 语言统一（本库规范：**英文**）；不中英混杂、不夹「中文触发：」类双语标记 |
+| **语言一致性** | description **纯英文**（本库规范：英文——CJK 扫描零残留）；不夹「中文触发：」类双语标记；**中文原生技能例外**：正文全中文、面向中文用户的技能可用纯中文（语言统一即可），但**禁止中英混杂**（如「中文名 (English Name):」头部） |
 | **正文非空** | 第二个 `---` 之后正文长度 > 0；例外仅 `thin-allowlist.txt`（如 `grill-me`）。空正文 → **[高]**（不可执行） |
 
-缺 WHAT 或 WHEN → 至少 **[中]**。超长或空 → **[高]**。结构未闭合/吞正文 → **[高]**。语言不统一 → **[低]**（若与库规范不符则 **[中]**）。
+缺 WHAT 或 WHEN → 至少 **[中]**。超长或空 → **[高]**。结构未闭合/吞正文 → **[高]**。**语言一致性：description 含中文/CJK（中英混杂或中文残留，含格式示例/头部标签）→ [中]**（与库规范「英文」不符——2026-08-05 教训：project-handoff 中文示例「一句话标题」/ project-intake 头部「项目对接」曾被误判 [低] 放过、未触发修正）；中文原生技能纯中文 → ✅（语言统一即可）。
 
 ### 3.5 名称语义检查（防误触发与语义漂移）
 
@@ -284,8 +285,8 @@ metadata:
 | 级 | 标准 |
 |----|------|
 | **高** | 空/超长描述；**frontmatter 未闭合 / description 吞正文（结构破坏）**；标志性强制能力缺失；描述与正文核心矛盾；严重假称 |
-| **中** | 缺 WHAT 或 WHEN；重要能力缺失；输入/术语与正文明显不一致；正文写死**快变**易变数据未外置；**WHEN 过宽已致误命中（缺反触发）**；**引用已改名旧名**；名称含工具/个人绑定 |
-| **低** | 触发词可补强；弱覆盖；双语重复；**语言不统一**；**单段泛名（匹配指向弱）**；WHEN 过宽仅潜在风险；细节未写入描述；慢变数据未外置；refreshInterval 一刀切 |
+| **中** | 缺 WHAT 或 WHEN；重要能力缺失；输入/术语与正文明显不一致；正文写死**快变**易变数据未外置；**WHEN 过宽已致误命中（缺反触发）**；**引用已改名旧名**；名称含工具/个人绑定；**description 含中文/CJK（中英混杂或中文残留——库规范纯英文，2026-08-05 提高）** |
+| **低** | 触发词可补强；弱覆盖；双语重复；**单段泛名（匹配指向弱）**；WHEN 过宽仅潜在风险；细节未写入描述；慢变数据未外置；refreshInterval 一刀切 |
 | **信息** | 版本未 bump、旧报告过期、合理扩展触发等非缺陷备忘 |
 
 ## 反模式
@@ -305,6 +306,7 @@ metadata:
 - **审计改名技能时不查旧名残留**（description **和正文**引用已更名技能名——正文层盲区，product-doc-audit 的 launch 残留教训）
 - **旧名检查子串误报 / 把审计反例当残留**（须边界匹配 + 元提及过滤——`*-research/SKILL`、本表 `animation`/`research`/`launch` 反例行）
 - **把 fenced code 行首 `#` 当 H1**（代码注释 ≠ 标志性标题）
+- **放过 description 中英混杂/中文残留**（判 [低]「可接受」）——库规范**纯英文**，CJK 残留（含格式示例/头部标签）即 **[中]**，须报修（2026-08-05 教训：project-handoff 中文示例「一句话标题」/ project-intake 头部「项目对接」曾被误判 [低] 未触发修正，用户指出后提高标准）
 
 ## 完成标准
 
@@ -316,7 +318,7 @@ metadata:
 - [ ] 数据外置判定已给出（外置完整 / 需外置 / 无该类数据）
 - [ ] 结构检查已执行（frontmatter 闭合 / description 不吞正文）
 - [ ] 正文非空已判定（或确认在 thin-allowlist.txt）
-- [ ] 语言一致性判定已给出（统一 / 混杂）
+- [ ] 语言一致性判定已给出（✅ 纯英文 / 中文原生技能纯中文 / ❌ 含中文 [中]——CJK 扫描实证）
 - [ ] 误触发防护已评估（WHEN 过宽 → 反触发建议；名称语义/旧名残留已查）
 - [ ] 正文层旧名残留已查（改名技能审计时：正文反引号/链接/对齐表引用）
 - [ ] 用户收到总评与报告路径

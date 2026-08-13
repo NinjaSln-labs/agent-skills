@@ -1,9 +1,9 @@
 ---
 name: task-loop-progress
 description: >-
-  长任务进度 Loop · Config + Adapter 生成: scaffold config + adapter for the generic long-task
-  progress loop (generate task_loop_scaffold.py / task_loop_poll.py / task_loop_start.sh
-  from templates/). Config-driven: adapter extracts numeric/percentage/stage progress via
+  Generate config + adapter for the generic long-task progress loop (scaffold
+  task_loop_scaffold.py / task_loop_poll.py / task_loop_start.sh from templates/).
+  Config-driven: adapter extracts numeric/percentage/stage progress via
   progress_extract — zero code changes per task. Supports local files, remote SSH fetch,
   stdout JSON, and terminal matching. Requires successful poll validation before start; on
   AGENT_LOOP_TICK, Agent must post chat_line to Chat. Use when the user asks for a task

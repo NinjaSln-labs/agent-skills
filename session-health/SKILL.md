@@ -1,7 +1,7 @@
 ---
 name: session-health
 description: >-
-  会话健康度评估 (Session Health): assess the current AI coding tool session — context
+  Session Health: assess the current AI coding tool session — context
   compaction/condensation ratio, message count, context occupation cost, work nature,
   recoverability (git/handoff/runtime), and token economics — to judge continue vs
   new-session. Reads tool session storage read-only. Use when the user mentions context

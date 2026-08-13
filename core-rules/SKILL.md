@@ -1,8 +1,8 @@
 ---
 name: core-rules
 description: >-
-  全局规则 (Global rules) applicable to all projects/sessions across AI coding tools (Deep
-  Code / Cursor, etc.). Four bottom lines: credential safety (no plaintext secrets),
+  Global rules applicable to all projects/sessions across AI coding tools (Deep Code /
+  Cursor, etc.). Four bottom lines: credential safety (no plaintext secrets),
   permission confirmation (confirm before write ops), long-task feedback (progress update
   within 60s), session progress (maintained in .agents/session.md). Use when handling
   passwords/credentials, write operations, long-running tasks, session records, or at any

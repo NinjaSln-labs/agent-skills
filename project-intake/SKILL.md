@@ -1,11 +1,12 @@
 ---
 name: project-intake
 description: >-
-  项目对接 (Project Intake): take over a project as the receiving side — read HANDOFF.md and
-  restore context by its 6 sections (metadata/snapshot/next steps/immediate ops/reference
-  index/maintenance rules), execute suggested receiver actions (git init → .gitignore →
-  first commit / read tickets / request credentials). Use when receiving a handoff,
-  onboarding onto an existing repo, or resuming from HANDOFF.md.
+  Take over a project as the receiving side — read HANDOFF.md and restore context by its 6
+  sections (metadata/snapshot/next steps/immediate ops/reference index/maintenance rules;
+  snapshot deltas are one-liners — fetch details via git log or the HANDOFF-ARCHIVE.md
+  history), execute suggested receiver actions (git init → .gitignore → first commit / read
+  tickets / request credentials). Use when receiving a handoff, onboarding onto an existing
+  repo, or resuming from HANDOFF.md.
 ---
 
 # 项目对接（Project Intake）
@@ -31,7 +32,7 @@ description: >-
 
 ```
 - [ ] 1. 定位 HANDOFF.md（项目根；不存在则先读 README/docs 重建上下文，并提示交接方先生成）
-- [ ] 2. 读 6 节：元信息（谁/为什么/建议动作）/ 快照（进度到哪）/ 下一步（做什么/验证什么）/
+- [ ] 2. 读 6 节：元信息（谁/为什么/建议动作）/ 快照（进度到哪——§2 最近完成是一行式 `- [hash] 一句话标题`，详情不足时 `git log` 查 commit；更早历史在 `HANDOFF-ARCHIVE.md`）/ 下一步（做什么/验证什么）/
         即时操作（命令+坑）/ 引用索引（权威位置）/ 维护规则（回填约定）
 - [ ] 3. 复述上下文：向用户确认「当前状态 + 下一步」，核对无误再继续
 - [ ] 4. 执行接收方建议动作（HANDOFF §1）：git init → .gitignore → 首次提交 / 读 tickets / 向用户索取凭据
@@ -51,7 +52,7 @@ description: >-
 
 ## 完成标准
 
-- [ ] 已读 HANDOFF 6 节并复述上下文（状态 + 下一步）得到确认
+- [ ] 已读 HANDOFF 6 节并复述上下文（状态 + 下一步）得到确认（§2 一行式 delta 详情不足时查 `git log` / `HANDOFF-ARCHIVE.md` 回溯）
 - [ ] 建议动作已执行（git/.gitignore/读 tickets/凭据来源明确）
 - [ ] 环境就绪检查通过（构建 + 启动）
 - [ ] 验证点完成（对照 ticket AC）

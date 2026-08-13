@@ -1,7 +1,7 @@
 ---
 name: product-doc-audit
 description: >-
-  产品文档审计 (Product Document Audit): three-layer audit of a product documentation set (0-1
+  Product Document Audit: three-layer audit of a product documentation set (0-1
   phase docs): 1) completeness against the 0-1 delivery doc panorama (required/optional),
   2) each doc by type-specific checkpoints and core review dimensions, 3) cross-validate
   alignment. Produces readiness score (0-100), Critical/Major/Minor grading, authority

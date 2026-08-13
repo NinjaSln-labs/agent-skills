@@ -284,3 +284,12 @@ These techniques are part of systematic debugging and available in this director
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
 - **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+
+## Relationship to sibling skills
+
+- `problem-dive` — when the user reports a problem/UX issue and the work is still "what's
+  going on", use that skill first (evidence, 5-whys, research). This skill is for the
+  **code-bug** path once the issue is a technical defect.
+- `problem-resolution-flow` — end-to-end pipeline from symptom to shipped fix (classify,
+  scope, research, TDD fix, close). This skill is the root-cause protocol used inside
+  that pipeline's code path.
