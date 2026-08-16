@@ -141,7 +141,7 @@
 
 | 技能 | 能力 |
 |------|------|
-| ddd-qa-chain | 质量链编排（L1 单测→L2 契约→L3 组件→L4 E2E→L5 视觉 + DoD 门禁）|
+| ddd-qa-chain | 质量链编排（L1 单测→L2 契约→L3 组件→L4 E2E→L5 视觉 + DoD 门禁——**层概念通用，工具命令按项目映射探测**；含金字塔梯度/V&V 确认层/flaky 治理）|
 | coverage-matrix | **覆盖矩阵**（不变量↔测试 / 事件↔测试 / DoD↔门禁 三向表 + 缺口入审计项）|
 | playwright-best-practices | Playwright 最佳实践（选择器/断言/稳定性）|
 | pixel-perfect | 视觉回归（像素对比——默认免费）|
@@ -161,8 +161,8 @@
 | audit-item | **审计问题 issue 化跟踪**（NNN-slug + 索引——open/fixed/recorded，被 stage-gate 枚举）|
 | verification-before-completion | 完成前验证（行为保持——规范）|
 | systematic-debugging | 系统化调试（假设/二分/证据——代码缺陷路径）|
-| problem-dive | 问题深挖（证据先行→根因追问→尽调→决策清单——**不直接修**）|
-| problem-resolution-flow | 问题处理全流程（定位→类型分级→外部调研双渠道验证→修复→收尾）|
+| problem-dive | 问题深挖（证据先行→根因追问+RCA 工具→**认知偏差防御**→尽调→决策清单——**不直接修**）|
+| problem-resolution-flow | 问题处理全流程（定位→类型分级→**严重度分级**→外部调研双渠道验证→**workaround vs 永久修复**→修复→验证→收尾+无责复盘）|
 
 #### 4.5 质询（2）
 
