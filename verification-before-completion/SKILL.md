@@ -4,6 +4,8 @@ description: >-
   > Run verification commands and confirm fresh output before claiming work
   complete—evidence before assertions, never claim done without verification. Use when
   about to claim work is complete, fixed, or passing, before committing or creating PRs.
+  NOT for: stage-level aggregation of a whole DoD spec — that is stage-gate, which runs
+  the full gate and never fixes.
 ---
 
 # Verification Before Completion
@@ -13,6 +15,8 @@ description: >-
 **Core principle:** Evidence before claims, always.
 
 **Violating the letter of this rule is violating the spirit of this rule.**
+
+**边界（与 stage-gate 分工）：** 本技能 = 单次验证（一条命令/一个声明/一次提交前）；`stage-gate` = 阶段级聚合（整份 stage-spec DoD 逐条执行，只验不修）——单点验证先行，阶段收口再跑门禁。
 
 ## The Iron Law
 

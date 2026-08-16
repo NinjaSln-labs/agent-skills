@@ -1,7 +1,7 @@
-# 技能库全景图（81 技能——产品 0-1 全阶段模式）
+# 技能库全景图（87 技能——产品 0-1 全阶段模式）
 
-- 日期：2026-08-13 · 全量审计 81/81 合规 · **2026-08-05 新增 `problem-resolution-flow`；2026-08-06 新增 `problem-dive`（4.4 质量审查 3→5）**
-- 覆盖：本仓库 `agent-skills` 的 81 个技能（可安装到 `~/.agents/skills/<name>`）
+- 日期：2026-08-16 · **新增 6 技能（spec-kit 阶段门禁族：stage-gate / stage-spec / decision-log / coverage-matrix / audit-item / skill-eval——需求规格 `.scratch/neonforge-v1/skill-requirements-20260816.md`）** · 2026-08-13 全量审计 81/81 合规（新技能接入后按审计流程补 DESCRIPTION-AUDIT）
+- 覆盖：本仓库 `agent-skills` 的 87 个技能（可安装到 `~/.agents/skills/<name>`）
 - 模式：**产品 0-1 全生命周期**（发现 → 定义 → 设计 → 交付 → 上线 → 运营）+ 贯穿层（质量/工程/协作/技能基建）
 
 ---
@@ -122,11 +122,12 @@
 
 ### ④ 交付（20）—— 计划 / 实现 / 测试 / 质量
 
-#### 4.1 计划执行（3）
+#### 4.1 计划执行（4）
 
 | 技能 | 能力 |
 |------|------|
 | writing-plans | 实施计划编写（任务拆解/文件路径/验证步骤）|
+| stage-spec | **阶段契约编写/回填**（DoD 机器可验证断言 + TDD 网格 + 边界——被 stage-gate 执行）|
 | executing-plans | 计划执行（加载→批判性审查→逐任务执行→汇报）|
 | roadmap-planning | 产品路线图规划（目标/里程碑/优先级）|
 
@@ -136,11 +137,12 @@
 |------|------|
 | git-workflow | Git 工作流（分支策略/Conventional Commits/CI 集成——37★）|
 
-#### 4.3 测试链（9）
+#### 4.3 测试链（10）
 
 | 技能 | 能力 |
 |------|------|
 | ddd-qa-chain | 质量链编排（L1 单测→L2 契约→L3 组件→L4 E2E→L5 视觉 + DoD 门禁）|
+| coverage-matrix | **覆盖矩阵**（不变量↔测试 / 事件↔测试 / DoD↔门禁 三向表 + 缺口入审计项）|
 | playwright-best-practices | Playwright 最佳实践（选择器/断言/稳定性）|
 | pixel-perfect | 视觉回归（像素对比——默认免费）|
 | visual-regression-tester | 视觉回归（双路线——Playwright 免费 + Chromatic/Percy 商业）|
@@ -150,11 +152,13 @@
 | test-data-generation | 测试数据生成（Faker/工厂/构建器/种子）|
 | cicd-pipeline | CI/CD 配置（GitHub Actions/Jenkins/GitLab CI）|
 
-#### 4.4 质量审查（5）
+#### 4.4 质量审查（7）
 
 | 技能 | 能力 |
 |------|------|
-| code-review | 代码审查（diff/PR——bug/风格/约定——mattpocock）|
+| code-review | 代码审查（diff/PR——bug/风格/约定 + **阶段末即时评审模式**：固定点=阶段首 commit^、状态化 open/fixed/recorded 报告）|
+| stage-gate | **阶段门禁执行**（读 stage-spec DoD 逐条验证——L1/L2/L3/行为验收/覆盖矩阵/审计项/push——只验不修）|
+| audit-item | **审计问题 issue 化跟踪**（NNN-slug + 索引——open/fixed/recorded，被 stage-gate 枚举）|
 | verification-before-completion | 完成前验证（行为保持——规范）|
 | systematic-debugging | 系统化调试（假设/二分/证据——代码缺陷路径）|
 | problem-dive | 问题深挖（证据先行→根因追问→尽调→决策清单——**不直接修**）|
@@ -181,11 +185,12 @@
 
 ### 贯穿层（12）—— 质量 / 工程 / 协作 / 技能基建
 
-#### P.1 技能基建 / 审计（2）
+#### P.1 技能基建 / 审计（3）
 
 | 技能 | 能力 |
 |------|------|
-| skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护——自审只出报告）|
+| skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护 + **pushy 质量（场景/关键词密度）**——自审只出报告）|
+| skill-eval | **skill 行为评估**（3-5 代表任务 × 有/无 skill N≥3 次 → pass-rate 对比表 + 失败案例反哺）|
 | product-doc-audit | 产品文档集审计（三层 + 就绪度评分 + 四层 go/no-go 最终验收）|
 
 #### P.2 安全（4）
@@ -203,12 +208,13 @@
 |------|------|
 | core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）|
 
-#### P.4 协作（5）
+#### P.4 协作（6）
 
 | 技能 | 能力 |
 |------|------|
-| project-handoff | 交接文档（引用型 delta 6 节——交接方）|
+| project-handoff | 交接文档（引用型 delta 6 节——交接方；§5 含决策日志/覆盖矩阵/阶段契约引用）|
 | project-intake | 项目接手（读 HANDOFF 恢复上下文——接收方）|
+| decision-log | **决策日志（ADR）**（Nygard 模板 + proposed/accepted/superseded/rejected 状态机——记录/查询）|
 | task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）|
 | workshop-facilitation | 交互工作坊协议（deanpeters 交互技能配对——session 头/单问轮/进度标签）|
 | session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）|
@@ -222,18 +228,18 @@
 | ① 发现 | 16 | 用户研究 3 + 问题定义 4 + 市场竞品 7 + 调研纪律 2 |
 | ② 定义 | 7 | 定位 2 + 需求规格 4 + 拆解立项 1 |
 | ③ 设计 | 23 | 领域建模 9 + 模型评审 2 + 架构 3 + 编码规范 3 + 视觉 6 |
-| ④ 交付 | 20 | 计划 3 + 工程 1 + 测试链 9 + 质量审查 5 + 质询 2 |
+| ④ 交付 | 24 | 计划 4 + 工程 1 + 测试链 10 + 质量审查 7 + 质询 2 |
 | ⑤ 上线 | 1 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
-| 贯穿层 | 12 | 审计 2 + 安全 4 + 规则 1 + 协作 5 |
-| **合计** | **81** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
+| 贯穿层 | 14 | 审计 3 + 安全 4 + 规则 1 + 协作 6 |
+| **合计** | **87** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
 
 ---
 
 ## 三、一图流（子类级）
 
 ```text
-产品 0-1 全生命周期（21 子类 · 81 技能）
+产品 0-1 全生命周期（21 子类 · 87 技能）
 ┌──────────────────────────────────────────────────────────────┐
 │ ① 发现     1.1 用户研究(3)  1.2 问题定义(4)                  │
 │            1.3 市场竞品(7)×8编排  1.4 调研纪律(2)             │
@@ -244,12 +250,12 @@
 │ ③ 设计     3.1 领域建模DDD(9·链式)  3.2 模型评审(2)           │
 │            3.3 架构设计(3)  3.4 编码规范(3)  3.5 视觉设计(6)   │
 ├──────────────────────────────────────────────────────────────┤
-│ ④ 交付     4.1 计划执行(3)  4.2 工程协作(1)                   │
-│            4.3 测试链(9·L1-L5)  4.4 质量审查(5)  4.5 质询(2)   │
+│ ④ 交付     4.1 计划执行(4·含 stage-spec)  4.2 工程协作(1)     │
+│            4.3 测试链(10·含 coverage-matrix)  4.4 质量审查(7·含 stage-gate/audit-item)  4.5 质询(2)  │
 ├──────────────────────────────────────────────────────────────┤
 │ ⑤ 上线     product-launch · ⑥ 运营  product-marketing · marketing-copywriting  │
 ├──────────────────────────────────────────────────────────────┤
-│ 贯穿       P.1 审计(2)  P.2 安全(4)  P.3 规则(1)  P.4 协作(5) │
+│ 贯穿       P.1 审计(3·含 skill-eval)  P.2 安全(4)  P.3 规则(1)  P.4 协作(6·含 decision-log) │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -261,7 +267,7 @@
 2. **发现**：1.1 `user-research` / `discovery-interview-prep` → 1.2 `problem-statement` → `jobs-to-be-done` → `proto-persona` → `customer-journey-map`；竞品走 1.3 `competitive-analysis-process`（编排 ×8）
 3. **定义**：2.1 `positioning-workshop` → `positioning-statement` → 2.2 `write-spec` / `prd-development` → `prd-driven-ddd`（主入口）→ 2.3 `to-tickets`（拆解）
 4. **设计**：3.1 `prd-driven-ddd` 链式调 `ddd-scope→discover→subdomains→contexts→context-map→aggregates→domain-interactions→openspec-bridge`；3.3 `architecture-patterns` + `codebase-design`；3.4 规范三件套；3.5 视觉 `frontend-design` + `ui-ux-pro-max`
-5. **交付**：4.1 `roadmap-planning` → `writing-plans` → `executing-plans` → 4.2 按 `git-workflow` 提交 → 4.3 `ddd-qa-chain`（L1-L5）→ 4.4 `code-review` → `verification-before-completion`；遇问题先 `problem-dive` 深挖，代码路径用 `systematic-debugging`，确认后走 `problem-resolution-flow` 收尾
+5. **交付**：4.1 `roadmap-planning` → **阶段制**：开工前 `stage-spec`（阶段契约）→ 需要时 `writing-plans`（任务分解）→ `executing-plans`（执行）→ 阶段中裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix`（S2 起）→ 4.4 `code-review`（阶段末即时评审模式）→ 声称完成 → **`stage-gate` 跑 DoD 门禁**（含 `audit-item` open 项核对）；遇问题先 `problem-dive` 深挖，代码路径用 `systematic-debugging`，确认后走 `problem-resolution-flow` 收尾
 6. **验收**：P.1 `product-doc-audit`（四层 go/no-go）+ P.2 安全四件套 + 3.2 `ddd-model-review` + 4.3 `k6-performance`（性能）
 7. **上线/交接**：⑤ `product-launch` + ⑥ `product-marketing` → P.4 `project-handoff` → 下一位 `project-intake`
 
@@ -272,7 +278,7 @@
 ## 五、使用建议
 
 - **新项目启动**：按阶段取技能（①→⑥）——阶段间产物自然传递（研究→PRD→领域模型→tickets→实现→验收）
-- **质量门禁**：交付前跑 ddd-qa-chain 全链 + product-doc-audit（含项目最终验收）
+- **质量门禁**：交付前跑 ddd-qa-chain 全链 + product-doc-audit（含项目最终验收）；阶段制项目走「阶段门禁链」（7.1：stage-spec → 执行 → stage-gate 跑 DoD + audit-item 核对）
 - **技能审计**：新接入技能 → 审计（description 合规）+ 本图更新（分类/计数/一图同步）
 - **克制原则**：只接高价值技能（多源验证 + 实物克隆）；二级语义引用标注不接入
 
@@ -280,7 +286,7 @@
 
 ## 六、语义引用说明（未接入的可选参考——2026-08-02）
 
-为保持技能库克制（81 技能），以下**二级语义引用未接入**（deanpeters 同库可选参考——各技能正文已加「相关技能说明」标注）：
+为保持技能库克制（87 技能），以下**二级语义引用未接入**（deanpeters 同库可选参考——各技能正文已加「相关技能说明」标注）：
 
 - **tam-sam-som-calculator**（被 market-landscape-scan / competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用——市场量化）
 - **company-research**（被 competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用）
@@ -306,6 +312,7 @@
 | **新项目主链** | 1.1→1.2→2.1→2.2（主入口 prd-driven-ddd）→3.1（DDD 链 8 步）→2.3→4.1→4.3→P.1 |
 | **竞争分析链** | 1.3 `competitive-analysis-process` 编排 ×8（景观→快照→VoC→公司→监测→战斗卡）|
 | **质量门禁链** | 4.3 测试（L1-L5）→4.4 审查→P.1 文档审计→P.2 安全四件套→3.2 模型评审 |
+| **阶段门禁链** | 4.1 `stage-spec`（契约）→ `writing-plans`/`executing-plans`（执行）→ 裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix` + 4.4 `code-review`（阶段评审→发现入 `audit-item`）→ **`stage-gate` 跑 DoD**（open 项核对）→ 下一阶段 |
 | **问题处理链** | 4.4 `problem-dive`（深挖不修）→ `systematic-debugging`（代码根因）→ `problem-resolution-flow`（修复收尾）|
 | **重构操作链** | 4.4 code-review（发现 smells）→3.3 codebase-design（设计目标）→3.2 tactical-review（领域重构）|
 | **交接链** | P.4 handoff（写 delta）→ intake（读 delta 恢复）——工具/会话切换 |
@@ -315,6 +322,7 @@
 | 组合 | 构成 | 场景 |
 |------|------|------|
 | **定义闭环** | 2.1 + 2.2 + 2.3 | 定位→PRD→tickets（一次定清楚）|
+| **阶段门禁组合** | 4.1 stage-spec + decision-log（P.4）+ 4.4 code-review（阶段评审）+ audit-item + stage-gate | 阶段开工契约 → 阶段中裁定 → 阶段末评审 → 门禁收口（7.1 阶段门禁链）|
 | **架构三件套** | 3.3（patterns/design/analysis）| 设计→深化→分析（新模块）|
 | **规范三件套** | 3.4（ts/react/electron）| 前端工程规范（我们栈）|
 | **QA 全家当** | 4.3 全部 9 | 全量质量验证（交付前）|
@@ -334,7 +342,7 @@
 
 ### 7.4 覆盖度观察
 
-- **测试侧最厚**（4.3 九技能 + P.2 四件套）——质量保证优先——符合产品交付观
+- **测试侧最厚**（4.3 测试链十技能 + 4.4 stage-gate 聚合验证 + P.2 四件套）——质量保证优先——符合产品交付观
 - **上线/运营最薄**（1+2）——符合现状（项目未到上线期）——上线前再评估
 - **二级语义引用 6 个**（克制保持）——需要时按需接入
 

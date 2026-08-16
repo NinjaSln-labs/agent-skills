@@ -5,7 +5,8 @@ description: >-
   work into bite-sized tasks with exact file paths, complete code, and verification steps
   (DRY, YAGNI, TDD, frequent commits; no placeholders). Save plans to
   docs/superpowers/plans/. Use when you have a spec or requirements for a multi-step task,
-  before touching code.
+  before touching code. NOT for: stage contract specs (DoD/gate assertions + TDD grid) —
+  those are stage-spec, executed by stage-gate.
 ---
 
 # Writing Plans
@@ -151,6 +152,12 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+
+## 边界（与 stage-spec 分工）
+
+- **stage-spec**（阶段契约）：DoD 机器可验证断言 + TDD 网格 + 产出物 + 边界——被 `stage-gate` 逐条执行；用户要「写 S{N} spec / 回填阶段 spec」→ 走 `stage-spec` 技能。
+- **writing-plans**（本技能）：通用任务分解——bite-size 步骤 + 完整代码 + 验证步骤。
+- 顺序：stage-spec 定稿（契约先行）→ 需要时再按 writing-plans 拆任务；DoD 断言是验收依据，plan 的任务不得超出 DoD 边界。
 
 ## Execution Handoff
 

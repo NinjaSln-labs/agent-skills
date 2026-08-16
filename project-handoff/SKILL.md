@@ -5,9 +5,11 @@ description: >-
   metadata / snapshot / next steps / immediate ops (commands + pitfalls) / reference index / maintenance
   rules. Records only delta not already in docs or commit log; one-line entries (details in commit
   messages); never copies (anti-dual-source); desensitized. Maintenance rules: update timing, one-line
-  deltas, rolling archive to HANDOFF-ARCHIVE.md, backfill. Use when handing off across sessions/tools,
-  generating or updating HANDOFF.md, or capturing project delta state. NOT for: resuming prior work —
-  that belongs to project-intake.
+  deltas, rolling archive to HANDOFF-ARCHIVE/ (pits.md / cycles.md / done.md), confirmed-fixed
+  pitfalls/todos must be archived, backfill, decision-log sync (stage rulings -> docs/decisions/ ADRs,
+  referenced by number, never copied). Use when handing off across sessions/tools, generating or
+  updating HANDOFF.md, capturing project delta state, or after stage rulings. NOT for: resuming prior
+  work — that belongs to project-intake.
 ---
 
 # 项目交接文档（Project Handoff）
@@ -35,9 +37,9 @@ description: >-
 1. 交接元信息     日期/交接方/接收方/原因/项目一句话/文档入口链 + 接收方建议动作（git init → .gitignore（node_modules/dist）→ 首次提交 / 先读哪些 artifacts / 用哪个技能维护 / 凭据索取）
 2. 当前状态快照  各域状态表（文档/tickets/资产）+ 版本控制状态（git 与否/branch/未提交变更）+ 构建环境状态（依赖/构建产物就绪与否）+ 最近完成（增量一行式 `- [hash] 一句话标题`——详情在 commit message，git log 是详情权威；明示占位/未完成边界）
 3. 下一步与验证点 立即待办（引用 tickets AC）+ 外部依赖来源（凭据/配置从哪获取）+ 随后路线 + 风险提醒
-4. 即时操作      启动/构建/验证命令 + 已知坑（本会话发现，不回填 docs/ 的）
-5. 引用索引      主题 → 权威文档路径表（架构/产品/指标/tickets/审计/上线）
-6. 维护规则      更新时机 / 防双源约定（含 commit message 不复制 + §2 一行式规范）/ 滚动归档约定（跨交接周期旧 delta 移 HANDOFF-ARCHIVE.md，§2 只含当前周期）/ 回填约定（ticket 完成 → 回填 ticket + 同步快照）/ 脱敏
+4. 即时操作      启动/构建/验证命令 + 已知坑（未修 / 仍会踩；**确认已修的强制迁归档**）
+5. 引用索引      主题 → 权威文档路径表（架构/产品/指标/tickets/审计/上线/**决策日志 docs/decisions/ · 覆盖矩阵 docs/tests/ · 阶段契约 docs/design/stage-specs/**）
+6. 维护规则      更新时机 / 防双源 / 滚动归档 / **确认修复即归档（坑→pits.md，待办→done.md）** / 回填 / 脱敏 / **决策日志同步（阶段裁定 → docs/decisions/ ADR——只引用编号不复制）**
 ```
 
 ## 工作流
@@ -59,7 +61,8 @@ description: >-
 - 把稳定知识（架构）与易变状态（进度）混写——分层：稳定进引用索引，易变进快照
 - 节数堆砌（把「当前验证清单」「路线图」当固定节）——具体状态属快照/下一步，结构保持通用 6 节
 - 写 API Key/密码/PII
-- 只生成不维护（更新时只动 §2-§4 易变节）
+- 只生成不维护（更新时只动 §2–§4 易变节）
+- **交接文档当百科**（已确认修复的坑/待办仍堆在 HANDOFF.md）→ 正文只胀不瘦；确认已修（或裁决不修）当次必须按类型迁 `HANDOFF-ARCHIVE/`（坑→`pits.md`，待办→`done.md`）
 - **版本控制坐标缺失**（未记 git 状态/branch/commit）→ 接收方无历史可查（marcusglee11 原则：commit hash 优先）
 - **进度声明含糊**（占位/未实现未明示）→ 接收方误判「已完成」，基于占位继续开发
 - **外部依赖来源不明**（API Key/凭据/配置不指来源）→ 接收方瞎找或卡住；应明确「向用户索取/配置文件位置」
@@ -69,7 +72,7 @@ description: >-
 
 - [ ] 项目根存在 `HANDOFF.md`
 - [ ] 6 节结构齐全；只记 delta，无文档/commit message 内容复制（引用索引节全覆盖）
-- [ ] §2 最近完成一行式 `- [hash] 一句话标题`（详情在 commit message）；跨周期旧 delta 已滚动归档（HANDOFF-ARCHIVE.md）
+- [ ] §2 最近完成一行式 `- [hash] 一句话标题`（详情在 commit message）；跨周期旧 delta 已滚动归档（`HANDOFF-ARCHIVE/cycles.md`）
 - [ ] 快照/下一步/即时操作准确反映当前状态
 - [ ] 版本控制状态已记（git 与否/branch/未提交变更）
 - [ ] 构建环境状态已记（依赖/构建产物就绪与否）
@@ -78,6 +81,7 @@ description: >-
 - [ ] 快照与 tickets 同步（回填约定含「ticket 完成 → 更新 §2」）
 - [ ] 无敏感信息
 - [ ] 接收方起点明确（下一步 + 命令 + 建议动作）
+- [ ] **确认修复已归档**：已修/已裁决不修的坑 → `HANDOFF-ARCHIVE/pits.md`；§3 `[x]` → `HANDOFF-ARCHIVE/done.md`；未留在正文
 
 ## 方法论来源（2026-08 调研 + 实践）
 

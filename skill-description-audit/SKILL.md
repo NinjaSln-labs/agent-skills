@@ -11,7 +11,7 @@ description: >-
   auditing or cross-validating a skill description against SKILL.md body. NOT for:
   auditing product doc sets (PRDs/specs/launch docs) — use product-doc-audit.
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
   standard: agentskills.io
   scope: user
   patches:
@@ -24,6 +24,7 @@ metadata:
     - "v1.3.2：旧名检查边界匹配 + 元提及误报过滤（复合 slug / 审计反例行）"
     - "v1.3.3：正文能力抽取跳过 fenced code（`#` 注释不当 H1）；示例主机用占位符不计本机硬编码"
     - "v1.4.0：语言一致性标准提高——description 含中文/CJK（中英混杂或中文残留，含格式示例/头部标签）由 [低] 升 **[中]**（库规范纯英文，CJK 扫描实证）；中文原生技能例外：纯中文可，禁中英混杂（2026-08-05 project-handoff/intake 教训）"
+    - "v1.5.0：新增 description pushy 质量维度（§6.5）——WHEN 场景密度 + 触发关键词覆盖：正文标志性能力必须在 description 可找到触发词（否则 [中]）；WHEN 泛泛（when needed/必要时）或场景/关键词过疏 → [低] 建议补场景示例；与 skill-eval（行为评估）衔接——本维度评估触发有效性，行为验证归 skill-eval"
 ---
 
 # 技能描述交叉验证审计（Skill Description Audit）
@@ -180,6 +181,19 @@ metadata:
 - **WHEN 过宽**：description 含泛动词+泛领域组合（如 `analyzing source code` + `maintenance/refactoring`）会命中不相关请求 → 建议**收窄 Use when**（明确「分析什么、何时用」）+ 加**反触发**（`NOT for` / `DO NOT TRIGGER when`——指向该用哪个替代技能）。判定：WHEN 过宽缺反触发 → **[中]**（实测误命中）或 **[低]**（潜在风险）。
 - 反触发格式示例：`NOT for: single-file edits, auditing one skill's SKILL.md — those belong to code-review / skill-description-audit.`
 
+### 6.5 description pushy 质量（场景/关键词密度——v1.5.0）
+
+评估 WHEN 的「可触发强度」——描述写得合规（WHAT+WHEN 齐全）不等于会被正确触发：
+
+| 检查项 | 通过条件 | 判定 |
+|--------|----------|------|
+| **标志性能力有触发词** | 正文每条标志性能力（§4 抽取）都能在 description 找到对应触发词（用户可能的口头说法）| 缺 → **[中]**（标志性能力无触发词 = 该能力永远不被触发） |
+| **场景密度** | WHEN 含 ≥2 个具体使用场景/触发时刻（「何时/什么情况下用」），非泛泛「when needed/必要时」| 泛泛或只有 1 个场景 → **[低]**（建议补场景示例） |
+| **关键词覆盖** | 高频触发词（技能领域专有名词/常见短语）已在 WHEN | 高频词缺失 → **[低]** |
+| **反触发完整** | 易误触发技能（泛动词+泛领域组合）已有 NOT for 指向替代技能（见 §6）| 缺 → **[中]**（实测误命中）或 **[低]**（潜在） |
+
+**与 skill-eval 的分工**：本维度是静态评估——「触发词写没写、够不够」；触发后行为是否真的正确（pass-rate）归 `skill-eval`（动态行为评估）。审计建议可写「若触发仍不理想，走 skill-eval 行为验证」。
+
 ### 7. 写报告（唯一产出）
 
 用下方模板写入 `DESCRIPTION-AUDIT.md`。语言与用户一致（默认中文）。
@@ -303,6 +317,7 @@ metadata:
 - 数据外置检查只查「有没有 references/」，不核对 lastUpdated/refreshInterval/置信度机制
 - **不检查 frontmatter 闭合 / description 吞正文**（结构破坏——曾批量中招，属 [高] 级缺陷）
 - **放过 WHEN 过宽导致的误触发**（应给反触发建议——deep-codebase-analysis 教训）
+- **只查 WHAT+WHEN 齐全、不查触发强度**（标志性能力无触发词 / WHEN 泛泛——合规但永远不被触发；§6.5 pushy 质量）
 - **审计改名技能时不查旧名残留**（description **和正文**引用已更名技能名——正文层盲区，product-doc-audit 的 launch 残留教训）
 - **旧名检查子串误报 / 把审计反例当残留**（须边界匹配 + 元提及过滤——`*-research/SKILL`、本表 `animation`/`research`/`launch` 反例行）
 - **把 fenced code 行首 `#` 当 H1**（代码注释 ≠ 标志性标题）
@@ -320,6 +335,7 @@ metadata:
 - [ ] 正文非空已判定（或确认在 thin-allowlist.txt）
 - [ ] 语言一致性判定已给出（✅ 纯英文 / 中文原生技能纯中文 / ❌ 含中文 [中]——CJK 扫描实证）
 - [ ] 误触发防护已评估（WHEN 过宽 → 反触发建议；名称语义/旧名残留已查）
+- [ ] pushy 质量已评估（§6.5：标志性能力触发词覆盖 / 场景密度 ≥2 / 高频关键词 / 反触发）
 - [ ] 正文层旧名残留已查（改名技能审计时：正文反引号/链接/对齐表引用）
 - [ ] 用户收到总评与报告路径
 

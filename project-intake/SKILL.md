@@ -3,8 +3,9 @@ name: project-intake
 description: >-
   Take over a project as the receiving side — read HANDOFF.md and restore context by its 6
   sections (metadata/snapshot/next steps/immediate ops/reference index/maintenance rules;
-  snapshot deltas are one-liners — fetch details via git log or the HANDOFF-ARCHIVE.md
-  history), execute suggested receiver actions (git init → .gitignore → first commit / read
+  snapshot deltas are one-liners — fetch details via git log or HANDOFF-ARCHIVE/
+  (pits.md / cycles.md / done.md; confirmed-fixed items live in the archive, not live HANDOFF). Execute
+  suggested receiver actions (git init → .gitignore → first commit / read
   tickets / request credentials). Use when receiving a handoff, onboarding onto an existing
   repo, or resuming from HANDOFF.md.
 ---
@@ -32,13 +33,13 @@ description: >-
 
 ```
 - [ ] 1. 定位 HANDOFF.md（项目根；不存在则先读 README/docs 重建上下文，并提示交接方先生成）
-- [ ] 2. 读 6 节：元信息（谁/为什么/建议动作）/ 快照（进度到哪——§2 最近完成是一行式 `- [hash] 一句话标题`，详情不足时 `git log` 查 commit；更早历史在 `HANDOFF-ARCHIVE.md`）/ 下一步（做什么/验证什么）/
-        即时操作（命令+坑）/ 引用索引（权威位置）/ 维护规则（回填约定）
+- [ ] 2. 读 6 节：元信息（谁/为什么/建议动作）/ 快照（进度到哪——§2 最近完成是一行式 `- [hash] 一句话标题`，详情不足时 `git log`；过期周期见 `HANDOFF-ARCHIVE/cycles.md`，已修坑见 `pits.md`）/ 下一步（做什么/验证什么——§3 只应有未完成项）/
+        即时操作（命令 + §4 未修/仍会踩的坑）/ 引用索引 / 维护规则（回填 + **确认修复即归档**：坑→`pits.md`，待办→`done.md`）
 - [ ] 3. 复述上下文：向用户确认「当前状态 + 下一步」，核对无误再继续
 - [ ] 4. 执行接收方建议动作（HANDOFF §1）：git init → .gitignore → 首次提交 / 读 tickets / 向用户索取凭据
 - [ ] 5. 环境就绪检查（HANDOFF §3 首项）：构建通过 + 应用可启动（依赖已装则跳过重装）
 - [ ] 6. 执行下一步验证点（对照 ticket AC 逐条跑）
-- [ ] 7. 回填闭环：ticket 完成 → 勾选 AC + 标注文档引用兑现 → 同步更新 HANDOFF §2 快照 → 新坑追加 §4
+- [ ] 7. 回填闭环：ticket 完成 → 勾选 AC + 标注文档引用兑现 → 同步更新 HANDOFF §2 快照 → 新的未修坑追加 §4 → **确认已修（或裁决不修）当次按类型迁 `HANDOFF-ARCHIVE/`（坑→`pits.md`，待办→`done.md`），不留在正文**
 ```
 
 ## 反模式
@@ -47,20 +48,21 @@ description: >-
 - **复制 HANDOFF 内容**到你的笔记/新文档——造成双源
 - **环境未就绪就业务验证**——把环境问题误判为业务缺陷
 - **完成后不回填**（ticket/快照）——HANDOFF 过期，下一位接收方误读
+- **确认已修却不归档**——§3 `[x]` / 已修坑留在正文，交接文档只胀不瘦；与 `project-handoff` 对称：坑→`HANDOFF-ARCHIVE/pits.md`，待办→`done.md`
 - **凭据瞎猜**（从代码/配置搜索 Key）——应向用户索取或引用存储位置
 - **改动前不看快照**——基于过期状态做决策
 
 ## 完成标准
 
-- [ ] 已读 HANDOFF 6 节并复述上下文（状态 + 下一步）得到确认（§2 一行式 delta 详情不足时查 `git log` / `HANDOFF-ARCHIVE.md` 回溯）
+- [ ] 已读 HANDOFF 6 节并复述上下文（状态 + 下一步）得到确认（§2 一行式详情不足时查 `git log` / `HANDOFF-ARCHIVE/cycles.md`；已修坑查 `pits.md`）
 - [ ] 建议动作已执行（git/.gitignore/读 tickets/凭据来源明确）
 - [ ] 环境就绪检查通过（构建 + 启动）
 - [ ] 验证点完成（对照 ticket AC）
-- [ ] 回填完成（ticket AC 勾选 + HANDOFF §2 快照同步 + 新坑入 §4）
+- [ ] 回填完成（ticket AC 勾选 + HANDOFF §2 快照同步 + 新的未修坑入 §4 + **确认已修已迁归档**）
 - [ ] 未复制 HANDOFF 内容；无敏感信息写入
 
 ## 方法论来源（2026-08）
 
-- project-handoff（对称技能）：交接方 6 节结构 → 接收方按同构 6 节恢复上下文；维护规则（回填/防双源/脱敏）双向共用
+- project-handoff（对称技能）：交接方 6 节结构 → 接收方按同构 6 节恢复上下文；维护规则（回填/防双源/脱敏/**确认修复即归档**）双向共用
 - mattpocock handoff：交接文档作为下一 session 的起始上下文——接收方视角即「读文档 → 继续」
 - NeonForge HANDOFF.md 实践（2026-08-02）：Deep Code → Cursor 交接——接收方需建议动作（git init/.gitignore/读 tickets/Key 索取）与环境就绪检查（4 轮 AI 评审发现的接收方需求）

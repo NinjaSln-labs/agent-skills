@@ -2,7 +2,7 @@
 
 个人维护的 Agent Skill 集合，遵循 [Agent Skills](https://agentskills.io) 开放规范（`SKILL.md`），可安装到任何支持该规范的 AI 编码代理。
 
-共 **81 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线），以及 DDD、工程、QA、安全、UI/UX。
+共 **87 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线），以及 DDD、工程、QA、安全、UI/UX。
 
 技能全景图（按产品 0-1 阶段分类与编排路径）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 

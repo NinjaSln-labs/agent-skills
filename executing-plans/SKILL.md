@@ -4,7 +4,9 @@ description: >-
   Executing Plans: execute a written implementation plan — load the plan, review it
   critically, execute all tasks with per-task commits and review checkpoints, and report
   when complete. Use when you have a written implementation plan to execute in a separate
-  session (use subagent-driven-development instead if subagents are available).
+  session (use subagent-driven-development instead if subagents are available). NOT for:
+  verifying a stage against its spec — that is stage-gate, which only verifies and never
+  executes.
 ---
 
 # Executing Plans
@@ -40,6 +42,12 @@ After all tasks complete and verified:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
+
+## 边界（与 stage-gate 分工）
+
+- **executing-plans**（本技能）：执行计划——逐任务实现 + 提交 + 验证。
+- **stage-gate**：阶段完成检查——读 stage-spec DoD 逐条验证（只验不修，交回开发）。
+- 顺序：执行完所有任务 → 阶段声称完成时 → 跑 `stage-gate` 验证阶段契约；执行过程中不做门禁，门禁结果不自己修（差异交回开发）。
 
 ## When to Stop and Ask for Help
 

@@ -4,8 +4,11 @@ description: >-
   Review the changes since a fixed point (commit, branch, tag, or merge-base) along two
   axes — Standards (does the code follow this repo's documented coding standards?) and
   Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews
-  in parallel sub-agents and reports them side by side. Use when the user wants to review
-  a branch, a PR, work-in-progress changes, or asks to "review since X".
+  in parallel sub-agents and reports them side by side. Stage-end mode: fixed point is the
+  parent of the stage's first commit, Spec axis checks the stage spec's DoD, output is a
+  statusized open/fixed/recorded findings list. Use when the user wants to review a branch,
+  a PR, work-in-progress changes, asks to "review since X", or at a stage completion
+  ("阶段末评审").
 ---
 
 # Code Review
@@ -85,6 +88,18 @@ If the spec is missing, skip the Spec sub-agent and note this in the final repor
 Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings — the two axes are deliberately separate (see _Why two axes_).
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes — that's the reranking the separation exists to prevent.
+
+## 阶段末即时评审模式（Stage-End Review）
+
+阶段完成声明 → stage-gate 之前的收口评审（NeonForge 已实践，回写为可复用模式）：
+
+- **固定点**：阶段首 commit^（`git log --oneline --grep="S{N}"` 找该阶段首个 commit，取其父提交）；无阶段 commit 则从用户确认。
+- **Spec 轴**：以 stage-spec DoD 为 spec 来源（`docs/design/stage-specs/S{N}.md`）——逐条核对代码是否实现（DoD 未实现 = Spec fail）。
+- **Standards 轴**：同普通模式（仓库规范 + smell 基线）。
+- **产出 = 状态化报告**：每条 finding 标注状态——`open`（待修）/ `fixed`（本次已修，含 commit+回归测试证据）/ `recorded`（裁决不修，含理由）——落盘 `docs/audits/stage-review-S{N}-YYYY-MM-DD.md`。
+- **下游**：open 项 → `audit-item` 入账（`.scratch/neonforge-v1/audit-items/`）；阶段收口 → `stage-gate` 跑 DoD（含审计状态核对）。
+
+与普通模式的差异：普通模式输出双轴报告即可；阶段模式要求**状态化清单**（每条 finding 带状态 + 证据），可直接被 audit-item 消费、被 stage-gate 枚举。
 
 ## Why two axes
 
