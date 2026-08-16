@@ -2,12 +2,12 @@
 name: problem-resolution-flow
 description: >-
   Problem Resolution Flow: end-to-end evidence-driven pipeline from symptom to shipped
-  fix — locate, trace root cause, classify by type, scope, grade severity, draft before
-  research, cross-validate externally, decide workaround vs permanent fix, fix with a
-  failing test, verify, close the loop with a no-blame lesson. Use when handling any bug,
-  UX complaint, or behavior gap, before jumping to fixes. NOT for: root-cause
-  investigation alone (use systematic-debugging) or the evidence-first intake
-  methodology (use problem-dive).
+  fix — locate, trace, grade severity first (P0/P1 fast path: restore before deep
+  investigation), classify by type, scope, draft before research, cross-validate
+  externally, decide workaround vs permanent fix, fix with a failing test, verify, close
+  the loop with a no-blame lesson. Use when handling any bug, UX complaint, or behavior
+  gap, before jumping to fixes. NOT for: root-cause investigation alone (use
+  systematic-debugging) or the evidence-first intake methodology (use problem-dive).
 ---
 
 # Problem Resolution Flow
@@ -22,9 +22,10 @@ symptom is fixed three times, stop and question the design.
 ```
 ① LOCATE     — evidence first: error message → logs → reproduced behavior → which component
 ② TRACE      — follow the data/call chain back to the original trigger (root-cause-tracing)
-③ CLASSIFY   — problem type: single-point / logic error / interaction UX / design or architecture
-④ SCOPE      — line / function / module / project → determines fix depth
-⑤ SEVERITY   — grade impact × urgency (grading table) → sets the response path
+③ SEVERITY   — grade impact × urgency NOW (grading table) — P0/P1 → stop-and-restore path,
+               investigation depth can wait; P2/P3 → proceed in order
+④ CLASSIFY   — problem type: single-point / logic error / interaction UX / design or architecture
+⑤ SCOPE      — line / function / module / project → determines fix depth
 ⑥ DRAFT      — form your own solution before looking outward
 ⑦ RESEARCH   — external evidence by type (competitor behavior / user logs / official or academic
                docs); key claims cross-validated across 2+ independent channels
@@ -36,6 +37,9 @@ symptom is fixed three times, stop and question the design.
                recurring symptoms become a tracked problem with a known-error note
                (reusable knowledge for the next occurrence)
 ```
+
+**P0/P1 fast path（triage 前置的意义）**：③ 分级后若为 P0/P1，立即进入止损分支——
+先 workaround/回滚恢复服务，再回来完成 ④-⑧（根因调查可延后）；恢复 ≠ 结束（见 Incident vs Problem）。
 
 ## Severity Grading（行业对齐）
 
