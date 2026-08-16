@@ -22,13 +22,14 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 
 ## 技能清单
 
-### 工程实践（18）
+### 工程实践（21）
 
 | 技能 | 说明 |
 |------|------|
 | architecture-patterns | 架构模式指南 |
+| audit-item | 审计发现 issue 化跟踪（open/fixed/recorded，被阶段门禁枚举） |
 | cicd-pipeline | CI/CD 管道测试配置 |
-| code-review | 代码审查 |
+| code-review | 代码审查（含阶段末即时评审模式） |
 | codebase-design | 代码库设计 |
 | deep-codebase-analysis | 深度代码库分析 |
 | electron-best-practices | Electron 最佳实践 |
@@ -40,6 +41,8 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | problem-resolution-flow | 问题处理全流程（定位→分级→调研→修复→收尾） |
 | typescript-best-practices | TypeScript 最佳实践 |
 | verification-before-completion | 完成前验证（证据先于断言） |
+| stage-gate | 阶段门禁执行（stage-spec DoD 逐条验证，只验不修） |
+| stage-spec | 阶段契约编写（DoD 机器可验证断言 + TDD 网格） |
 | writing-plans | 编写实现计划 |
 | write-spec | 编写 spec / PRD |
 | executing-plans | 执行实现计划 |
@@ -92,12 +95,13 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | voice-of-customer-miner | 客户之声挖掘 |
 | workshop-facilitation | 工作坊促导 |
 
-### 测试 / QA（8）
+### 测试 / QA（9）
 
 | 技能 | 说明 |
 |------|------|
 | accessibility-auditor | 无障碍合规审计 |
 | api-contract-validator | API 契约验证 |
+| coverage-matrix | 覆盖矩阵（不变量/事件/DoD ↔ 测试门禁） |
 | dependency-scan | 依赖漏洞扫描 |
 | k6-performance | k6 性能测试 |
 | playwright-best-practices | Playwright 最佳实践 |
@@ -124,16 +128,18 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | ux-heuristics | 可用性启发式审计（Nielsen 10） |
 | marketing-copywriting | 营销文案写作 |
 
-### Agent 会话与个人效率（7）
+### Agent 会话与个人效率（9）
 
 | 技能 | 说明 |
 |------|------|
 | project-handoff | 项目交接文档 |
 | project-intake | 项目接手恢复 |
+| decision-log | 决策日志 ADR（记录/查询，状态机） |
 | delegated-research | 委托式后台调研 |
 | session-health | 会话健康度评估 |
 | core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护） |
 | skill-description-audit | 技能描述交叉验证审计 |
+| skill-eval | skill 行为评估（有/无 skill pass-rate 对比） |
 | task-loop-progress | 长任务进度 Loop |
 
 ## 目录结构
