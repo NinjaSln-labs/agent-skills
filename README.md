@@ -1,24 +1,26 @@
 # Agent Skills
 
-个人维护的 Agent Skill 集合，遵循 [Agent Skills](https://agentskills.io) 开放规范（`SKILL.md`），可安装到任何支持该规范的 AI 编码代理。
+**[English](README.en.md) | 中文**
 
-共 **87 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线），以及 DDD、工程、QA、安全、UI/UX。
+> 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
 
-技能全景图（按产品 0-1 阶段分类与编排路径）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
+共 **87 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
 
-## 安装
+技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
-将技能目录拷贝到代理的技能发现根目录（用户级 `~/.agents/skills/` 或项目级 `.agents/skills/`）：
+## 快速开始
 
 ```bash
 git clone https://github.com/NinjaSln-labs/agent-skills.git
-# 安装单个技能
-cp -r agent-skills/<skill-name> ~/.agents/skills/
+cd agent-skills
+
+# 安装单个技能（拷贝到代理的技能发现根目录）
+cp -r <skill-name> ~/.agents/skills/
 # 或安装全部技能
 for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 ```
 
-安装后重启/重载代理客户端，技能即可被发现。
+安装后重启/重载代理客户端，技能即可被发现。用户级目录为 `~/.agents/skills/`，项目级为 `<项目>/.agents/skills/`。
 
 ## 技能清单
 
@@ -59,7 +61,7 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | ddd-domain-interactions | 领域交互 |
 | ddd-model-review | 领域模型审查 |
 | ddd-openspec-bridge | OpenSpec 桥接 |
-| ddd-qa-chain | 质量链（DoD 验证） |
+| ddd-qa-chain | 质量链（5 层验证 + DoD 门禁，工具命令按项目映射） |
 | ddd-scope | 领域范围界定 |
 | ddd-subdomains | 子域划分 |
 | ddd-tactical-review | 战术设计审查 |
@@ -78,10 +80,10 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | competitive-research-snapshot | 竞争调研快照 |
 | customer-journey-map | 客户旅程地图 |
 | discovery-interview-prep | 发现访谈准备 |
-| grill-me / plan-grilling |
+| grill-me / plan-grilling | 计划/设计质询（执行前压力测试） |
 | intelligence-collection-disciplines | 情报收集纪律 |
 | jobs-to-be-done | JTBD 框架 |
-| product-launch |
+| product-launch | 产品发布（ORB + 五阶段） |
 | market-landscape-scan | 市场格局扫描 |
 | positioning-statement / positioning-workshop | 定位陈述/工作坊 |
 | prd-development | PRD 开发 |
@@ -157,5 +159,3 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 ## License
 
 各技能自带 `license` 字段（多为 MIT / CC-BY-SA-4.0），以各 `SKILL.md` frontmatter 为准。
-
-
