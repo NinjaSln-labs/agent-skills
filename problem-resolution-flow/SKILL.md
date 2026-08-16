@@ -32,7 +32,9 @@ symptom is fixed three times, stop and question the design.
                keep a tracked permanent-fix item
 ⑨ FIX        — TDD: write a failing test first, then the minimum change
 ⑩ VERIFY     — run the verifier (a check that produces pass/fail); full regression stays green
-⑪ CLOSE      — refill tickets / handoff deltas / write a no-blame one-line lesson
+⑪ CLOSE      — refill tickets / handoff deltas / write a no-blame one-line lesson;
+               recurring symptoms become a tracked problem with a known-error note
+               (reusable knowledge for the next occurrence)
 ```
 
 ## Severity Grading（行业对齐）
