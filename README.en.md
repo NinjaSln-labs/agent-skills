@@ -1,5 +1,7 @@
 # Agent Skills
 
+[![skills.sh](https://skills.sh/b/NinjaSln-labs/agent-skills)](https://skills.sh/NinjaSln-labs/agent-skills)
+
 **[中文](README.md) | English**
 
 > Portable Agent Skills (following the [Agent Skills](https://agentskills.io) open spec, `SKILL.md`), installable on any AI coding agent that supports the spec (Claude Code / Cursor / Deep Code / Copilot CLI, etc.).
@@ -9,6 +11,10 @@
 The full map (skills classified by product-0-1 stage with orchestration paths — including the "stage-gate chain" and "problem-resolution chain") is in [SKILLS-MAP.md](SKILLS-MAP.md).
 
 ## Quick Start
+
+```bash
+npx skills add NinjaSln-labs/agent-skills   # one command installs all 87 skills via skills.sh
+```
 
 ```bash
 git clone https://github.com/NinjaSln-labs/agent-skills.git

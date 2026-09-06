@@ -1,5 +1,7 @@
 # Agent Skills
 
+[![skills.sh](https://skills.sh/b/NinjaSln-labs/agent-skills)](https://skills.sh/NinjaSln-labs/agent-skills)
+
 **[English](README.en.md) | 中文**
 
 > 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
@@ -9,6 +11,10 @@
 技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
 ## 快速开始
+
+```bash
+npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 87 技能
+```
 
 ```bash
 git clone https://github.com/NinjaSln-labs/agent-skills.git
