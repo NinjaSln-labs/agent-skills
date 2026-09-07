@@ -3,6 +3,9 @@ name: proto-persona
 description: >-
   Create a proto-persona from current research, market signals, and team knowledge. Use
   when you need a working customer profile before deeper validation.
+slug: proto-persona
+version: 1.0.0
+displayName: proto-persona
 ---
 
 # Proto Persona

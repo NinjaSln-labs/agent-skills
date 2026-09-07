@@ -7,6 +7,9 @@ description: >-
   system, understanding architecture before maintenance, or scoping a refactor). NOT for:
   single-file edits, auditing one skill's SKILL.md, or reviewing a small diff — those
   belong to code-review / skill-description-audit.
+slug: deep-codebase-analysis
+version: 1.0.0
+displayName: deep-codebase-analysis
 ---
 
 # Deep Codebase Analysis

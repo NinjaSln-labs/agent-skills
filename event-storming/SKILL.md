@@ -9,6 +9,9 @@ description: >-
   --glossary, --notation, --remote. No args: interactive discovery — checks Miro for
   boards (if available), asks goal, recommends format. Not for agentic simulation — use
   /event-storming:simulation.
+slug: event-storming
+version: 1.0.0
+displayName: event-storming
 ---
 
 # Event Storming

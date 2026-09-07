@@ -5,6 +5,9 @@ description: >-
   manual keyboard navigation, screen reader compatibility, and focus management
   verification Use when running accessibility checks, WCAG compliance testing, or axe-core
   audits.
+slug: accessibility-auditor
+version: 1.0.0
+displayName: accessibility-auditor
 ---
 
 # Accessibility Auditor Skill

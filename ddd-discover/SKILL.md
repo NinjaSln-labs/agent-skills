@@ -5,6 +5,9 @@ risk: safe
 source: self
 tags: "[ddd, discovery, event-storming, domain-storytelling]"
 date_added: "2026-05-08"
+slug: ddd-discover
+version: 1.0.0
+displayName: ddd-discover
 ---
 
 # DDD Discover

@@ -6,6 +6,9 @@ description: >-
   about to claim work is complete, fixed, or passing, before committing or creating PRs.
   NOT for: stage-level aggregation of a whole DoD spec — that is stage-gate, which runs
   the full gate and never fixes.
+slug: verification-before-completion
+version: 1.0.0
+displayName: verification-before-completion
 ---
 
 # Verification Before Completion

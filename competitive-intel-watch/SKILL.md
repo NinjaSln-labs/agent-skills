@@ -4,6 +4,9 @@ description: >-
   Competitive Intel Watch: scheduled delta monitoring against a prior competitive
   snapshot. Use when tracking competitors on a cadence: material shifts only, cited
   evidence, battle-card update flags, runs unattended.
+slug: competitive-intel-watch
+version: 1.0.0
+displayName: competitive-intel-watch
 ---
 
 # Competitive Intel Watch

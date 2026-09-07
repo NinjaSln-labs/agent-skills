@@ -4,6 +4,9 @@ description: >-
   Research a competitive landscape with cited snapshots, a comparison matrix, and so-what
   implications. Use when a product decision needs competitive grounding, not a market
   report.
+slug: competitive-research-snapshot
+version: 1.0.0
+displayName: competitive-research-snapshot
 ---
 
 # Competitive Research Snapshot

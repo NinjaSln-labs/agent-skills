@@ -8,6 +8,9 @@ description: >-
   compaction, starting a new session, high context overhead, or long-session continuation
   (e.g. "go" / "keep going"). NOT for: auditing skill descriptions, full-codebase
   architecture analysis, or product-doc set audits.
+slug: session-health
+version: 1.0.0
+displayName: session-health
 ---
 # 会话健康度评估（Session Health）
 在长会话中评估「继续 vs 新开」的得失，判断是否该新开会话。**只评估不修改**任何会话文件。

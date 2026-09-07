@@ -8,6 +8,9 @@ description: >-
   flag gaps (invariant without test, event without assertion) into audit items.
   Use when at a stage end ("更新覆盖矩阵") or after adding invariants/events. NOT for: runtime
   enforcement — the matrix is a human-checked artifact, never a test gate.
+slug: coverage-matrix
+version: 1.0.0
+displayName: coverage-matrix
 ---
 
 # Coverage Matrix（覆盖矩阵生成/维护）

@@ -6,6 +6,9 @@ description: >-
   comparison table plus concrete improvement items that feed back into the skill's
   SKILL.md. Use when a skill changes, at quarterly evaluation, or when accepting a new
   skill. NOT for: static description compliance — use skill-description-audit.
+slug: skill-eval
+version: 1.0.0
+displayName: skill-eval
 ---
 
 # Skill Eval（高频 skill 行为评估）

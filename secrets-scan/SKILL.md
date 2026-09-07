@@ -3,6 +3,9 @@ name: secrets-scan
 description: >-
   Secrets scan: detect API keys, passwords, tokens, and other secrets in code. Use when
   you need to find hardcoded credentials and sensitive data in source code.
+slug: secrets-scan
+version: 1.0.0
+displayName: secrets-scan
 ---
 
 # Secrets Scan

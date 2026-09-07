@@ -4,6 +4,9 @@ description: >-
   Validate API responses against OpenAPI/Swagger specifications, JSON Schema definitions,
   and consumer-driven contracts to prevent breaking changes Use when validating API
   responses against OpenAPI/JSON Schema/consumer contracts.
+slug: api-contract-validator
+version: 1.0.0
+displayName: api-contract-validator
 ---
 
 # API Contract Validator Skill

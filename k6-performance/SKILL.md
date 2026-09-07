@@ -4,6 +4,9 @@ description: >-
   k6 performance testing: modern load testing with thresholds, scenarios, custom metrics,
   and env-based BASE_URL. Use when load/performance testing with k6 (thresholds,
   scenarios, metrics).
+slug: k6-performance
+version: 1.0.0
+displayName: k6-performance
 ---
 
 # k6 Performance Testing Skill

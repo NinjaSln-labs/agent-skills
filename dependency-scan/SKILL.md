@@ -4,6 +4,9 @@ description: >-
   Dependency scan: detect CVEs and security issues in project dependencies. Use when you
   need to analyze packages for known vulnerabilities across npm, pip, cargo, and other
   ecosystems.
+slug: dependency-scan
+version: 1.0.0
+displayName: dependency-scan
 ---
 
 # Dependency Scan

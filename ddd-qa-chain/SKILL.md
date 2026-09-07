@@ -10,6 +10,9 @@ description: >-
   or when asked to run full self-tests / quality checks. NOT for: stage-level DoD
   aggregation (use stage-gate) or single-shot verification (use
   verification-before-completion).
+slug: ddd-qa-chain
+version: 1.0.0
+displayName: ddd-qa-chain
 ---
 
 # QA Chain（质量链编排）

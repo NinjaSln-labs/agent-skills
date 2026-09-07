@@ -3,6 +3,9 @@ name: battle-card-builder
 description: >-
   Research and draft a competitive battle card from public evidence — every claim labeled
   and sourced. Use when a rep needs a field-action card, not a research report.
+slug: battle-card-builder
+version: 1.0.0
+displayName: battle-card-builder
 ---
 
 # Battle Card Builder

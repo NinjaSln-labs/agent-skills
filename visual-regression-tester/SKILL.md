@@ -5,6 +5,9 @@ description: >-
   using Playwright or Chromatic/Percy. Use when users request visual testing, screenshot
   testing, UI regression, visual diff, or Chromatic setup. Prefer pixel-perfect for free
   local flows; use this for Chromatic/Percy platform needs.
+slug: visual-regression-tester
+version: 1.0.0
+displayName: visual-regression-tester
 ---
 
 # Visual Regression Tester

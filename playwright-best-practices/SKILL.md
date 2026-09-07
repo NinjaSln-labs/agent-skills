@@ -6,6 +6,9 @@ description: >-
   WebSockets, mobile, GraphQL, PWA, Electron, and extensions. Use when writing or
   debugging Playwright tests. NOT for: non-Playwright frameworks (Cypress/Selenium-only)
   or general CI without Playwright.
+slug: playwright-best-practices
+version: 1.0.0
+displayName: playwright-best-practices
 ---
 
 # Playwright Best Practices

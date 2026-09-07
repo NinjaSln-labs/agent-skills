@@ -5,6 +5,9 @@ risk: safe
 source: self
 tags: "[ddd, strategic, bounded-context, ubiquitous-language]"
 date_added: "2026-05-08"
+slug: ddd-contexts
+version: 1.0.0
+displayName: ddd-contexts
 ---
 
 # DDD Contexts

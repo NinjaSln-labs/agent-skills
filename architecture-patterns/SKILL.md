@@ -6,6 +6,9 @@ description: >-
   adapters for unit tests). Use when designing clean architecture for a new microservice,
   refactoring a monolith to bounded contexts, implementing hexagonal or onion
   architecture, or debugging dependency cycles between application layers.
+slug: architecture-patterns
+version: 1.0.0
+displayName: architecture-patterns
 ---
 
 # Architecture Patterns

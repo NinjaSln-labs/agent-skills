@@ -3,6 +3,9 @@ name: workshop-facilitation
 description: >-
   Facilitate workshop sessions in a one-step, multi-turn flow. Use when an interactive
   skill needs consistent pacing, options, and progress tracking.
+slug: workshop-facilitation
+version: 1.0.0
+displayName: workshop-facilitation
 ---
 
 # Workshop Facilitation

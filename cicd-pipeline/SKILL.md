@@ -4,6 +4,9 @@ description: >-
   Configure testing in CI/CD pipelines for GitHub Actions, Jenkins, and GitLab CI: shards,
   parallelization, wait-on health checks, and service containers. Use when configuring
   tests in CI/CD pipelines (GitHub Actions, Jenkins, GitLab).
+slug: cicd-pipeline
+version: 1.0.0
+displayName: cicd-pipeline
 ---
 
 # CI/CD Pipeline Config Skill

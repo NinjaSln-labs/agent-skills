@@ -3,6 +3,9 @@ name: positioning-statement
 description: >-
   Create a Geoffrey Moore-style positioning statement. Use when clarifying who you serve,
   what problem you solve, your category, and why you're different from alternatives.
+slug: positioning-statement
+version: 1.0.0
+displayName: positioning-statement
 ---
 
 # Positioning Statement

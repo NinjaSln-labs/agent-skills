@@ -8,6 +8,9 @@ description: >-
   types, or coding standards. Keywords: typescript, types, coding standards, best
   practices, type safety, generics, architecture, refactoring. Use when working with this
   skill's domain.
+slug: typescript-best-practices
+version: 1.0.0
+displayName: typescript-best-practices
 ---
 
 # TypeScript Best Practices

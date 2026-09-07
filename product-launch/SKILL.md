@@ -10,6 +10,9 @@ description: >-
   whenever someone is preparing to release something publicly. For ongoing marketing after
   launch, see marketing-ideas. For the offer being launched (bonuses, guarantees,
   scarcity, naming), see offers.
+slug: product-launch
+version: 1.0.0
+displayName: product-launch
 ---
 
 # Launch Strategy

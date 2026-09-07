@@ -3,6 +3,9 @@ name: company-intel
 description: >-
   Research a company, industry, or competitor set using web search and seven analytical
   lenses. Use when you need structured intel that feeds downstream PM skills.
+slug: company-intel
+version: 1.0.0
+displayName: company-intel
 ---
 
 ## Purpose

@@ -5,6 +5,9 @@ risk: safe
 source: self
 tags: "[ddd, tactical, events, services, repositories]"
 date_added: "2026-05-08"
+slug: ddd-domain-interactions
+version: 1.0.0
+displayName: ddd-domain-interactions
 ---
 
 # DDD Domain Interactions

@@ -3,6 +3,9 @@ name: press-release
 description: >-
   Write an Amazon-style press release that defines customer value before building. Use
   when aligning stakeholders on a new product, feature, or strategic bet.
+slug: press-release
+version: 1.0.0
+displayName: press-release
 ---
 
 # Press Release

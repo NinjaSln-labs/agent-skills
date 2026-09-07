@@ -4,6 +4,9 @@ description: >-
   Mine public reviews, app stores, and forums for unmet needs, competitor weaknesses, and
   switching triggers — with quoted evidence. Use when you want customer voice without
   waiting on interviews.
+slug: voice-of-customer-miner
+version: 1.0.0
+displayName: voice-of-customer-miner
 ---
 
 # Voice-of-Customer Miner

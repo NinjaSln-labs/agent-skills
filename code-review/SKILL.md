@@ -9,6 +9,9 @@ description: >-
   statusized open/fixed/recorded findings list. Use when the user wants to review a branch,
   a PR, work-in-progress changes, asks to "review since X", or at a stage completion
   ("阶段末评审").
+slug: code-review
+version: 1.0.0
+displayName: code-review
 ---
 
 # Code Review

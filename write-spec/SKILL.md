@@ -5,6 +5,9 @@ description: >-
   vague idea or user request into a structured document, scoping a feature with goals and
   non-goals, defining success metrics and acceptance criteria, or breaking a big ask into
   a phased spec.
+slug: write-spec
+version: 1.0.0
+displayName: write-spec
 ---
 
 # Write Spec

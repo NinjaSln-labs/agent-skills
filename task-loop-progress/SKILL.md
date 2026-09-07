@@ -9,6 +9,9 @@ description: >-
   AGENT_LOOP_TICK, Agent must post chat_line to Chat. Use when the user asks for a task
   loop, progress loop, AGENT_LOOP_TICK, config+adapter templates, long-task polling, or
   provides a custom poll command.
+slug: task-loop-progress
+version: 1.0.0
+displayName: task-loop-progress
 ---
 
 # 长任务进度 Loop · Config + Adapter 生成

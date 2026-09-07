@@ -4,6 +4,9 @@ description: >-
   PRD development: build a structured Product Requirements Document that connects problem,
   users, solution, and success criteria. Use when turning discovery notes into an
   engineering-ready document for a major initiative or feature.
+slug: prd-development
+version: 1.0.0
+displayName: prd-development
 ---
 
 # PRD Development

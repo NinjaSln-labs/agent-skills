@@ -4,6 +4,9 @@ description: >-
   Config scan: detect security misconfigurations in config files, Docker, and IaC. Use
   when reviewing configuration security for containers, Kubernetes, Terraform, or
   application settings.
+slug: config-scan
+version: 1.0.0
+displayName: config-scan
 ---
 
 # Config Scan

@@ -7,6 +7,9 @@ description: >-
   within 60s), session progress (maintained in .agents/session.md). Use when handling
   passwords/credentials, write operations, long-running tasks, session records, or at any
   project start/end.
+slug: core-rules
+version: 1.0.0
+displayName: core-rules
 ---
 
 # 全局规则（Global Rules）

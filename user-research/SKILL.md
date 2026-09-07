@@ -4,6 +4,9 @@ description: >-
   Plan, conduct, and synthesize user research. Trigger with "user research plan",
   "interview guide", "usability test", "survey design", "research questions", or when the
   user needs help with any aspect of understanding their users through research.
+slug: user-research
+version: 1.0.0
+displayName: user-research
 ---
 
 # User Research

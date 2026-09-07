@@ -9,6 +9,9 @@ description: >-
   "help me describe my product." Use whenever website text must persuade or convert. NOT
   for: email copy, popup copy, or offer framing (bonuses/guarantees) — those belong to
   dedicated email/popup/offers skills when available.
+slug: marketing-copywriting
+version: 1.0.0
+displayName: marketing-copywriting
 ---
 
 # Marketing Copywriting

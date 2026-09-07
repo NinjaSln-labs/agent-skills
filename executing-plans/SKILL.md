@@ -7,6 +7,9 @@ description: >-
   session (use subagent-driven-development instead if subagents are available). NOT for:
   verifying a stage against its spec — that is stage-gate, which only verifies and never
   executes.
+slug: executing-plans
+version: 1.0.0
+displayName: executing-plans
 ---
 
 # Executing Plans

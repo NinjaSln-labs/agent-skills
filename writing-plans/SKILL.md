@@ -7,6 +7,9 @@ description: >-
   docs/superpowers/plans/. Use when you have a spec or requirements for a multi-step task,
   before touching code. NOT for: stage contract specs (DoD/gate assertions + TDD grid) —
   those are stage-spec, executed by stage-gate.
+slug: writing-plans
+version: 1.0.0
+displayName: writing-plans
 ---
 
 # Writing Plans

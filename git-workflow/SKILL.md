@@ -8,6 +8,9 @@ description: >-
   hook-install failures in git worktrees. Use when doing any of the above. NOT for:
   creating releases (use github-release) or diagnosing BLOCKED/won't-merge PRs (use
   github-project).
+slug: git-workflow
+version: 1.0.0
+displayName: git-workflow
 ---
 
 # Git Workflow Skill

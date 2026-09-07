@@ -8,6 +8,9 @@ description: >-
   or evaluating information architecture and navigation. Covers Krug''s laws, Nielsen''s
   10 heuristics, severity ratings, dark-pattern recognition, and accessibility. For visual
   design fixes, see refactoring-ui. For conversion-focused audits, see cro-methodology.
+slug: ux-heuristics
+version: 1.0.0
+displayName: ux-heuristics
 ---
 
 # UX Heuristics Framework

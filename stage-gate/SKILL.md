@@ -8,6 +8,9 @@ description: >-
   Use when a stage is claimed complete or on "run the stage gate" / "跑阶段门禁".
   NOT for: single-shot verification (use verification-before-completion) or
   executing a plan (use executing-plans).
+slug: stage-gate
+version: 1.0.0
+displayName: stage-gate
 ---
 
 # Stage Gate（阶段门禁执行）

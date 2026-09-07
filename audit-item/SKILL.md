@@ -7,6 +7,9 @@ description: >-
   plus a summary index README that stage-gate enumerates. Use when an audit or review
   produces findings ("把审计发现入账" / "审计项"). NOT for: finding the issues
   (use code-review or the audit itself) — this skill only tracks them.
+slug: audit-item
+version: 1.0.0
+displayName: audit-item
 ---
 
 # Audit Item（审计问题 issue 化跟踪）

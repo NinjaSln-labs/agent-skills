@@ -7,6 +7,9 @@ description: >-
   HANDOFF reference sync. Use when a semantic ruling or adjudication happens in a stage,
   or on "记录裁定" / "写进决策日志" / "ADR" / querying "决策 X 的现状". NOT for: writing
   handoff docs (use project-handoff) — HANDOFF references ADR numbers, never copies them.
+slug: decision-log
+version: 1.0.0
+displayName: decision-log
 ---
 
 # Decision Log（ADR 记录/查询）

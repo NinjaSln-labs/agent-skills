@@ -3,6 +3,9 @@ name: jobs-to-be-done
 description: >-
   Uncover customer jobs, pains, and gains in a structured JTBD format. Use when clarifying
   unmet needs, repositioning a product, or improving discovery and messaging.
+slug: jobs-to-be-done
+version: 1.0.0
+displayName: jobs-to-be-done
 ---
 
 # Jobs To Be Done

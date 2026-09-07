@@ -4,6 +4,9 @@ description: >-
   Run a positioning workshop that surfaces target customer, unmet need, category,
   benefits, and differentiation. Use when your product messaging feels fuzzy, generic, or
   misaligned.
+slug: positioning-workshop
+version: 1.0.0
+displayName: positioning-workshop
 ---
 
 # Positioning Workshop

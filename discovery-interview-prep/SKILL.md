@@ -4,6 +4,9 @@ description: >-
   Plan customer discovery interviews with the right goal, segment, constraints, and
   method. Use when preparing interviews for problem validation, churn research, or new
   product ideas.
+slug: discovery-interview-prep
+version: 1.0.0
+displayName: discovery-interview-prep
 ---
 
 # Discovery Interview Prep

@@ -8,6 +8,9 @@ risk: safe
 source: self
 tags: "[ddd, discovery, scope]"
 date_added: "2026-05-08"
+slug: ddd-scope
+version: 1.0.0
+displayName: ddd-scope
 ---
 
 # DDD Scope

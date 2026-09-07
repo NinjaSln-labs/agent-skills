@@ -7,6 +7,9 @@ description: >-
   auto-apply silently. AUDIT MODE: when reviewing interfaces, flag violations and fixes.
   Trigger on UI/landing/component/dashboard/document generation or "fix the typography".
   NOT for: marketing copywriting strategy, print-only typesetting, or non-UI prose.
+slug: ui-typography
+version: 1.0.0
+displayName: ui-typography
 ---
 
 # UI Typography Skill

@@ -5,6 +5,9 @@ risk: safe
 source: self
 tags: "[ddd, strategic, subdomains]"
 date_added: "2026-05-08"
+slug: ddd-subdomains
+version: 1.0.0
+displayName: ddd-subdomains
 ---
 
 # DDD Subdomains

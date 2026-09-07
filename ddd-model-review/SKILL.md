@@ -8,6 +8,9 @@ risk: safe
 source: self
 tags: "[ddd, validation, review, feedback-loop]"
 date_added: "2026-05-08"
+slug: ddd-model-review
+version: 1.0.0
+displayName: ddd-model-review
 ---
 
 # DDD Model Review

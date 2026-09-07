@@ -5,6 +5,9 @@ risk: safe
 source: self
 tags: "[ddd, implementation, openspec, sdd]"
 date_added: "2026-05-11"
+slug: ddd-openspec-bridge
+version: 1.0.0
+displayName: ddd-openspec-bridge
 ---
 
 # DDD OpenSpec Bridge

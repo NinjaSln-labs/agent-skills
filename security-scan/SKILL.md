@@ -4,6 +4,9 @@ description: >-
   Security scan: scan code for security vulnerabilities including OWASP Top 10, secrets,
   and misconfigurations, with severity thresholds. Use when you need comprehensive
   security analysis of a codebase.
+slug: security-scan
+version: 1.0.0
+displayName: security-scan
 ---
 
 # Security Scan

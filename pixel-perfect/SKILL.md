@@ -8,6 +8,9 @@ description: >-
   verify that code changes didn't break the UI visually. DO NOT TRIGGER when: user wants
   functional/behavioral testing (use playwright-skill), just wants a single screenshot (use screenshots
   skill), or asks about accessibility.
+slug: pixel-perfect
+version: 1.0.0
+displayName: pixel-perfect
 ---
 
 # Pixel Perfect

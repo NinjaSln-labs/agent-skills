@@ -5,6 +5,9 @@ risk: safe
 source: self
 tags: "[ddd, strategic, context-map, integration]"
 date_added: "2026-05-08"
+slug: ddd-context-map
+version: 1.0.0
+displayName: ddd-context-map
 ---
 
 # DDD Context Map

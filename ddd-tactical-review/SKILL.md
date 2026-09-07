@@ -10,6 +10,9 @@ description: >-
   Do NOT use for module or service boundary design, architectural decomposition, strategic
   DDD context mapping, or code outside the domain layer (DTOs, controllers, infrastructure
   adapters).
+slug: ddd-tactical-review
+version: 1.0.0
+displayName: ddd-tactical-review
 ---
 
 # Tactical DDD — Rich Domain Modeling

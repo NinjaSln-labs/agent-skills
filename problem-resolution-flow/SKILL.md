@@ -8,6 +8,9 @@ description: >-
   the loop with a no-blame lesson. Use when handling any bug, UX complaint, or behavior
   gap, before jumping to fixes. NOT for: root-cause investigation alone (use
   systematic-debugging) or the evidence-first intake methodology (use problem-dive).
+slug: problem-resolution-flow
+version: 1.0.0
+displayName: problem-resolution-flow
 ---
 
 # Problem Resolution Flow

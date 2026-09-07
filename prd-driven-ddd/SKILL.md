@@ -23,6 +23,9 @@ metadata:
     - "工厂示例对齐门槛②（多VO+非平凡校验）"
     - "交付物#3显式含编舞责任方"
     - "进度清单§3与交付物对齐（编舞责任方）"
+slug: prd-driven-ddd
+version: 1.0.0
+displayName: prd-driven-ddd
 ---
 
 # PRD 驱动的领域建模（PRD-Driven Domain Modeling）

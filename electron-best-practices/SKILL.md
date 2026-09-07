@@ -6,6 +6,9 @@ description: >-
   electron, electron-vite, electron-forge, contextBridge, IPC, security, react, packaging,
   code signing, notarization, playwright, desktop app. Use when building secure Electron
   apps with React/TypeScript (IPC, packaging, testing).
+slug: electron-best-practices
+version: 1.0.0
+displayName: electron-best-practices
 ---
 
 # Electron + React Best Practices

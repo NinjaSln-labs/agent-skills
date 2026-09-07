@@ -7,6 +7,9 @@ description: >-
   (AI-ready, not prose — directly verifiable post-implementation). Use when the user wants to turn a
   plan or PRD into agent-ready tickets, split work with explicit blockers, or publish a tracer-bullet
   breakdown to a local issues folder or issue tracker.
+slug: to-tickets
+version: 1.0.0
+displayName: to-tickets
 ---
 
 # To Tickets

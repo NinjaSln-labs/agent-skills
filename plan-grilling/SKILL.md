@@ -3,6 +3,9 @@ name: plan-grilling
 description: >-
   Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to
   stress-test their thinking, or uses any 'grill' trigger phrases.
+slug: plan-grilling
+version: 1.0.0
+displayName: plan-grilling
 ---
 
 # Plan Grilling

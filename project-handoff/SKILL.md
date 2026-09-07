@@ -10,6 +10,9 @@ description: >-
   referenced by number, never copied). Use when handing off across sessions/tools, generating or
   updating HANDOFF.md, capturing project delta state, or after stage rulings. NOT for: resuming prior
   work — that belongs to project-intake.
+slug: project-handoff
+version: 1.0.0
+displayName: project-handoff
 ---
 
 # 项目交接文档（Project Handoff）

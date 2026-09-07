@@ -9,6 +9,9 @@ description: >-
   docs. Supports final project acceptance (four-layer go/no-go). Use when auditing or
   cross-validating product docs (PRDs, design docs, specs, domain docs, launch docs) for
   readiness, grading, contradictions, or go/no-go delivery decisions.
+slug: product-doc-audit
+version: 1.0.0
+displayName: product-doc-audit
 ---
 
 # 产品文档审计（Product Document Audit）

@@ -3,6 +3,9 @@ name: competitive-analysis-process
 description: >-
   Orchestrate a complete competitive analysis across six steps, from landscape to
   strategic direction. Use when you need the full picture, not a single scan or card.
+slug: competitive-analysis-process
+version: 1.0.0
+displayName: competitive-analysis-process
 ---
 
 # Competitive Analysis Process

@@ -7,6 +7,9 @@ description: >-
   决策清单+小步推进 → 持续盘点闭环。含认知偏差防御（反例清单/可证伪预期）。当用户反馈
   「体验完毕」「有问题」「报错」「卡住」「失败」「异常」「先看看」「分析一下」「怎么回事」等触发。
   产出：根因 + 方案对比 + 决策清单（不直接修——修复落地归 problem-resolution-flow）。
+slug: problem-dive
+version: 1.0.0
+displayName: problem-dive
 ---
 
 # Problem Dive（问题深挖方法论）

@@ -5,6 +5,9 @@ description: >-
   optimizing React components built with Vite. Triggers on tasks involving Vite
   configuration, build optimization, code splitting, lazy loading, HMR, bundle size, or
   React performance.
+slug: react-vite-best-practices
+version: 1.0.0
+displayName: react-vite-best-practices
 ---
 
 # React + Vite Best Practices

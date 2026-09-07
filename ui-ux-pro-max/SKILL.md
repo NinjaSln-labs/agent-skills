@@ -8,6 +8,9 @@ description: >-
   building, or reviewing UI: pages, components, color schemes, typography, layout,
   accessibility, animation, or data visualization — including design system and
   stack-guideline steps.
+slug: ui-ux-pro-max
+version: 1.0.0
+displayName: ui-ux-pro-max
 ---
 
 # UI/UX Pro Max - Design Intelligence

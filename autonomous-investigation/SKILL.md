@@ -4,6 +4,9 @@ description: >-
   The protocol behind every investigation skill. Use when AI research must proceed without
   you: search-plan gate, Fact/Inference/Assumption labels, confidence stacking, diffable
   outputs.
+slug: autonomous-investigation
+version: 1.0.0
+displayName: autonomous-investigation
 ---
 
 # Autonomous Investigation Protocol

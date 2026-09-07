@@ -8,6 +8,9 @@ description: >-
   suggested receiver actions (git init → .gitignore → first commit / read
   tickets / request credentials). Use when receiving a handoff, onboarding onto an existing
   repo, or resuming from HANDOFF.md.
+slug: project-intake
+version: 1.0.0
+displayName: project-intake
 ---
 
 # 项目对接（Project Intake）

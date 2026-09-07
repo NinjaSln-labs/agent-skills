@@ -4,6 +4,9 @@ description: >-
   Run competitive research like an intelligence agency: eight collection disciplines
   (OSINT to MASINT), signal-to-inference chains, and fusion. Use when one-source research
   isn't enough.
+slug: intelligence-collection-disciplines
+version: 1.0.0
+displayName: intelligence-collection-disciplines
 ---
 
 # Intelligence Collection Disciplines

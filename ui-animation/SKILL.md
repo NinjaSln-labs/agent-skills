@@ -6,6 +6,9 @@ description: >-
   building or reviewing interfaces, improving UI polish, auditing animation
   timing/easing/motion, checking animation accessibility (prefers-reduced-motion), or
   making components feel responsive and deliberate.
+slug: ui-animation
+version: 1.0.0
+displayName: ui-animation
 ---
 
 # Design Engineering

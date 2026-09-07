@@ -8,6 +8,9 @@ description: >-
   Use when starting a new stage ("写 S{N} spec" / "回填阶段 spec") or after the
   design's stage plan changes. NOT for: generic implementation plans (use writing-plans)
   or running the gate (use stage-gate).
+slug: stage-spec
+version: 1.0.0
+displayName: stage-spec
 ---
 
 # Stage Spec（阶段 spec 编写/回填）

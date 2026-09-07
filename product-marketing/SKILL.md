@@ -8,6 +8,9 @@ description: >-
   context,' 'positioning,' 'who is my target audience,' 'describe my product,' 'ICP,'
   'ideal customer profile.' Use at the start of any new project before other marketing
   skills.
+slug: product-marketing
+version: 1.0.0
+displayName: product-marketing
 ---
 
 # Product Marketing Context
