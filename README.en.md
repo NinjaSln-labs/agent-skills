@@ -48,10 +48,10 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | problem-handling | Problem handling: one evidence-driven pipeline from a reported symptom to a shipped fix —… |
 | typescript-best-practices | Guide AI agents through TypeScript coding best practices including type safety, error handling… |
 | version-management | Universal version management for any software artifact, independent of any VCS. |
-| verification-before-completion | > Run verification commands and confirm fresh output before claiming work complete—evidence… |
+| verification-before-completion | Run verification commands and confirm fresh output before claiming work complete—evidence… |
 | stage-gate | Run a stage-completion gate for staged delivery (spec-kit): read the stage spec's DoD… |
 | stage-spec | Write or backfill a stage spec for staged delivery (spec-kit): turn a stage row of the phased… |
-| writing-plans | > Write comprehensive implementation plans from a spec or requirements—break multi-step work… |
+| writing-plans | Write comprehensive implementation plans from a spec or requirements—break multi-step work into… |
 | write-spec | Write a feature spec or PRD from a problem statement or feature idea. |
 | executing-plans | Executing Plans: execute a written implementation plan — load the plan, review it critically… |
 | to-tickets | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each… |

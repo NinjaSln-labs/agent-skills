@@ -91,6 +91,10 @@ function Invoke-Check([string]$File) {
     Write-Output "  WARN section 1 retains prior-handoff history (move to cycles.md)"
     $warns++
   }
+  if ($s1 -match '`(\./|bash |sh |python3? |npm |pnpm |yarn |make |docker )') {
+    Write-Output "  WARN section 1 embeds a runnable command (move to section 3; receiver gates first)"
+    $warns++
+  }
 
   $d = Split-Path -Parent $File
   if ([string]::IsNullOrEmpty($d)) { $d = '.' }

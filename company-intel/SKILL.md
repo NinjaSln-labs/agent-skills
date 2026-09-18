@@ -4,9 +4,11 @@ description: >-
   Research a company, industry, or competitor set using web search and seven analytical
   lenses. Use when you need structured intel that feeds downstream PM skills.
 slug: company-intel
-version: 1.0.0
+version: 1.0.1
 displayName: company-intel
 ---
+
+# Company Intel
 
 ## Purpose
 

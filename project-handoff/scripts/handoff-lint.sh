@@ -66,6 +66,12 @@ cmd_check() {
     warns=$((warns + 1))
   fi
 
+  # section 1 holds action pointers, not runnable commands (receiver gates first)
+  if awk '/^## 1\./{s=1;next} /^## /{s=0} s' "$f" | grep -qE '`(\./|bash |sh |python3? |npm |pnpm |yarn |make |docker )'; then
+    echo "  WARN section 1 embeds a runnable command (move to section 3; receiver gates first)"
+    warns=$((warns + 1))
+  fi
+
   # archive trio must exist
   d=$(dirname "$f")
   for a in cycles done pits; do

@@ -13,7 +13,7 @@ description: >-
   handing off across sessions/tools, generating or updating HANDOFF.md, capturing project delta
   state, or after stage rulings. NOT for: resuming prior work — that belongs to project-intake.
 slug: project-handoff
-version: 1.2.0
+version: 1.3.0
 displayName: project-handoff
 ---
 
@@ -42,7 +42,7 @@ displayName: project-handoff
 
 | 节 | 上限 | 内容 |
 |----|------|------|
-| §1 交接元信息 | ≤120 | 日期 / 交接方 / 接收方 / 原因 / 项目一句话 / 文档入口链 / 接收方建议动作（≤3 条）。**不留历次交接历史**（→ cycles.md）|
+| §1 交接元信息 | ≤120 | 日期 / 交接方 / 接收方 / 原因 / 项目一句话 / 文档入口链 / 接收方建议动作（≤3 条，**只放动作指针**：git init / .gitignore / 读 tickets / 索取凭据 / 跑 `fp check`；**不内嵌可运行验证命令**——命令归 §3，接收方一律先过指纹门控）。**不留历次交接历史**（→ cycles.md）|
 | §2 当前状态快照 | ≤400 | **仅域状态表**（域 \| 状态）+ 版本控制/构建环境各一行。**禁 commit 列表 / 「最近完成」**（git log 是详情权威）|
 | §3 下一步与验证点 | ≤200 | 未完成项 + 验证命令 + 外部依赖来源（凭据从哪取）|
 | §4 即时操作 | ≤180 | 启动/验证命令（`AGENTS.md` 已有则引用）+ 未修/仍会踩的坑（≤5 条，每条一行）|
@@ -57,6 +57,7 @@ displayName: project-handoff
 - 输入清单 `<project>/.handoff/fp.txt`（每项目定制，一行一项）：
   - `file:<相对路径>`——纳入文件内容哈希（依赖锁、运行配置等）
   - `cmd:<命令>`——纳入命令输出哈希（版本探测等，如 `cmd:node --version`）
+- 维度取舍（哪些合适、易误入的反例、各项目类型示例）→ `references/fp-dimensions.md`。
 - 写指纹：`scripts/handoff-lint.sh fp write`（Windows：`scripts/handoff-lint.ps1 fp write`）→ 生成 `.handoff/fp.sha`。
 - `.handoff/fp.sha` **不占 HANDOFF 预算**（非常驻 sidecar）；只存每项 8 位短哈希，**不存值** → 密钥文件内容不外泄。
 - 与 HANDOFF 正交：HANDOFF 记状态，指纹记环境；接收方用 `fp check` 决定是否复验（见 project-intake）。
@@ -90,6 +91,7 @@ displayName: project-handoff
 - 缺 HANDOFF-ARCHIVE 三件套；已修坑/已完成待办留在正文
 - 写 API Key/密码/PII；引用密钥写值
 - 交接不写环境指纹（逼接收方无脑全量复验）
+- §1 建议动作内嵌可运行命令（诱使接收方跳过指纹门控直接执行；命令应归 §3）
 
 ## 完成标准
 
@@ -104,7 +106,7 @@ displayName: project-handoff
 
 | 脚本 | 平台 | 说明 |
 |------|------|------|
-| `scripts/handoff-lint.sh` | Linux / macOS / WSL / Git Bash | `check`（预算+结构）/ `fp write\|check`（环境指纹）|
+| `scripts/handoff-lint.sh` | Linux / macOS / WSL / Git Bash | `check`（预算+结构+§1 命令守卫）/ `fp write\|check`（环境指纹）|
 | `scripts/handoff-lint.ps1` | Windows PowerShell 5.1+ | 同契约（纯 ASCII，兼容 PS5.1 的 GBK 读稿）|
 
 零 python/node 依赖（仅系统自带 `wc/awk/sed/sha256sum` 或 PowerShell 内建）。
@@ -117,3 +119,4 @@ displayName: project-handoff
 - NeonForge HANDOFF.md 实践（2026-08-02）：9 节 → 6 节重构——「delta+引用」批判性修正的产物
 - **AI 评审反哺（2026-08-02）**：版本控制坐标、接收方建议动作、占位/未完成边界明示、外部依赖来源
 - **2026-09-17 瘦身改版**：26 个实际 HANDOFF.md 盘点（4KB–70KB，仅 3 个达标）→ ~1K token 硬预算 + 删 §6 + §2 去 commit 列表 + §1 去历史 + 归档硬触发 + 环境指纹最小化复验
+- **2026-09-18 顺序修正**：§1 建议动作只放动作指针、不内嵌可运行命令（命令归 §3）——避免接收方照抄命令、绕过指纹门控；指纹维度取舍移入 `references/fp-dimensions.md`

@@ -7,10 +7,10 @@ description: >-
   in parallel sub-agents and reports them side by side. Stage-end mode: fixed point is the
   parent of the stage's first commit, Spec axis checks the stage spec's DoD, output is a
   statusized open/fixed/recorded findings list. Use when the user wants to review a branch,
-  a PR, work-in-progress changes, asks to "review since X", or at a stage completion
-  ("阶段末评审").
+  a PR, work-in-progress changes, asks to "review since X", asks to review for code smells,
+  or at a stage completion (stage-end review).
 slug: code-review
-version: 1.0.0
+version: 1.0.1
 displayName: code-review
 ---
 

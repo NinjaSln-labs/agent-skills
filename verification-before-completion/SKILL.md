@@ -1,13 +1,13 @@
 ---
 name: verification-before-completion
 description: >-
-  > Run verification commands and confirm fresh output before claiming work
+  Run verification commands and confirm fresh output before claiming work
   complete—evidence before assertions, never claim done without verification. Use when
   about to claim work is complete, fixed, or passing, before committing or creating PRs.
   NOT for: stage-level aggregation of a whole DoD spec — that is stage-gate, which runs
   the full gate and never fixes.
 slug: verification-before-completion
-version: 1.0.0
+version: 1.0.1
 displayName: verification-before-completion
 ---
 

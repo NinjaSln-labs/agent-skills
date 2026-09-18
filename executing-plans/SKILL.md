@@ -2,13 +2,14 @@
 name: executing-plans
 description: >-
   Executing Plans: execute a written implementation plan — load the plan, review it
-  critically, execute all tasks with per-task commits and review checkpoints, and report
-  when complete. Use when you have a written implementation plan to execute in a separate
-  session (use subagent-driven-development instead if subagents are available). NOT for:
+  critically, execute all tasks in order running the verifications each task specifies,
+  and report when complete. Use when you have a written implementation plan to execute in
+  a separate session, or when resuming a plan in a fresh session after an agent/tool
+  switch (use subagent-driven-development instead if subagents are available). NOT for:
   verifying a stage against its spec — that is stage-gate, which only verifies and never
   executes.
 slug: executing-plans
-version: 1.0.0
+version: 1.0.1
 displayName: executing-plans
 ---
 

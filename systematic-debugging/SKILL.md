@@ -4,8 +4,10 @@ description: >-
   Systematic Debugging: find the root cause before proposing fixes — symptom fixes are
   failure; reproduce, isolate, and verify the fix addresses the actual cause. Use when
   encountering any bug, test failure, or unexpected behavior, before proposing fixes.
+  For a reported problem that is not yet a confirmed technical code defect, start with
+  problem-handling; this skill is the code-bug root-cause protocol used inside it.
 slug: systematic-debugging
-version: 1.0.1
+version: 1.0.2
 displayName: systematic-debugging
 ---
 

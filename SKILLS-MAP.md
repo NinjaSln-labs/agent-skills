@@ -358,8 +358,8 @@
 |------|------|------|------|------|------|
 | `accessibility-auditor` | 1.0.0 | `api-contract-validator` | 1.0.0 | `architecture-patterns` | 1.0.0 |
 | `audit-item` | 1.0.0 | `autonomous-investigation` | 1.0.0 | `battle-card-builder` | 1.0.0 |
-| `cicd-pipeline` | 1.0.0 | `code-review` | 1.0.0 | `codebase-design` | 1.0.0 |
-| `company-intel` | 1.0.0 | `competitive-analysis-process` | 1.0.0 | `competitive-intel-watch` | 1.0.0 |
+| `cicd-pipeline` | 1.0.0 | `code-review` | 1.0.1 | `codebase-design` | 1.0.0 |
+| `company-intel` | 1.0.1 | `competitive-analysis-process` | 1.0.0 | `competitive-intel-watch` | 1.0.0 |
 | `competitive-research-snapshot` | 1.0.0 | `config-scan` | 1.0.0 | `core-rules` | 1.1.0 |
 | `coverage-matrix` | 1.0.0 | `customer-journey-map` | 1.0.0 | `ddd-aggregates` | 1.0.0 |
 | `ddd-context-map` | 1.0.0 | `ddd-contexts` | 1.0.0 | `ddd-discover` | 1.0.0 |
@@ -367,7 +367,7 @@
 | `ddd-qa-chain` | 1.0.0 | `ddd-scope` | 1.0.0 | `ddd-subdomains` | 1.0.0 |
 | `ddd-tactical-review` | 1.0.0 | `decision-log` | 1.0.0 | `deep-codebase-analysis` | 1.0.0 |
 | `delegated-research` | 1.0.0 | `dependency-scan` | 1.0.0 | `discovery-interview-prep` | 1.0.0 |
-| `electron-best-practices` | 1.0.0 | `event-storming` | 1.0.0 | `executing-plans` | 1.0.0 |
+| `electron-best-practices` | 1.0.0 | `event-storming` | 1.0.0 | `executing-plans` | 1.0.1 |
 | `frontend-design` | 1.0.0 | `git-workflow` | 1.0.0 | `grill-me` | 1.0.0 |
 | `intelligence-collection-disciplines` | 1.0.0 | `jobs-to-be-done` | 1.0.0 | `k6-performance` | 1.0.0 |
 | `market-landscape-scan` | 1.0.0 | `marketing-copywriting` | 1.0.0 | `pixel-perfect` | 1.0.0 |
@@ -375,17 +375,16 @@
 | `positioning-workshop` | 1.0.0 | `prd-development` | 1.0.0 | `prd-driven-ddd` | 4.5.4 |
 | `press-release` | 1.0.0 | `problem-handling` | 1.0.1 |  |  |
 | `problem-statement` | 1.0.0 | `product-doc-audit` | 1.0.0 | `product-launch` | 1.0.0 |
-| `product-marketing` | 1.0.0 | `project-handoff` | 1.1.1 | `project-intake` | 1.1.1 |
-| `proto-persona` | 1.0.0 | `react-vite-best-practices` | 1.0.1 | `roadmap-planning` | 1.0.0 |
+| `product-marketing` | 1.0.0 | `project-handoff` | 1.3.0 | `project-intake` | 1.3.0 |
+| `proto-persona` | 1.0.0 | `react-vite-best-practices` | 1.0.2 | `roadmap-planning` | 1.0.0 |
 | `secrets-scan` | 1.0.0 | `security-scan` | 1.0.0 | `session-health` | 1.0.0 |
-| `skill-description-audit` | 1.5.0 | `skill-eval` | 1.0.0 | `stage-gate` | 1.0.0 |
-| `stage-spec` | 1.0.0 | `systematic-debugging` | 1.0.1 | `task-loop-progress` | 1.0.0 |
+| `skill-description-audit` | 1.9.1 | `skill-eval` | 1.0.0 | `stage-gate` | 1.0.0 |
+| `stage-spec` | 1.0.0 | `systematic-debugging` | 1.0.2 | `task-loop-progress` | 1.0.0 |
 | `test-data-generation` | 1.0.0 | `to-tickets` | 1.0.0 | `typescript-best-practices` | 1.0.0 |
 | `ui-animation` | 1.0.0 | `ui-typography` | 1.0.0 | `ui-ux-pro-max` | 1.0.0 |
-| `user-research` | 1.0.0 | `ux-heuristics` | 1.0.0 | `verification-before-completion` | 1.0.0 |
+| `user-research` | 1.0.0 | `ux-heuristics` | 1.0.0 | `verification-before-completion` | 1.0.1 |
 | `visual-regression-tester` | 1.0.0 | `voice-of-customer-miner` | 1.0.0 | `web-design-guidelines` | 1.0.0 |
-| `workshop-facilitation` | 1.0.0 | `write-spec` | 1.0.0 | `writing-plans` | 1.0.0 |
+| `workshop-facilitation` | 1.0.0 | `write-spec` | 1.0.0 | `writing-plans` | 1.0.1 |
 | `experiment-handoff` | 1.0.2 | `skill-fit` | 1.2.1 | `version-management` | 1.2.0 |
-| `project-handoff` | 1.2.0 | `project-intake` | 1.2.0 |  |  |
 
 
