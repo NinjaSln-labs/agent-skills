@@ -45,9 +45,9 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | git-workflow | Git 分支/提交/PR/合并流程 |
 | react-vite-best-practices | React + Vite 性能优化 |
 | systematic-debugging | 系统性调试（先根因后修复） |
-| problem-dive | 问题深挖（证据先行，不直接修） |
-| problem-resolution-flow | 问题处理全流程（定位→分级→调研→修复→收尾） |
+| problem-handling | 问题处理单链（诊断→分级→处置→收尾） |
 | typescript-best-practices | TypeScript 最佳实践 |
+| version-management | 通用版本管理（SemVer 定号 + 单版本源 + CHANGELOG，不依赖 VCS） |
 | verification-before-completion | 完成前验证（证据先于断言） |
 | stage-gate | 阶段门禁执行（stage-spec DoD 逐条验证，只验不修） |
 | stage-spec | 阶段契约编写（DoD 机器可验证断言 + TDD 网格） |
@@ -136,18 +136,20 @@ for d in agent-skills/*/; do cp -r "$d" ~/.agents/skills/; done
 | ux-heuristics | 可用性启发式审计（Nielsen 10） |
 | marketing-copywriting | 营销文案写作 |
 
-### Agent 会话与个人效率（9）
+### Agent 会话与个人效率（11）
 
 | 技能 | 说明 |
 |------|------|
 | project-handoff | 项目交接文档 |
 | project-intake | 项目接手恢复 |
+| experiment-handoff | 实验性交接（隔离试验 → 交接 → 反馈驱动合并回主；仅用户手动调用） |
 | decision-log | 决策日志 ADR（记录/查询，状态机） |
 | delegated-research | 委托式后台调研 |
 | session-health | 会话健康度评估 |
 | core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护） |
 | skill-description-audit | 技能描述交叉验证审计 |
 | skill-eval | skill 行为评估（有/无 skill pass-rate 对比） |
+| skill-fit | 技能适配管家（按项目画像出建议挂/摘/缺口；仅用户手动调用） |
 | task-loop-progress | 长任务进度 Loop |
 
 ## 目录结构
