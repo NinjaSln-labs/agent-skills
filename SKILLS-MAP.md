@@ -352,7 +352,7 @@
 
 ## 八、技能版本索引（frontmatter `version` · SkillHub 发布版本）
 
-> 版本**唯一源 = frontmatter 顶层 `version`**（SemVer，内容更新必须 bump；禁止 `metadata.version` 等第二源）。`skill-executability-smoke.py` 校验：version 存在 + `X.Y.Z` 格式 + 无重复源 + 未提交改动而版本未增 → 硬失败。
+> 本表是**版本索引**（版本唯一源仍是各包 frontmatter 顶层 `version`）；一致性由 `bash scripts/check-index.py` 校验，漂移即门禁失败。规则说明见 [`README.md`](README.md)「版本规范」。
 
 | 技能 | 版本 | 技能 | 版本 | 技能 | 版本 |
 |------|------|------|------|------|------|
@@ -373,19 +373,19 @@
 | `market-landscape-scan` | 1.0.0 | `marketing-copywriting` | 1.0.0 | `pixel-perfect` | 1.0.0 |
 | `plan-grilling` | 1.0.0 | `playwright-best-practices` | 1.0.0 | `positioning-statement` | 1.0.0 |
 | `positioning-workshop` | 1.0.0 | `prd-development` | 1.0.0 | `prd-driven-ddd` | 4.5.4 |
-| `press-release` | 1.0.0 | `problem-handling` | 1.0.0 |  |  |
+| `press-release` | 1.0.0 | `problem-handling` | 1.0.1 |  |  |
 | `problem-statement` | 1.0.0 | `product-doc-audit` | 1.0.0 | `product-launch` | 1.0.0 |
 | `product-marketing` | 1.0.0 | `project-handoff` | 1.1.1 | `project-intake` | 1.1.1 |
-| `proto-persona` | 1.0.0 | `react-vite-best-practices` | 1.0.0 | `roadmap-planning` | 1.0.0 |
+| `proto-persona` | 1.0.0 | `react-vite-best-practices` | 1.0.1 | `roadmap-planning` | 1.0.0 |
 | `secrets-scan` | 1.0.0 | `security-scan` | 1.0.0 | `session-health` | 1.0.0 |
 | `skill-description-audit` | 1.5.0 | `skill-eval` | 1.0.0 | `stage-gate` | 1.0.0 |
-| `stage-spec` | 1.0.0 | `systematic-debugging` | 1.0.0 | `task-loop-progress` | 1.0.0 |
+| `stage-spec` | 1.0.0 | `systematic-debugging` | 1.0.1 | `task-loop-progress` | 1.0.0 |
 | `test-data-generation` | 1.0.0 | `to-tickets` | 1.0.0 | `typescript-best-practices` | 1.0.0 |
 | `ui-animation` | 1.0.0 | `ui-typography` | 1.0.0 | `ui-ux-pro-max` | 1.0.0 |
 | `user-research` | 1.0.0 | `ux-heuristics` | 1.0.0 | `verification-before-completion` | 1.0.0 |
 | `visual-regression-tester` | 1.0.0 | `voice-of-customer-miner` | 1.0.0 | `web-design-guidelines` | 1.0.0 |
 | `workshop-facilitation` | 1.0.0 | `write-spec` | 1.0.0 | `writing-plans` | 1.0.0 |
-| `experiment-handoff` | 1.0.2 | `skill-fit` | 1.2.0 | `version-management` | 1.2.0 |
+| `experiment-handoff` | 1.0.2 | `skill-fit` | 1.2.1 | `version-management` | 1.2.0 |
 | `project-handoff` | 1.2.0 | `project-intake` | 1.2.0 |  |  |
 
 

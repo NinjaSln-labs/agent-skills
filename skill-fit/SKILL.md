@@ -13,7 +13,7 @@ description: >-
   /skill:skill-fit. Use when the user explicitly invokes /skill:skill-fit to audit or fit skills for
   a project. NOT for: creating/editing a skill (use skill-builder / skill-description-audit).
 slug: skill-fit
-version: 1.2.0
+version: 1.2.1
 displayName: skill-fit
 disable-model-invocation: true
 ---
@@ -24,7 +24,7 @@ disable-model-invocation: true
 
 你是**技能适配管家**。给定一个项目，产出「**该挂什么 / 该摘什么 / 缺什么**」三张清单——**只读第一版：只建议，不擅自动手**。
 
-单一数据源：真源仓 `catalog.yaml`（每技能的 `tier` / `when` / `requires` / `invoke` / `status`）。registry 占用状态**不落表**，用 `scripts/skill-name-check` 实时查。
+单一数据源：适配维度在真源仓 `catalog.yaml`（`tier` / `when` / `requires` / `invoke`），退役状态在真源仓 `retired.txt`；两者都不在本技能正文复制。registry 占用状态**不落表**，用 `scripts/skill-name-check` 实时查。
 
 ## 何时使用（**已挂载 · 仅用户 `/skill:skill-fit`**）
 
@@ -36,7 +36,7 @@ disable-model-invocation: true
 ## 硬约束
 
 1. **只读 v1**——**不改**任何技能、不增删符号链接、不改项目文件；只输出建议（执行安装/摘除由用户确认后再做，或下版本的可执行模式）。
-2. **单源**——推荐依据只来自 `catalog.yaml`；不在本技能正文复制 tier 清单（防双源）。
+2. **单源**——推荐依据只来自 `catalog.yaml` + `retired.txt`；不在本技能正文复制 tier 清单或退役名单（防双源）。
 3. **registry 状态实时查**——SkillHub/skills.sh 占用用 `scripts/skill-name-check`；不写进 catalog。
 4. **`requires` 先判**——环境不满足的前置（如无 git）→ 该技能降级/剔除，并说明原因。
 5. **反馈不撒谎**——记录用户对建议的**采纳/否决**，不美化。
@@ -51,6 +51,8 @@ disable-model-invocation: true
    - `<本技能目录>/../catalog.yaml`（整仓安装——常态）
    - `<项目根>/catalog.yaml`（项目自带适配目录）
    - `<项目根>/.agents/skills/catalog.yaml`（项目级挂载）
+
+   `retired.txt` 按同目录同规则定位；缺失 → 视为无退役技能。
 2. **都没有 → 降级为「按 frontmatter 推断」**：扫已装技能的 `SKILL.md` frontmatter（`description` 的场景线索当 `when`，`compatibility` 当 `requires`），**显式声明**「无 catalog，本次依据为推断」，并建议用户补一份 catalog。
 3. **registry 查重**：优先 `<本技能目录>/../scripts/skill-name-check.{sh,ps1}`；缺失 → 直接调端点（SkillHub `GET https://api.skillhub.cn/api/v1/skills/{slug}?namespace=<handle>`；skills.sh `GET https://skills.sh/api/search?q=<name>`）；网络不可用 → 标注「占用未核验」，**不臆断**。
 
@@ -67,7 +69,7 @@ disable-model-invocation: true
 
 ## 对照 catalog 出三清单
 
-1. **建议挂（mount）**：`when` 命中画像 且 `requires` 满足 且当前未挂 → 给**挂载方式**（用户级/项目级）与理由。
+1. **建议挂（mount）**：`when` 命中画像 且 `requires` 满足 且当前未挂 且不在 `retired.txt` → 给**挂载方式**（用户级/项目级）与理由。
 2. **建议摘（unmount）**：当前已挂但 `when` 不命中 或 `requires` 不满足 或 `tier=project` 却挂在用户级常驻位 → 建议摘除（并指出去哪找安装源）。
 3. **缺口（gap）**：画像显示需要但 catalog 里**没有**对应技能的能力（例：系统/环境维护类当前缺）→ 明说「暂无技能，可后补」。
 

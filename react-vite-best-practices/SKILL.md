@@ -6,7 +6,7 @@ description: >-
   configuration, build optimization, code splitting, lazy loading, HMR, bundle size, or
   React performance.
 slug: react-vite-best-practices
-version: 1.0.0
+version: 1.0.1
 displayName: react-vite-best-practices
 ---
 
@@ -182,4 +182,4 @@ rules/env-vite-prefix.md
 
 ## Full Compiled Document
 
-For the complete guide with all rules expanded: `AGENTS.md`
+For the complete guide with all rules expanded: `REFERENCE.md`

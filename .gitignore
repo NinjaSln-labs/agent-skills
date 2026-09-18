@@ -26,3 +26,8 @@ skill-executability-smoke.py
 FRONTMATTER-SAFE.md
 thin-allowlist.txt
 renames.yaml
+publish/
+HANDOFF-ARCHIVE/
+sync-release.ps1
+publish-skillhub.sh
+install-git-hooks.ps1

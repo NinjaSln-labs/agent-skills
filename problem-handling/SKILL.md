@@ -9,7 +9,7 @@ description: >-
   bug, error, UX complaint, or behavior gap is reported, before jumping to a fix. NOT for:
   code-bug root cause alone — use systematic-debugging.
 slug: problem-handling
-version: 1.0.0
+version: 1.0.1
 displayName: problem-handling
 ---
 
