@@ -6,7 +6,7 @@
 
 > 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
 
-共 **87 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
+共 **89 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
 
 技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 

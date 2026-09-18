@@ -5,7 +5,7 @@ description: >-
   failure; reproduce, isolate, and verify the fix addresses the actual cause. Use when
   encountering any bug, test failure, or unexpected behavior, before proposing fixes.
 slug: systematic-debugging
-version: 1.0.0
+version: 1.0.1
 displayName: systematic-debugging
 ---
 
@@ -290,9 +290,7 @@ These techniques are part of systematic debugging and available in this director
 
 ## Relationship to sibling skills
 
-- `problem-dive` — when the user reports a problem/UX issue and the work is still "what's
-  going on", use that skill first (evidence, 5-whys, research). This skill is for the
-  **code-bug** path once the issue is a technical defect.
-- `problem-resolution-flow` — end-to-end pipeline from symptom to shipped fix (classify,
-  scope, research, TDD fix, close). This skill is the root-cause protocol used inside
-  that pipeline's code path.
+- `problem-handling` — end-to-end single pipeline (diagnose → grade severity → fix → close)
+  for any reported problem/UX issue/bug. This skill is the **code-bug root-cause protocol**
+  used inside that pipeline's diagnostic stage (A2). Reach for `problem-handling` first when a
+  problem is reported; stay here once the issue is a technical code defect.

@@ -10,7 +10,6 @@ description: >-
   (post-modeling user scenario checks) and continuous ubiquitous-language management (term-to-code
   consistency, anti-drift).
 metadata:
-  version: "4.5.4"
   standard: agentskills.io
   patches:
     - "术语按限界上下文唯一；词汇表含适用上下文列"
@@ -24,7 +23,7 @@ metadata:
     - "交付物#3显式含编舞责任方"
     - "进度清单§3与交付物对齐（编舞责任方）"
 slug: prd-driven-ddd
-version: 1.0.0
+version: 4.5.4
 displayName: prd-driven-ddd
 ---
 

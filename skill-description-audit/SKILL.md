@@ -11,7 +11,6 @@ description: >-
   auditing or cross-validating a skill description against SKILL.md body. NOT for:
   auditing product doc sets (PRDs/specs/launch docs) — use product-doc-audit.
 metadata:
-  version: "1.5.0"
   standard: agentskills.io
   scope: user
   patches:
@@ -26,7 +25,7 @@ metadata:
     - "v1.4.0：语言一致性标准提高——description 含中文/CJK（中英混杂或中文残留，含格式示例/头部标签）由 [低] 升 **[中]**（库规范纯英文，CJK 扫描实证）；中文原生技能例外：纯中文可，禁中英混杂（2026-08-05 project-handoff/intake 教训）"
     - "v1.5.0：新增 description pushy 质量维度（§6.5）——WHEN 场景密度 + 触发关键词覆盖：正文标志性能力必须在 description 可找到触发词（否则 [中]）；WHEN 泛泛（when needed/必要时）或场景/关键词过疏 → [低] 建议补场景示例；与 skill-eval（行为评估）衔接——本维度评估触发有效性，行为验证归 skill-eval"
 slug: skill-description-audit
-version: 1.0.0
+version: 1.5.0
 displayName: skill-description-audit
 ---
 

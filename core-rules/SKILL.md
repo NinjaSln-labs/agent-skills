@@ -1,18 +1,31 @@
 ---
 name: core-rules
 description: >-
-  Global rules applicable to all projects/sessions across AI coding tools (Deep Code /
-  Cursor, etc.). Four bottom lines: credential safety (no plaintext secrets),
-  permission confirmation (confirm before write ops), long-task feedback (progress update
-  within 60s), session progress (maintained in .agents/session.md). Use when handling
-  passwords/credentials, write operations, long-running tasks, session records, or at any
-  project start/end.
+  RETIRED 2026-09-17 — the consumer link was removed; this source is kept for reference only.
+  Its surviving bottom line (no plaintext secrets) now lives in the user-level AGENTS.md memory;
+  the session-progress rule is covered by project-handoff / project-intake; permission-confirmation
+  and long-task-feedback were dropped. Original text — global rules applicable to all
+  projects/sessions across AI coding tools (Deep Code / Cursor, etc.), four bottom lines: credential
+  safety (no plaintext secrets), permission confirmation (confirm before write ops), long-task
+  feedback (progress update within 60s), session progress (maintained in .agents/session.md).
+  Use when re-linking this retired source or tracing where those rules went.
 slug: core-rules
-version: 1.0.0
+version: 1.1.0
 displayName: core-rules
 ---
 
-# 全局规则（Global Rules）
+# 全局规则（Global Rules）——**已退役**
+
+> **本技能已退役（2026-09-17）**：消费侧链接已摘（`~/.agents/skills/core-rules` 不存在），真源保留仅供追溯。
+> 四条规则的最终去处：
+> 1. **禁止明文密码** → 用户级 memory `~/.commandcode/AGENTS.md`「通用硬约束」（该层每个项目都加载，是硬规则的常驻归宿）
+> 2. **权限确认** → **废弃**（各 agent 自带权限控制，规则冗余）
+> 3. **长任务反馈** → **废弃**（各 agent 已具备进度反馈能力）
+> 4. **会话进度** → 收敛为单一交接文档，见 `project-handoff` / `project-intake`（不再单独维护 `.agents/session.md`）
+>
+> 以下为退役时的原文，**仅供追溯，勿直接照用**——若需重新启用，先核对上述去处是否已被新的单一来源覆盖。
+
+---
 
 以下 4 条规则适用于所有项目。
 

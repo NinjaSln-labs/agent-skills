@@ -1,7 +1,7 @@
-# 技能库全景图（87 技能——产品 0-1 全阶段模式）
+# 技能库全景图（89 技能——产品 0-1 全阶段模式）
 
 - 日期：2026-08-16 · **新增 6 技能（spec-kit 阶段门禁族：stage-gate / stage-spec / decision-log / coverage-matrix / audit-item / skill-eval——需求规格 `.scratch/neonforge-v1/skill-requirements-20260816.md`）** · 2026-08-13 全量审计 81/81 合规（新技能接入后按审计流程补 DESCRIPTION-AUDIT）
-- 覆盖：本仓库 `agent-skills` 的 87 个技能（可安装到 `~/.agents/skills/<name>`）
+- 覆盖：本仓库 `agent-skills` 的 89 个技能（可安装到 `~/.agents/skills/<name>`）
 - 模式：**产品 0-1 全生命周期**（发现 → 定义 → 设计 → 交付 → 上线 → 运营）+ 贯穿层（质量/工程/协作/技能基建）
 
 ---
@@ -152,7 +152,7 @@
 | test-data-generation | 测试数据生成（Faker/工厂/构建器/种子）|
 | cicd-pipeline | CI/CD 配置（GitHub Actions/Jenkins/GitLab CI）|
 
-#### 4.4 质量审查（7）
+#### 4.4 质量审查（6）
 
 | 技能 | 能力 |
 |------|------|
@@ -161,8 +161,7 @@
 | audit-item | **审计问题 issue 化跟踪**（NNN-slug + 索引——open/fixed/recorded，被 stage-gate 枚举）|
 | verification-before-completion | 完成前验证（行为保持——规范）|
 | systematic-debugging | 系统化调试（假设/二分/证据——代码缺陷路径）|
-| problem-dive | 问题深挖（证据先行→根因追问+RCA 工具→**认知偏差防御**→尽调→决策清单——**不直接修**）|
-| problem-resolution-flow | 问题处理全流程（定位→类型分级→**严重度分级**→外部调研双渠道验证→**workaround vs 永久修复**→修复→验证→收尾+无责复盘）|
+| problem-handling | **问题处理单链**（诊断→严重度分级→workaround/永久修复→TDD 修复→验证→无责收尾+known-error；含 3-strikes 升级）**（合并自 problem-dive + problem-resolution-flow）**|
 
 #### 4.5 质询（2）
 
@@ -183,14 +182,15 @@
 | product-marketing | 产品营销上下文（.agents/product-marketing.md 共享语境）|
 | marketing-copywriting | 营销文案（价值主张/情感/转化——15 节）|
 
-### 贯穿层（12）—— 质量 / 工程 / 协作 / 技能基建
+### 贯穿层（17）—— 质量 / 工程 / 协作 / 技能基建
 
-#### P.1 技能基建 / 审计（3）
+#### P.1 技能基建 / 审计（4）
 
 | 技能 | 能力 |
 |------|------|
 | skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护 + **pushy 质量（场景/关键词密度）**——自审只出报告）|
 | skill-eval | **skill 行为评估**（3-5 代表任务 × 有/无 skill N≥3 次 → pass-rate 对比表 + 失败案例反哺）|
+| skill-fit | **技能适配管家**（按项目画像对照 `catalog.yaml` 出「建议挂/建议摘/缺口」三清单；只读 v1；**仅用户 `/skill:skill-fit`**）|
 | product-doc-audit | 产品文档集审计（三层 + 就绪度评分 + 四层 go/no-go 最终验收）|
 
 #### P.2 安全（4）
@@ -202,22 +202,24 @@
 | config-scan | 配置扫描（硬编码/敏感配置）|
 | dependency-scan | 依赖扫描（漏洞/许可证）|
 
-#### P.3 全局规则（1）
+#### P.3 全局规则（2）
 
 | 技能 | 能力 |
 |------|------|
-| core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）|
+| core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）**（退役：真源保留、链接已摘——硬约束迁用户级 memory，②③废弃，④并入交接）**|
+| version-management | **通用版本管理**（SemVer 定号 + 单版本源 + CHANGELOG + 发布标记；兼容性判定/弃用政策/不可变发布；**不依赖 VCS**，无 git 也可用）|
 
-#### P.4 协作（6）
+#### P.4 协作（7）
 
 | 技能 | 能力 |
 |------|------|
-| project-handoff | 交接文档（引用型 delta 6 节——交接方；§5 含决策日志/覆盖矩阵/阶段契约引用）|
-| project-intake | 项目接手（读 HANDOFF 恢复上下文——接收方）|
+| project-handoff | 交接文档（引用型 delta **5 节 + ≤1K token 硬预算**——交接方；环境指纹最小化接手复验）|
+| project-intake | 项目接手（读 HANDOFF 恢复上下文；**指纹门控：环境未变即跳过复验**——接收方）|
 | decision-log | **决策日志（ADR）**（Nygard 模板 + proposed/accepted/superseded/rejected 状态机——记录/查询）|
-| task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）|
+| experiment-handoff | 实验性交接（worktree/branch/copy 隔离 → 交接 → 反馈驱动合并回主；**已挂载、仅用户 `/invoke`（禁 agent 自主）**）|
+| task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）**（退役：真源保留、链接已摘）**|
 | workshop-facilitation | 交互工作坊协议（deanpeters 交互技能配对——session 头/单问轮/进度标签）|
-| session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）|
+| session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）**（退役：真源保留、链接已摘）**|
 
 ---
 
@@ -228,11 +230,11 @@
 | ① 发现 | 16 | 用户研究 3 + 问题定义 4 + 市场竞品 7 + 调研纪律 2 |
 | ② 定义 | 7 | 定位 2 + 需求规格 4 + 拆解立项 1 |
 | ③ 设计 | 23 | 领域建模 9 + 模型评审 2 + 架构 3 + 编码规范 3 + 视觉 6 |
-| ④ 交付 | 24 | 计划 4 + 工程 1 + 测试链 10 + 质量审查 7 + 质询 2 |
+| ④ 交付 | 23 | 计划 4 + 工程 1 + 测试链 10 + 质量审查 6 + 质询 2 |
 | ⑤ 上线 | 1 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
-| 贯穿层 | 14 | 审计 3 + 安全 4 + 规则 1 + 协作 6 |
-| **合计** | **87** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
+| 贯穿层 | 17 | 审计 4 + 安全 4 + 规则 2 + 协作 7 |
+| **合计** | **89** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
 
 ---
 
@@ -251,11 +253,11 @@
 │            3.3 架构设计(3)  3.4 编码规范(3)  3.5 视觉设计(6)   │
 ├──────────────────────────────────────────────────────────────┤
 │ ④ 交付     4.1 计划执行(4·含 stage-spec)  4.2 工程协作(1)     │
-│            4.3 测试链(10·含 coverage-matrix)  4.4 质量审查(7·含 stage-gate/audit-item)  4.5 质询(2)  │
+│            4.3 测试链(10·含 coverage-matrix)  4.4 质量审查(6·含 stage-gate/audit-item)  4.5 质询(2)  │
 ├──────────────────────────────────────────────────────────────┤
 │ ⑤ 上线     product-launch · ⑥ 运营  product-marketing · marketing-copywriting  │
 ├──────────────────────────────────────────────────────────────┤
-│ 贯穿       P.1 审计(3·含 skill-eval)  P.2 安全(4)  P.3 规则(1)  P.4 协作(6·含 decision-log) │
+│ 贯穿       P.1 审计(4·含 skill-eval/skill-fit)  P.2 安全(4)  P.3 规则(2·含 core-rules/version-management)  P.4 协作(7·含 decision-log/experiment-handoff) │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -263,11 +265,11 @@
 
 ## 四、新项目启动引导（0-1 按阶段取用）
 
-1. **启动对齐**：P.3 `core-rules` → 1.1 `delegated-research`（调研）
+1. **启动对齐**：`core-rules` 已退役（硬约束改由用户级 memory `~/.commandcode/AGENTS.md` 常驻；工作区事实见工作区根 `AGENTS.md`）→ 1.1 `delegated-research`（调研）
 2. **发现**：1.1 `user-research` / `discovery-interview-prep` → 1.2 `problem-statement` → `jobs-to-be-done` → `proto-persona` → `customer-journey-map`；竞品走 1.3 `competitive-analysis-process`（编排 ×8）
 3. **定义**：2.1 `positioning-workshop` → `positioning-statement` → 2.2 `write-spec` / `prd-development` → `prd-driven-ddd`（主入口）→ 2.3 `to-tickets`（拆解）
 4. **设计**：3.1 `prd-driven-ddd` 链式调 `ddd-scope→discover→subdomains→contexts→context-map→aggregates→domain-interactions→openspec-bridge`；3.3 `architecture-patterns` + `codebase-design`；3.4 规范三件套；3.5 视觉 `frontend-design` + `ui-ux-pro-max`
-5. **交付**：4.1 `roadmap-planning` → **阶段制**：开工前 `stage-spec`（阶段契约）→ 需要时 `writing-plans`（任务分解）→ `executing-plans`（执行）→ 阶段中裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix`（S2 起）→ 4.4 `code-review`（阶段末即时评审模式）→ 声称完成 → **`stage-gate` 跑 DoD 门禁**（含 `audit-item` open 项核对）；遇问题先 `problem-dive` 深挖，代码路径用 `systematic-debugging`，确认后走 `problem-resolution-flow` 收尾
+5. **交付**：4.1 `roadmap-planning` → **阶段制**：开工前 `stage-spec`（阶段契约）→ 需要时 `writing-plans`（任务分解）→ `executing-plans`（执行）→ 阶段中裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix`（S2 起）→ 4.4 `code-review`（阶段末即时评审模式）→ 声称完成 → **`stage-gate` 跑 DoD 门禁**（含 `audit-item` open 项核对）；遇问题走 `problem-handling`（诊断→分级→处置→收尾），代码根因路径内用 `systematic-debugging`
 6. **验收**：P.1 `product-doc-audit`（四层 go/no-go）+ P.2 安全四件套 + 3.2 `ddd-model-review` + 4.3 `k6-performance`（性能）
 7. **上线/交接**：⑤ `product-launch` + ⑥ `product-marketing` → P.4 `project-handoff` → 下一位 `project-intake`
 
@@ -286,7 +288,7 @@
 
 ## 六、语义引用说明（未接入的可选参考——2026-08-02）
 
-为保持技能库克制（87 技能），以下**二级语义引用未接入**（deanpeters 同库可选参考——各技能正文已加「相关技能说明」标注）：
+为保持技能库克制（89 技能），以下**二级语义引用未接入**（deanpeters 同库可选参考——各技能正文已加「相关技能说明」标注）：
 
 - **tam-sam-som-calculator**（被 market-landscape-scan / competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用——市场量化）
 - **company-research**（被 competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用）
@@ -313,7 +315,7 @@
 | **竞争分析链** | 1.3 `competitive-analysis-process` 编排 ×8（景观→快照→VoC→公司→监测→战斗卡）|
 | **质量门禁链** | 4.3 测试（L1-L5）→4.4 审查→P.1 文档审计→P.2 安全四件套→3.2 模型评审 |
 | **阶段门禁链** | 4.1 `stage-spec`（契约）→ `writing-plans`/`executing-plans`（执行）→ 裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix` + 4.4 `code-review`（阶段评审→发现入 `audit-item`）→ **`stage-gate` 跑 DoD**（open 项核对）→ 下一阶段 |
-| **问题处理链** | 4.4 `problem-dive`（深挖不修）→ `systematic-debugging`（代码根因）→ `problem-resolution-flow`（修复收尾）|
+| **问题处理链** | 4.4 `problem-handling`（诊断→分级→处置→收尾；代码根因路径内用 `systematic-debugging`）|
 | **重构操作链** | 4.4 code-review（发现 smells）→3.3 codebase-design（设计目标）→3.2 tactical-review（领域重构）|
 | **交接链** | P.4 handoff（写 delta）→ intake（读 delta 恢复）——工具/会话切换 |
 
@@ -336,7 +338,7 @@
 | 2.3 拆解立项 | to-tickets | ⭐⭐⭐ 需求→任务（AI-ready AC）|
 | 4.2 工程协作 | git-workflow | ⭐⭐ 提交一致性 |
 | ⑤ 上线 | product-launch | ⭐⭐⭐ 发布全流程 |
-| P.3 规则 | core-rules | ⭐⭐⭐ 全局底线 |
+| P.3 规则 | version-management | ⭐⭐⭐ 版本一致性底线（core-rules 已退役）|
 
 **说明**：薄弱子类均为单体高价值（无需扩展——多则冗余）；4.2 可考虑补 pre-commit 钩子类（mattpocock setup-pre-commit——已见未接——低优先）。
 
@@ -345,4 +347,45 @@
 - **测试侧最厚**（4.3 测试链十技能 + 4.4 stage-gate 聚合验证 + P.2 四件套）——质量保证优先——符合产品交付观
 - **上线/运营最薄**（1+2）——符合现状（项目未到上线期）——上线前再评估
 - **二级语义引用 6 个**（克制保持）——需要时按需接入
+
+---
+
+## 八、技能版本索引（frontmatter `version` · SkillHub 发布版本）
+
+> 版本**唯一源 = frontmatter 顶层 `version`**（SemVer，内容更新必须 bump；禁止 `metadata.version` 等第二源）。`skill-executability-smoke.py` 校验：version 存在 + `X.Y.Z` 格式 + 无重复源 + 未提交改动而版本未增 → 硬失败。
+
+| 技能 | 版本 | 技能 | 版本 | 技能 | 版本 |
+|------|------|------|------|------|------|
+| `accessibility-auditor` | 1.0.0 | `api-contract-validator` | 1.0.0 | `architecture-patterns` | 1.0.0 |
+| `audit-item` | 1.0.0 | `autonomous-investigation` | 1.0.0 | `battle-card-builder` | 1.0.0 |
+| `cicd-pipeline` | 1.0.0 | `code-review` | 1.0.0 | `codebase-design` | 1.0.0 |
+| `company-intel` | 1.0.0 | `competitive-analysis-process` | 1.0.0 | `competitive-intel-watch` | 1.0.0 |
+| `competitive-research-snapshot` | 1.0.0 | `config-scan` | 1.0.0 | `core-rules` | 1.1.0 |
+| `coverage-matrix` | 1.0.0 | `customer-journey-map` | 1.0.0 | `ddd-aggregates` | 1.0.0 |
+| `ddd-context-map` | 1.0.0 | `ddd-contexts` | 1.0.0 | `ddd-discover` | 1.0.0 |
+| `ddd-domain-interactions` | 1.0.0 | `ddd-model-review` | 1.0.0 | `ddd-openspec-bridge` | 1.0.0 |
+| `ddd-qa-chain` | 1.0.0 | `ddd-scope` | 1.0.0 | `ddd-subdomains` | 1.0.0 |
+| `ddd-tactical-review` | 1.0.0 | `decision-log` | 1.0.0 | `deep-codebase-analysis` | 1.0.0 |
+| `delegated-research` | 1.0.0 | `dependency-scan` | 1.0.0 | `discovery-interview-prep` | 1.0.0 |
+| `electron-best-practices` | 1.0.0 | `event-storming` | 1.0.0 | `executing-plans` | 1.0.0 |
+| `frontend-design` | 1.0.0 | `git-workflow` | 1.0.0 | `grill-me` | 1.0.0 |
+| `intelligence-collection-disciplines` | 1.0.0 | `jobs-to-be-done` | 1.0.0 | `k6-performance` | 1.0.0 |
+| `market-landscape-scan` | 1.0.0 | `marketing-copywriting` | 1.0.0 | `pixel-perfect` | 1.0.0 |
+| `plan-grilling` | 1.0.0 | `playwright-best-practices` | 1.0.0 | `positioning-statement` | 1.0.0 |
+| `positioning-workshop` | 1.0.0 | `prd-development` | 1.0.0 | `prd-driven-ddd` | 4.5.4 |
+| `press-release` | 1.0.0 | `problem-handling` | 1.0.0 |  |  |
+| `problem-statement` | 1.0.0 | `product-doc-audit` | 1.0.0 | `product-launch` | 1.0.0 |
+| `product-marketing` | 1.0.0 | `project-handoff` | 1.1.1 | `project-intake` | 1.1.1 |
+| `proto-persona` | 1.0.0 | `react-vite-best-practices` | 1.0.0 | `roadmap-planning` | 1.0.0 |
+| `secrets-scan` | 1.0.0 | `security-scan` | 1.0.0 | `session-health` | 1.0.0 |
+| `skill-description-audit` | 1.5.0 | `skill-eval` | 1.0.0 | `stage-gate` | 1.0.0 |
+| `stage-spec` | 1.0.0 | `systematic-debugging` | 1.0.0 | `task-loop-progress` | 1.0.0 |
+| `test-data-generation` | 1.0.0 | `to-tickets` | 1.0.0 | `typescript-best-practices` | 1.0.0 |
+| `ui-animation` | 1.0.0 | `ui-typography` | 1.0.0 | `ui-ux-pro-max` | 1.0.0 |
+| `user-research` | 1.0.0 | `ux-heuristics` | 1.0.0 | `verification-before-completion` | 1.0.0 |
+| `visual-regression-tester` | 1.0.0 | `voice-of-customer-miner` | 1.0.0 | `web-design-guidelines` | 1.0.0 |
+| `workshop-facilitation` | 1.0.0 | `write-spec` | 1.0.0 | `writing-plans` | 1.0.0 |
+| `experiment-handoff` | 1.0.2 | `skill-fit` | 1.2.0 | `version-management` | 1.2.0 |
+| `project-handoff` | 1.2.0 | `project-intake` | 1.2.0 |  |  |
+
 
