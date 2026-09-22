@@ -284,8 +284,15 @@ def _log_path(st: Store) -> Path:
 
 
 def _log(st: Store, event: str):
-    """每次门禁落一条快照（best-effort，不因日志失败中断）。"""
+    """每次门禁落一条快照（best-effort，不因日志失败中断）。
+
+    副作用边界：`--store` 指到**不是库**的目录时不落 log——`open(..., "a")` 会凭空建出文件，
+    那等于让只读命令在任意路径写脏（实测：`handoff --store . check` 曾在仓库根造出 log.jsonl）。
+    判据用 `index` 是否存在（init / import 都先写它），无 index＝不是库。
+    """
     try:
+        if not (st.d / "index").is_file():
+            return
         live = st.load_live()
         slots = {s: len([r for r in live if r.get("_slot") == s]) for s in ENTRY_SLOTS}
         slots["unconfirmed"] = len(read_jsonl(st.unconf_file()))

@@ -8,16 +8,16 @@ description: >-
   sessions or tools, or resuming or continuing prior work on a project. Initializing a
   new project's store or migrating an old HANDOFF.md model is done only when the user
   explicitly asks. NOT for: ephemeral scratch notes, or work outside a project.
-version: 3.2.1
+version: 4.0.0
 slug: project-handoff
 displayName: project-handoff
 ---
 
-# 项目交接（Project Handoff v3）
+# 项目交接（Project Handoff · v3 存储模型）
 
 ## 角色
 
-维护项目**交接存储** `.handoff/`（纯文本）：**9 槽** ＝ 一份「让接收方（agent / LLM）接得上」的**多维交接件**（**不止未决项**）。条目**只经** `scripts/handoff` CLI 写（**单一写入口** + **机检门禁**）。
+维护项目**交接存储** `.handoff/`（纯文本）：**9 槽** ＝ 一份「让接收方（agent / LLM）接得上」的**多维交接件**（**不止未决项**）。条目**只经** `scripts/handoff.py` CLI 写（**单一写入口** + **机检门禁**）。
 
 - **维度闭合**：9 槽固定；槽外信息 → `unconfirmed`（未能确认），**不即兴开槽**。
 - **只记不可推导项**：可读的用指针，读不到的才记——交接的意义＝**免重读仓库**。
@@ -47,7 +47,7 @@ prev/<slot>                                     # 单文件槽覆写前快照（
 - **决策**：`decisions/<id>.md` = frontmatter(`id/created/status/domain/topic`) + ADR 正文。
 - **`index` 由脚本重建**；**永不手写**。
 
-## CLI（`scripts/handoff`，python3）
+## CLI（`scripts/handoff.py`，python3）
 
 `init` · `index` · `check` · `log` · `add` · `set` · `edit` · `rm` · `close` · `next` · `unconfirmed` · `scope` · `confirm` · `filter` · `view` · `export` · `import`。
 

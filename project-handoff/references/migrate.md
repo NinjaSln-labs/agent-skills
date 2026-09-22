@@ -22,7 +22,7 @@
    - **决策**：ADR（如 `docs/decisions/*.md`）→ **登记并迁入 `decisions/`**（`_kind:"doc"`），勿只落 `unconfirmed`。
 2. **落存储 + 归档（一体，勿拆）**：
    ```sh
-   sh <技能>/scripts/migrate [--store .handoff] --archive <源件>… <清单>
+   sh <技能>/scripts/migrate.sh [--store .handoff] --archive <源件>… <清单>
    ```
    = `import`（自建骨架 + 单一写路径 + 校验）→ `check` 门禁 → 归档旧件到 `.handoff/legacy/<日期>/`（**默认归档不删**）→ `scope prune`（剪掉因归档而失效的登记项）。
    - **导入失败即中止**（不归档、不给「假 OK」）。**勿单跑裸 `import` 再单跑归档**——那会留下「空骨架 + `check` 看似 OK」的假成功。

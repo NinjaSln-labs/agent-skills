@@ -12,13 +12,13 @@
 
 1. **建骨架（脚本，勿手搓）**：
    ```sh
-   python3 <技能目录>/scripts/handoff init
+   python3 <技能目录>/scripts/handoff.py init
    ```
    → 建 `.handoff/` 全部 9 槽 + `index`。
 2. **构建源登记表（`scope`）**：
    ```sh
-   python3 <技能目录>/scripts/handoff scope scan     # 机械候选（标记命中 / 旧 HANDOFF 引用 / 未登记）
-   python3 <技能目录>/scripts/handoff scope add <path|glob>   # 逐条登记
+   python3 <技能目录>/scripts/handoff.py scope scan     # 机械候选（标记命中 / 旧 HANDOFF 引用 / 未登记）
+   python3 <技能目录>/scripts/handoff.py scope add <path|glob>   # 逐条登记
    ```
    → 给候选清单 → **请用户确认 / 补充** → 逐条 `scope add`。
    - **契约**：**只有登记的源被读**；未登记 → **不是未决源**（定义使然）。`check` 校每条登记**可解析**（路径存在 / glob 有命中）。
@@ -30,7 +30,7 @@
    ```
    - **幂等用机械锚**：已存在 `## 工作存储` 标题、或提及 `.handoff/` 的行 → **跳过**（勿重复、勿覆盖）。
    - 无 `AGENTS.md` → **新建**并写入该节。
-4. **门禁**：`python3 <技能目录>/scripts/handoff check`（不过不得交接）。
+4. **门禁**：`python3 <技能目录>/scripts/handoff.py check`（不过不得交接）。
 5. **出覆盖声明**：`读到 / 写入 / 未能确认`。
 
 ## 硬约束

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # migrate — v1 旧交接模型 → 新存储
 # 新模型下「迁移」= 用户确认源集 → agent 产「迁移清单（export 格式）」→ 本脚本校验并入册 + 归档旧件。
-# 依赖：scripts/handoff（python3）。契约见 references/migrate.md。
+# 依赖：scripts/handoff.py（python3）。契约见 references/migrate.md。
 #
 # 用法: migrate [--store .handoff] [--archive <path>]... <inventory.jsonl>
 #   <inventory.jsonl>  迁移清单（export 格式：首行 meta _format=handoff）
@@ -10,7 +10,7 @@
 set -eu
 
 SKILL_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-HANDOFF="$SKILL_DIR/scripts/handoff"
+HANDOFF="$SKILL_DIR/scripts/handoff.py"
 STORE=".handoff"
 INV=""
 ARCHIVES=""
