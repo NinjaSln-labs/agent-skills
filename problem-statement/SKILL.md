@@ -4,7 +4,7 @@ description: >-
   Write a user-centered problem statement with who is blocked, what they are trying to do,
   why it matters, and how it feels. Use when framing discovery, prioritization, or a PRD.
 slug: problem-statement
-version: 1.0.0
+version: 1.0.3
 displayName: problem-statement
 ---
 
@@ -65,7 +65,7 @@ Based on Jobs-to-be-Done and empathy mapping, the framework structures problems 
 - Pitching why a problem is worth solving
 
 ### When NOT to Use This
-- When you haven't done any user delegated-research yet (don't guess—interview first)
+- When you haven't done any user research yet (don't guess—interview first)
 - For internal operational problems (this is for user-facing problems)
 - As a substitute for a PRD (this frames the problem; PRD defines the solution)
 
@@ -77,9 +77,9 @@ Use `template.md` for the full fill-in structure.
 
 ### Step 1: Gather User Context
 Before drafting, ensure you have:
-- **User interviews or delegated-research:** Direct quotes, observed behaviors, pain points
-- **Jobs-to-be-Done insights:** What users are "hiring" your product to do (reference `skills/jobs-to-be-done/SKILL.md`)
-- **Persona clarity:** Who specifically experiences this problem (reference `skills/proto-persona/SKILL.md`)
+- **User interviews or research:** Direct quotes, observed behaviors, pain points
+- **Jobs-to-be-Done insights:** What users are "hiring" your product to do (reference [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md))
+- **Persona clarity:** Who specifically experiences this problem (reference [`proto-persona`](../proto-persona/SKILL.md))
 - **Constraints data:** Geographic, tech, time, demographic limitations
 
 **If missing context:** Run discovery interviews, contextual inquiries, or user shadowing. Don't fabricate problems.
@@ -119,7 +119,7 @@ Fill in the template from the persona's point of view:
 - **"Trying to" clarity:** Is this an outcome (measurable) or a task (activity)?
 - **"But" depth:** Are these real barriers or just inconveniences?
 - **"Because" honesty:** Is this the root cause or just a symptom?
-- **"Makes me feel" authenticity:** Do these emotions come from delegated-research or assumptions?
+- **"Makes me feel" authenticity:** Do these emotions come from research or assumptions?
 
 ---
 
@@ -236,10 +236,10 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/jobs-to-be-done/SKILL.md` — Informs the "Trying to" and "But" sections
-- `skills/proto-persona/SKILL.md` — Defines the "I am" persona
-- `skills/positioning-statement/SKILL.md` — Problem statement informs positioning
-- `skills/user-story/SKILL.md` — Problem statement guides story prioritization
+- [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) — Informs the "Trying to" and "But" sections
+- [`proto-persona`](../proto-persona/SKILL.md) — Defines the "I am" persona
+- [`positioning-statement`](../positioning-statement/SKILL.md) — Problem statement informs positioning
+- User stories — Problem statement guides story prioritization
 
 ### External Frameworks
 - Clayton Christensen, *Jobs to Be Done* — Origin of outcome-focused problem framing
@@ -257,4 +257,4 @@ Mini example excerpt:
 **Skill type:** Component
 **Suggested filename:** `problem-statement.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/jobs-to-be-done/SKILL.md`, `skills/proto-persona/SKILL.md`
+**Dependencies:** References [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md), [`proto-persona`](../proto-persona/SKILL.md)

@@ -6,10 +6,10 @@ description: >-
   behavioral acceptance, coverage matrix, open audit items, push state — reporting
   PASS/FAIL per assertion with fresh command evidence. Verifies only, never fixes.
   Use when a stage is claimed complete or on "run the stage gate" / "跑阶段门禁".
-  NOT for: single-shot verification (use verification-before-completion) or
-  executing a plan (use executing-plans).
+  NOT for: verifying one completion claim in isolation, or carrying out a written
+  plan task by task.
 slug: stage-gate
-version: 1.0.0
+version: 1.0.2
 displayName: stage-gate
 ---
 
@@ -74,7 +74,7 @@ NeonForge 阶段完成检查器——把「声称完成」变成「逐条可验�
 # Stage Gate S{N} 报告
 
 - 日期 / spec 路径 / 基线 commit（阶段首 commit^，如有）
-- 结论：全绿 ✅ | 有 FAIL ❌ | 有未验证 ⚠️
+- 结论：全绿 ✓ | 有 FAIL ✗ | 有未验证
 
 ## 断言结果
 

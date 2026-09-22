@@ -1,6 +1,6 @@
 ---
 name: ddd-aggregates
-description: "Design aggregate boundaries from invariants: aggregate roots, entities, value objects, transaction boundaries, and cross-aggregate consistency strategies."
+description: "Design DDD aggregates and aggregate boundaries from invariants: aggregate roots, entities, value objects, transaction boundaries, and cross-aggregate consistency strategies. Use when designing aggregate boundaries, invariants, transaction boundaries, or cross-aggregate consistency."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Aggregates
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

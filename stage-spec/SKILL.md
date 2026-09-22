@@ -3,13 +3,13 @@ name: stage-spec
 description: >-
   Write or backfill a stage spec for staged delivery (spec-kit): turn a stage row of
   the phased design into a machine-verifiable contract — DoD assertions directly
-  executable by stage-gate, a TDD grid (spec assertion -> failing test -> implementation
+  executable by a stage-completion gate, a TDD grid (spec assertion -> failing test -> implementation
   -> refactor), deliverables, and explicit non-goals. No prose "done" statements.
   Use when starting a new stage ("写 S{N} spec" / "回填阶段 spec") or after the
-  design's stage plan changes. NOT for: generic implementation plans (use writing-plans)
-  or running the gate (use stage-gate).
+  design's stage plan changes. NOT for: generic implementation plans, or
+  running the gate once a stage is done.
 slug: stage-spec
-version: 1.0.0
+version: 1.0.6
 displayName: stage-spec
 ---
 
@@ -69,7 +69,10 @@ displayName: stage-spec
 ## 产出物
 
 - 文件/模块/测试清单——可勾选，作为 DoD 断言的落点。
-- 与 HANDOFF §3 同步：spec 定稿后 HANDOFF §3 的该阶段行加 spec 引用（防双源——只引用不复制）。
+- 与项目交接存储（`.handoff/`）的 actions 槽同步：spec 定稿后让该阶段行**指向本 spec 的路径**
+  （`docs/design/stage-specs/S{N}.md`），只引用不复制（防双源）；尚无该行则先登记再指。
+  写入口与命令形以 [`project-handoff`](../project-handoff/SKILL.md) 的写槽表为**唯一权威面**——
+  本件只定「阶段行要指到 spec」这条契约，不复制它的参数面（那份拷贝会先烂）。
 
 ## 边界（不做——防蔓延）
 
@@ -80,7 +83,7 @@ displayName: stage-spec
 - [ ] 每条 DoD 可被 stage-gate 直接执行（命令或测试文件路径，无散文式表述）
 - [ ] 无「完成 XX」类无验证表述；计数断言有下限/预期值
 - [ ] 五节齐全；来源/开工日期在头部；TDD 网格覆盖全部新增功能
-- [ ] 与 HANDOFF §3 同步（引用 spec 路径）
+- [ ] 与 `.handoff/` actions 槽同步（该阶段行带上 spec 路径；写入口见「产出物」节所委托的 project-handoff 写槽表）
 
 ## 边界（分工）
 
@@ -89,13 +92,14 @@ displayName: stage-spec
 | `writing-plans` | stage-spec = 阶段契约（DoD/网格/边界，被 stage-gate 执行）；writing-plans = 通用任务分解（bite-size 步骤 + 代码 + 验证）。先 spec 定稿，再按需 plan 拆任务 |
 | `stage-gate` | spec 的消费者——spec 写完即被 gate 执行；DoD 不满足可执行性 = spec 返工 |
 | `decision-log` | 阶段裁定（如 DoD 变更）→ ADR；spec 引用 ADR 编号不复制内容 |
+| [`project-handoff`](../project-handoff/SKILL.md) | 交接存储的**工具方**：`.handoff/` 结构与写命令参数面全归它定义，本件步骤只按契约要求登记引用；它改形不回流改本件 |
 
 ## 完成标准
 
 - [ ] `docs/design/stage-specs/S{N}.md` 已创建/更新（五节齐全）
 - [ ] 每条 DoD 断言可执行（命令或测试路径），无散文式「完成」
 - [ ] TDD 网格先行——规范断言标来源，失败测试给文件名与用例清单
-- [ ] HANDOFF §3 已同步（引用 spec）
+- [ ] `.handoff/` actions 槽已同步（引用 spec）
 - [ ] DoD 变更（如有）已由 ADR 记录
 
 ## 反模式
@@ -104,4 +108,4 @@ displayName: stage-spec
 - 复制门禁输出/测试输出进 spec（双源）
 - DoD 与 TDD 网格脱节（网格功能无对应 DoD 断言）
 - 边界节缺失——蔓延风险无人认领
-- spec 定稿后不通知 HANDOFF（下个 session 不知道契约存在）
+- spec 定稿后不回写 `.handoff/`（下个 session 不知道契约存在）

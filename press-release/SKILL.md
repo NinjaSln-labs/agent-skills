@@ -4,7 +4,7 @@ description: >-
   Write an Amazon-style press release that defines customer value before building. Use
   when aligning stakeholders on a new product, feature, or strategic bet.
 slug: press-release
-version: 1.0.0
+version: 1.0.3
 displayName: press-release
 ---
 
@@ -13,7 +13,7 @@ displayName: press-release
 ## Purpose
 Create a visionary press release following Amazon's "Working Backwards" methodology to define and communicate a product or feature before building it. Use this to align stakeholders on the customer value proposition, clarify the problem being solved, and test if the product story resonates—treating the press release as a forcing function for clarity and customer-centricity.
 
-This is not a marketing artifact for product-launch day—it's a planning tool that asks "If we shipped this perfectly, how would we explain it to the world?"
+This is not a marketing artifact for launch day—it's a planning tool that asks "If we shipped this perfectly, how would we explain it to the world?"
 
 ## Input
 
@@ -22,7 +22,7 @@ This is not a marketing artifact for product-launch day—it's a planning tool t
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
-**Arriving empty-handed? That works too.** The skill asks who the customer is and what changes for them on product-launch day — the two things a working-backwards press release cannot fake.
+**Arriving empty-handed? That works too.** The skill asks who the customer is and what changes for them on launch day — the two things a working-backwards press release cannot fake.
 
 **Example invocation:** `Amazon-style press release: instant expense approval for field technicians, launching Q3.`
 
@@ -81,10 +81,10 @@ Use `template.md` for the full fill-in structure.
 ### Step 1: Gather Context
 Before drafting, ensure you have:
 - **Product/feature description:** What are you building?
-- **Target customer/persona:** Who is this for? (reference `skills/proto-persona/SKILL.md`)
-- **Problem statement:** What customer problem does this solve? (reference `skills/problem-statement/SKILL.md`)
+- **Target customer/persona:** Who is this for? (reference [`proto-persona`](../proto-persona/SKILL.md))
+- **Problem statement:** What customer problem does this solve? (reference [`problem-statement`](../problem-statement/SKILL.md))
 - **Key benefits:** What outcomes does it deliver?
-- **Competitive context:** How is this different from alternatives? (reference `skills/positioning-statement/SKILL.md`)
+- **Competitive context:** How is this different from alternatives? (reference [`positioning-statement`](../positioning-statement/SKILL.md))
 - **Company mission/values:** How does this fit the company's vision?
 
 **If missing context:** Run discovery, define the problem statement, or clarify positioning first.
@@ -105,8 +105,8 @@ Create a clear, benefit-focused headline:
 - **Memorable:** Can someone repeat this headline in a conversation?
 
 **Examples:**
-- ✅ "Acme Workflows Launches Invoice Automation to Cut Processing Time by 60% for Small Businesses"
-- ❌ "Acme Launches New Product with AI Features"
+- ✓ "Acme Workflows Launches Invoice Automation to Cut Processing Time by 60% for Small Businesses"
+- ✗ "Acme Launches New Product with AI Features"
 
 ---
 
@@ -132,7 +132,7 @@ Today, [Company], a [type of organization], announced [key news], a [brief descr
 
 **Quality checks:**
 - **Specific problem:** Not "inefficiency" but "manual invoice processing takes 8 hours per month"
-- **Validated:** Include data, customer quotes, or delegated-research to prove the problem is real
+- **Validated:** Include data, customer quotes, or research to prove the problem is real
 
 ---
 
@@ -259,10 +259,10 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/problem-statement/SKILL.md` — Defines the customer problem the press release highlights
-- `skills/positioning-statement/SKILL.md` — Informs the differentiation and value proposition
-- `skills/proto-persona/SKILL.md` — Defines the target customer mentioned in the press release
-- `skills/jobs-to-be-done/SKILL.md` — Informs the customer benefits and outcomes
+- [`problem-statement`](../problem-statement/SKILL.md) — Defines the customer problem the press release highlights
+- [`positioning-statement`](../positioning-statement/SKILL.md) — Informs the differentiation and value proposition
+- [`proto-persona`](../proto-persona/SKILL.md) — Defines the target customer mentioned in the press release
+- [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) — Informs the customer benefits and outcomes
 
 ### External Frameworks
 - Amazon's Working Backwards process — Origin of the press release-first methodology
@@ -280,4 +280,4 @@ Mini example excerpt:
 **Skill type:** Component
 **Suggested filename:** `press-release.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/problem-statement/SKILL.md`, `skills/positioning-statement/SKILL.md`, `skills/proto-persona/SKILL.md`, `skills/jobs-to-be-done/SKILL.md`
+**Dependencies:** References [`problem-statement`](../problem-statement/SKILL.md), [`positioning-statement`](../positioning-statement/SKILL.md), [`proto-persona`](../proto-persona/SKILL.md), [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md)

@@ -1,11 +1,17 @@
 ---
 name: dependency-scan
 description: >-
-  Dependency scan: detect CVEs and security issues in project dependencies. Use when you
-  need to analyze packages for known vulnerabilities across npm, pip, cargo, and other
-  ecosystems.
+  Dependency scan: detect CVEs and security issues in project
+  dependencies, report severity with remediations, and optionally
+  auto-fix by updating to patched versions. Also checks dependency
+  health: outdated, deprecated, unmaintained, and license issues.
+  Use when you need to audit packages for known vulnerabilities, fix
+  vulnerable dependencies, or review dependency health across npm,
+  pip, cargo, bundler, Go modules, and other ecosystems. NOT for:
+  source-code security review, secrets or credential detection, or
+  configuration and IaC misconfiguration scanning.
 slug: dependency-scan
-version: 1.0.0
+version: 1.0.1
 displayName: dependency-scan
 ---
 
@@ -37,11 +43,8 @@ Analyze package dependencies for known vulnerabilities.
 | Node.js | package.json, package-lock.json | npm audit |
 | Python | requirements.txt, Pipfile, pyproject.toml | pip-audit, safety |
 | Ruby | Gemfile, Gemfile.lock | bundler-audit |
-| Java | pom.xml, build.gradle | dependency-check |
 | Go | go.mod, go.sum | govulncheck |
 | Rust | Cargo.toml, Cargo.lock | cargo-audit |
-| PHP | composer.json, composer.lock | composer audit |
-| .NET | *.csproj, packages.config | dotnet list --vulnerable |
 
 ## Scan Modes
 
@@ -144,11 +147,12 @@ Remediation:
 
 ### Databases Consulted
 
+Each scanning tool queries its own ecosystem's advisory source
+(see Commands Used below for the tools). Databases with direct
+command support:
+
 | Database | Coverage |
 |----------|----------|
-| NVD (National Vulnerability Database) | All CVEs |
-| GitHub Advisory Database | GitHub-reported |
-| OSV (Open Source Vulnerabilities) | Multi-ecosystem |
 | npm Security Advisories | Node.js specific |
 | PyPI Advisory Database | Python specific |
 | RustSec Advisory Database | Rust specific |

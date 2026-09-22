@@ -1,6 +1,6 @@
 ---
 name: ddd-contexts
-description: "Design Bounded Contexts and their Ubiquitous Language: boundaries, responsibilities, glossary, team ownership, and boundary ADRs."
+description: "Design bounded contexts and their ubiquitous language: boundaries, responsibilities, glossary, team ownership, and boundary ADRs. Use when defining bounded contexts."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Contexts
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

@@ -5,7 +5,7 @@ description: >-
   parallelization, wait-on health checks, and service containers. Use when configuring
   tests in CI/CD pipelines (GitHub Actions, Jenkins, GitLab).
 slug: cicd-pipeline
-version: 1.0.0
+version: 1.0.1
 displayName: cicd-pipeline
 ---
 
@@ -63,6 +63,10 @@ You are an expert DevOps engineer specializing in CI/CD pipeline configuration f
 
 ```yaml
 name: Test Pipeline
+# Remaining pins below (action majors like @v4/@v3, postgres/redis/node tags,
+# snyk @master) are channel examples: prefer the versions your project already
+# uses; the refresh-managed table (rules + last-verified values + re-check
+# procedure) is references/pinned-versions.md.
 on:
   push:
     branches: [main, develop]
@@ -301,8 +305,12 @@ jobs:
 
       - name: Install k6
         run: |
+          # <k6-key-id> = the CURRENT k6 apt archive signing key ID published in
+          # k6's official APT install instructions (key IDs rotate; a stale ID
+          # fails this step). Last-verified value and re-check procedure:
+          # references/pinned-versions.md.
           sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D68
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys <k6-key-id>
           echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
           sudo apt-get install k6
@@ -449,6 +457,10 @@ stages:
 variables:
   NODE_VERSION: "20"
   CI: "true"
+  # Must equal the @playwright/test version in the project's package.json --
+  # the official image requires an exact match (derivation rule + refresh
+  # notes: references/pinned-versions.md). Derive per project, not from here.
+  PLAYWRIGHT_VERSION: "<match-playwright-package-version>"
 
 .node-cache:
   cache:
@@ -499,7 +511,9 @@ unit-tests:
 
 e2e-tests:
   stage: e2e
-  image: mcr.microsoft.com/playwright:v1.42.0-jammy
+  # Tag is derived from PLAYWRIGHT_VERSION above (must match @playwright/test
+  # exactly) -- never copy a literal tag from this template.
+  image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-jammy
   extends: .node-cache
   parallel: 4
   script:
@@ -581,3 +595,15 @@ jobs:
 8. **Ignoring CI-specific config** -- Some tests need different settings in CI (headless, retries).
 9. **Single point of failure** -- If one shard fails, still collect results from others.
 10. **Not cleaning up** -- Stale containers, files, or processes can affect subsequent runs.
+
+## Version References
+
+Fast-changing pins are kept out of the templates above and live in one
+refresh-managed table:
+
+- `references/pinned-versions.md` — carries `lastUpdated` + `refreshInterval`
+  (tiered by data stability: 30/60/180 days) + a per-row confidence column.
+  Covers the Playwright Docker image tag rule, the k6 apt signing key ID,
+  GitHub Action majors, and service image tags. When filling a `<placeholder>`
+  in a template, read the rule from this table first; the project's own
+  lockfile/package.json/CI config always wins over the example values there.

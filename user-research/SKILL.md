@@ -5,13 +5,13 @@ description: >-
   "interview guide", "usability test", "survey design", "research questions", or when the
   user needs help with any aspect of understanding their users through research.
 slug: user-research
-version: 1.0.0
+version: 1.0.1
 displayName: user-research
 ---
 
 # User Research
 
-Help plan, execute, and synthesize user delegated-research studies.
+Help plan, execute, and synthesize user research studies.
 
 ## Research Methods
 

@@ -10,7 +10,7 @@ description: >-
   a PR, work-in-progress changes, asks to "review since X", asks to review for code smells,
   or at a stage completion (stage-end review).
 slug: code-review
-version: 1.0.1
+version: 1.0.2
 displayName: code-review
 ---
 
@@ -23,7 +23,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-The issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if `docs/agents/issue-tracker.md` is missing.
+The Spec axis often needs the project's issue tracker. Prefer whatever tracker conventions the project already documents (e.g. `docs/agents/issue-tracker.md`). If that file is missing, ask the user where issues live (a tracker URL, local files, or a PRD path) and record the answer there; if you installed an upstream skill-suite, its setup command may bootstrap this file for you.
 
 ## Process
 
@@ -39,7 +39,7 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 Look for the originating spec, in this order:
 
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md`.
+1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md` if that file exists; otherwise ask the user how to reach the tracker (or probe the repo's remote host) — never assume the file is present.
 2. A path the user passed as an argument.
 3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".

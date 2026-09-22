@@ -4,12 +4,14 @@ description: >-
   Git workflow skill: branching strategies, Conventional Commits, creating or reviewing
   PRs, resolving PR review comments, merging PRs (CI verification, auto-merge queues,
   post-merge cleanup), PR review threads, signed commits, merge conflicts, Git+CI/CD
-  integration, git hooks (lefthook, captainhook, husky, pre-commit), and debugging
-  hook-install failures in git worktrees. Use when doing any of the above. NOT for:
-  creating releases (use github-release) or diagnosing BLOCKED/won't-merge PRs (use
-  github-project).
+  integration, git hooks (lefthook, captainhook, husky, pre-commit), debugging
+  hook-install failures in git worktrees, and GitHub release creation rules. Use when
+  merging stalls on failing checks or unresolved review threads, when a hook fails to
+  install in a worktree, when writing commit/branch/tag conventions, or when creating
+  a GitHub release. NOT for: diagnosing BLOCKED project-workflow PR states; no skill
+  name implied.
 slug: git-workflow
-version: 1.0.0
+version: 1.0.1
 displayName: git-workflow
 ---
 
@@ -38,7 +40,7 @@ Load on demand:
 | `references/pull-request-workflow.md` | Default-branch check, PR merge, merge gate, signed rebase |
 | `references/ci-cd-integration.md` | Watching CI from the CLI, git mirror repositories |
 | `references/advanced-git.md` | Rebase, cherry-pick, bisect, stash, worktrees, reflog, recovery |
-| `references/github-releases.md` | Pointer to the `github-release` skill |
+| `references/release-rules.md` | GitHub releases: immutable tags and tag reuse, Latest badge, pre-create checks |
 | `references/git-hooks-setup.md` | Hook frameworks, detection, hooks per stage |
 | `references/claude-code-hooks.md` | Claude Code `settings.json` hooks — merge gate, cache-path rejection, auto-lint |
 | `references/code-quality-tools.md` | shellcheck, shfmt, git-absorb, difftastic |

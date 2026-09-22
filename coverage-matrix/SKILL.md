@@ -1,16 +1,23 @@
 ---
 name: coverage-matrix
 description: >-
-  Generate or maintain the coverage matrix (docs/tests/coverage-matrix.md): scan unit
-  test names (describe/it in tests/unit/), the timeline event registry
-  (TIMELINE_EVENT_SPECS in src/domain/timeline.ts), and stage-spec DoD assertions, then
-  produce the three-way matrix (invariants<->tests / events<->tests / DoD<->gate) and
-  flag gaps (invariant without test, event without assertion) into audit items.
-  Use when at a stage end ("更新覆盖矩阵") or after adding invariants/events. NOT for: runtime
-  enforcement — the matrix is a human-checked artifact, never a test gate.
+  Generate or maintain the three-way coverage matrix (invariants<->tests /
+  events<->tests / DoD<->gate) for staged-delivery projects using this skill
+  family's layout: unit tests under tests/unit/, a domain event registry
+  (e.g. TIMELINE_EVENT_SPECS in src/domain/timeline.ts), per-stage spec DoD
+  files, output at docs/tests/coverage-matrix.md — if your project does not
+  follow this layout, this skill does not apply without path adaptation.
+  Scans those sources, produces the matrix, and flags gaps (invariant without
+  test, event without assertion) into the project's audit-item ledger.
+  USER-INVOKED ONLY: it writes a tracked artifact and opens audit items; run
+  only on the user's explicit request. Use when at a stage end or after
+  adding invariants/events, or on the Chinese trigger ("更新覆盖矩阵"). NOT for: runtime enforcement — the matrix is a
+  human-checked artifact, never a test gate.
 slug: coverage-matrix
-version: 1.0.0
+version: 1.0.2
 displayName: coverage-matrix
+disable-model-invocation: true
+compatibility: Requires the staged-delivery (spec-kit) project layout; the concrete paths below are this family's default layout example, probe a new repo before applying
 ---
 
 # Coverage Matrix（覆盖矩阵生成/维护）
@@ -27,6 +34,9 @@ displayName: coverage-matrix
 
 ## 输入（扫描源）
 
+> **范围声明**：下表路径/符号是**本项目（neonforge）的默认布局示例**，不是普适事实。
+> 接手新仓库时先执行流程步 0 的存在性探测，按仓库实际等价源调整；无法对应则停止并向用户说明。
+
 | 源 | 路径 | 提取什么 |
 |----|------|---------|
 | L1 测试 | `tests/unit/*.test.ts` | describe/it 名称（用例清单） |
@@ -37,6 +47,9 @@ displayName: coverage-matrix
 ## 流程
 
 ```
+- [ ] 0. 布局探测：核对上表默认源是否存在（tests/unit/、事件注册表文件、
+       docs/design/stage-specs/、docs/tests/）；布局不同→先映射到仓库实际等价源
+       并在矩阵头部记录映射；无法映射→停止，向用户说明本技能仅适用 staged-delivery 布局
 - [ ] 1. 扫 L1 测试：读 tests/unit/ 全部 *.test.ts，提取 describe/it 名（含所属文件）
 - [ ] 2. 扫事件注册表：读 src/domain/timeline.ts TIMELINE_EVENT_SPECS，提取事件 id 清单
 - [ ] 3. 读不变量来源（设计 §9.5）与当前阶段 stage-spec DoD
@@ -52,19 +65,19 @@ displayName: coverage-matrix
 
 | 不变量 | 语义 | 覆盖测试（文件::用例） | 判定 |
 |--------|------|------------------------|------|
-| Inv 1 | … | tests/unit/conversationState.test.ts::「…」 | ✅ / ❌ 缺口 |
+| Inv 1 | … | tests/unit/conversationState.test.ts::「…」 | ✓ / ✗ 缺口 |
 
 ### 表 2：事件 ↔ 测试
 
 | 事件 id | 语义 | 断言测试 | 判定 |
 |---------|------|----------|------|
-| session.pending_set | … | … | ✅ / ❌ 无断言 |
+| session.pending_set | … | … | ✓ / ✗ 无断言 |
 
 ### 表 3：DoD ↔ 门禁
 
 | DoD 断言（spec 原文） | 门禁方法（stage-gate 执行方式） | 判定 |
 |----------------------|--------------------------------|------|
-| L1 全量绿（新增 ≥15 条） | `npx vitest run` | 断言可执行 ✅ |
+| L1 全量绿（新增 N 条） | `npx vitest run` | 断言可执行 ✓ |
 
 ## 缺口判定
 
@@ -92,7 +105,7 @@ displayName: coverage-matrix
 ## 反模式
 
 - 手工拍脑袋写矩阵（不扫测试/注册表——必然过期）
-- 矩阵与测试脱节还标 ✅（抽查是硬项）
+- 矩阵与测试脱节还标 ✓（抽查是硬项）
 - 缺口发现后不入账（门禁看不到）
 - 把矩阵当门禁执行（覆盖 ≠ 通过——矩阵不跑测试）
 - 只做表 1 忽略事件/DoD 向（三向缺一不可）

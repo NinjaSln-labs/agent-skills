@@ -1,7 +1,7 @@
-# 技能库全景图（89 技能——产品 0-1 全阶段模式）
+# 技能库全景图（88 技能——产品 0-1 全阶段模式）
 
 - 日期：2026-08-16 · **新增 6 技能（spec-kit 阶段门禁族：stage-gate / stage-spec / decision-log / coverage-matrix / audit-item / skill-eval——需求规格 `.scratch/neonforge-v1/skill-requirements-20260816.md`）** · 2026-08-13 全量审计 81/81 合规（新技能接入后按审计流程补 DESCRIPTION-AUDIT）
-- 覆盖：本仓库 `agent-skills` 的 89 个技能（可安装到 `~/.agents/skills/<name>`）
+- 覆盖：本仓库 `agent-skills` 的 88 个技能（可安装到 `~/.agents/skills/<name>`）
 - 模式：**产品 0-1 全生命周期**（发现 → 定义 → 设计 → 交付 → 上线 → 运营）+ 贯穿层（质量/工程/协作/技能基建）
 
 ---
@@ -68,7 +68,7 @@
 
 | 技能 | 能力 |
 |------|------|
-| to-tickets | 需求拆解为 ticket（垂直切片 + AI-ready 验收标准 predicates）|
+| to-tickets | 需求拆解为 ticket（垂直切片 + 阻塞边 + 逐票验收清单，仅用户调用）|
 
 ### ③ 设计（23）—— 领域 / 架构 / 规范 / 视觉
 
@@ -115,7 +115,7 @@
 |------|------|
 | frontend-design | 前端设计（组件/页面——两遍法+自评）|
 | ui-ux-pro-max | UI/UX 交互设计（设计系统/一致性）|
-| web-design-guidelines | Web 设计规范（排版/色彩/可及性——WebFetch 降级）|
+| web-design-guidelines | Web 设计规范（排版/色彩/可及性——需网络取回，不可达时用已有本地副本否则中止）|
 | ux-heuristics | 可用性启发式审计（Nielsen 10/Krug 定律/严重度评级——wondelai v1.6.0）|
 | ui-typography | 专业排版规则（引号/破折号/间距/层级——ENFORCEMENT+AUDIT 双模式——Butterick）|
 | ui-animation | 设计工程与动效决策（Emil Kowalski——动画框架/组件原则/隐形细节）|
@@ -145,9 +145,9 @@
 | coverage-matrix | **覆盖矩阵**（不变量↔测试 / 事件↔测试 / DoD↔门禁 三向表 + 缺口入审计项）|
 | playwright-best-practices | Playwright 最佳实践（选择器/断言/稳定性）|
 | pixel-perfect | 视觉回归（像素对比——默认免费）|
-| visual-regression-tester | 视觉回归（双路线——Playwright 免费 + Chromatic/Percy 商业）|
+| visual-regression-tester | 视觉回归（双路线——Playwright 免费 + Chromatic 托管商业）|
 | accessibility-auditor | 可及性审计（WCAG 2.1 AA——axe + 键盘/焦点）|
-| api-contract-validator | API 契约验证（OpenAPI/JSON Schema/消费者契约）|
+| api-contract-validator | API 契约验证（OpenAPI/JSON Schema/GraphQL/消费者契约）|
 | k6-performance | 性能测试（k6——阈值/场景/自定义指标）|
 | test-data-generation | 测试数据生成（Faker/工厂/构建器/种子）|
 | cicd-pipeline | CI/CD 配置（GitHub Actions/Jenkins/GitLab CI）|
@@ -209,12 +209,11 @@
 | core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）**（退役：真源保留、链接已摘——硬约束迁用户级 memory，②③废弃，④并入交接）**|
 | version-management | **通用版本管理**（SemVer 定号 + 单版本源 + CHANGELOG + 发布标记；兼容性判定/弃用政策/不可变发布；**不依赖 VCS**，无 git 也可用）|
 
-#### P.4 协作（7）
+#### P.4 协作（6）
 
 | 技能 | 能力 |
 |------|------|
-| project-handoff | 交接文档（引用型 delta **5 节 + ≤1K token 硬预算**——交接方；环境指纹最小化接手复验）|
-| project-intake | 项目接手（读 HANDOFF 恢复上下文；**指纹门控：环境未变即跳过复验**——接收方）|
+| project-handoff | **项目交接存储**（`.handoff/` 多维交接：status/summary/actions/pitfalls/decisions/commands/scope/exit + 机检 read-back；`next` 指针；JSONL 单源、单一写入口 CLI；机检门禁；P1–P3）|
 | decision-log | **决策日志（ADR）**（Nygard 模板 + proposed/accepted/superseded/rejected 状态机——记录/查询）|
 | experiment-handoff | 实验性交接（worktree/branch/copy 隔离 → 交接 → 反馈驱动合并回主；**已挂载、仅用户 `/invoke`（禁 agent 自主）**）|
 | task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）**（退役：真源保留、链接已摘）**|
@@ -233,15 +232,15 @@
 | ④ 交付 | 23 | 计划 4 + 工程 1 + 测试链 10 + 质量审查 6 + 质询 2 |
 | ⑤ 上线 | 1 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
-| 贯穿层 | 17 | 审计 4 + 安全 4 + 规则 2 + 协作 7 |
-| **合计** | **89** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
+| 贯穿层 | 16 | 审计 4 + 安全 4 + 规则 2 + 协作 6 |
+| **合计** | **88** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
 
 ---
 
 ## 三、一图流（子类级）
 
 ```text
-产品 0-1 全生命周期（21 子类 · 87 技能）
+产品 0-1 全生命周期（21 子类 · 88 技能）
 ┌──────────────────────────────────────────────────────────────┐
 │ ① 发现     1.1 用户研究(3)  1.2 问题定义(4)                  │
 │            1.3 市场竞品(7)×8编排  1.4 调研纪律(2)             │
@@ -257,7 +256,7 @@
 ├──────────────────────────────────────────────────────────────┤
 │ ⑤ 上线     product-launch · ⑥ 运营  product-marketing · marketing-copywriting  │
 ├──────────────────────────────────────────────────────────────┤
-│ 贯穿       P.1 审计(4·含 skill-eval/skill-fit)  P.2 安全(4)  P.3 规则(2·含 core-rules/version-management)  P.4 协作(7·含 decision-log/experiment-handoff) │
+│ 贯穿       P.1 审计(4·含 skill-eval/skill-fit)  P.2 安全(4)  P.3 规则(2·含 core-rules/version-management)  P.4 协作(6·含 decision-log/experiment-handoff) │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -271,9 +270,9 @@
 4. **设计**：3.1 `prd-driven-ddd` 链式调 `ddd-scope→discover→subdomains→contexts→context-map→aggregates→domain-interactions→openspec-bridge`；3.3 `architecture-patterns` + `codebase-design`；3.4 规范三件套；3.5 视觉 `frontend-design` + `ui-ux-pro-max`
 5. **交付**：4.1 `roadmap-planning` → **阶段制**：开工前 `stage-spec`（阶段契约）→ 需要时 `writing-plans`（任务分解）→ `executing-plans`（执行）→ 阶段中裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix`（S2 起）→ 4.4 `code-review`（阶段末即时评审模式）→ 声称完成 → **`stage-gate` 跑 DoD 门禁**（含 `audit-item` open 项核对）；遇问题走 `problem-handling`（诊断→分级→处置→收尾），代码根因路径内用 `systematic-debugging`
 6. **验收**：P.1 `product-doc-audit`（四层 go/no-go）+ P.2 安全四件套 + 3.2 `ddd-model-review` + 4.3 `k6-performance`（性能）
-7. **上线/交接**：⑤ `product-launch` + ⑥ `product-marketing` → P.4 `project-handoff` → 下一位 `project-intake`
+7. **上线/交接**：⑤ `product-launch` + ⑥ `product-marketing` → P.4 `project-handoff`（交接/接手同源，读 `.handoff/` 即恢复上下文）
 
-**规则**：阶段产物格式对齐下阶段技能（PRD 的 AC → to-tickets 的 predicates）；交付前必跑质量链。
+**规则**：阶段产物格式对齐下阶段技能（PRD 的 AC → to-tickets 的逐票验收清单）；交付前必跑质量链。
 
 ---
 
@@ -288,18 +287,18 @@
 
 ## 六、语义引用说明（未接入的可选参考——2026-08-02）
 
-为保持技能库克制（89 技能），以下**二级语义引用未接入**（deanpeters 同库可选参考——各技能正文已加「相关技能说明」标注）：
+为保持技能库克制（决策时 89 技能，现库 88），以下**二级语义引用未接入**（deanpeters 同库可选参考）。**2026-09-22 起本节为唯一登记处**：各技能正文不再点名这些件（既无 `../<name>/SKILL.md` 假链，也无逐件「相关技能说明」标注块），需要时按能力表述改写或按需接入：
 
-- **tam-sam-som-calculator**（被 market-landscape-scan / competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用——市场量化）
-- **company-research**（被 competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用）
-- **pestel-analysis**（被 competitive-intel-watch / company-intel 引用）
-- **derisk-measurement-advisor / business-health-diagnostic / acquisition-channel-advisor**（company-intel 引用）
-- **opportunity-solution-tree**（voice-of-customer-miner 引用）
+- **tam-sam-som-calculator**（原 market-landscape-scan / competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用，09-22 削名后正文以 TAM/SAM/SOM 活动表述指称——市场量化）
+- **company-research**（原 competitive-research-snapshot / intelligence-collection-disciplines / company-intel 引用，09-22 削名后不点名——轻量公司画像由本库 company-intel 覆盖）
+- **pestel-analysis**（原 competitive-intel-watch / company-intel 引用，09-22 削名后正文以 PESTEL 活动表述指称）
+- **derisk-measurement-advisor / business-health-diagnostic / acquisition-channel-advisor**（原 company-intel 引用，09-22 削名后正文以活动表述指称）
+- **opportunity-solution-tree**（原 voice-of-customer-miner 引用，09-22 削名后正文不再点名）
 - **refactoring**（wondel Fowler 目录——无直源——现有 code-review/codebase-design/ddd-tactical-review 组合覆盖重构操作——需要时自建）
-- **discovery-process / problem-framing-canvas / customer-journey-mapping-workshop**（prd-development 引用——发现/问题框定输入，现有 user-research / discovery-interview-prep / problem-statement / customer-journey-map 组合覆盖）
-- **epic-hypothesis**（jobs-to-be-done / prd-development 引用——epic 假设结构化，现有 to-tickets 拆解覆盖）
-- **user-story / user-story-mapping / user-story-mapping-workshop**（problem-statement / proto-persona / customer-journey-map / prd-development 引用——用户故事拆解，现有 to-tickets 覆盖）
-- **prioritization-advisor / product-strategy-session**（roadmap-planning 引用——优先级与策略前置，现有 roadmap-planning 内置 RICE 框架 + positioning-statement 覆盖）
+- **discovery-process / problem-framing-canvas / customer-journey-mapping-workshop**（原 prd-development 引用，09-22 悬空引用清理后正文已削名为能力表述——发现/问题框定输入，现有 user-research / discovery-interview-prep / problem-statement / customer-journey-map 组合覆盖）
+- **epic-hypothesis**（原 jobs-to-be-done / prd-development 引用，09-22 清理后正文已削名——epic 假设结构化，现有 to-tickets 拆解覆盖）
+- **user-story / user-story-mapping / user-story-mapping-workshop**（原 problem-statement / proto-persona / customer-journey-map / prd-development 引用，09-22 清理后正文已削名——用户故事拆解，现有 to-tickets 覆盖）
+- **prioritization-advisor / product-strategy-session**（原 roadmap-planning 引用，09-22 样例正文已削名——优先级与策略前置，现有 roadmap-planning 内置 RICE 框架 + positioning-statement 覆盖）
 
 **情况说明**：引用仅为参考方向（不阻塞独立使用）；实际需要时按需接入对应技能。
 
@@ -317,7 +316,7 @@
 | **阶段门禁链** | 4.1 `stage-spec`（契约）→ `writing-plans`/`executing-plans`（执行）→ 裁定 `decision-log`（ADR）→ 阶段末 `coverage-matrix` + 4.4 `code-review`（阶段评审→发现入 `audit-item`）→ **`stage-gate` 跑 DoD**（open 项核对）→ 下一阶段 |
 | **问题处理链** | 4.4 `problem-handling`（诊断→分级→处置→收尾；代码根因路径内用 `systematic-debugging`）|
 | **重构操作链** | 4.4 code-review（发现 smells）→3.3 codebase-design（设计目标）→3.2 tactical-review（领域重构）|
-| **交接链** | P.4 handoff（写 delta）→ intake（读 delta 恢复）——工具/会话切换 |
+| **交接链** | P.4 `project-handoff`（交接/接手同源：写/读 `.handoff/`）——工具/会话切换 |
 
 ### 7.2 组合模式（子类成组使用）
 
@@ -335,7 +334,7 @@
 
 | 子类 | 技能 | 关键性 |
 |------|------|--------|
-| 2.3 拆解立项 | to-tickets | ⭐⭐⭐ 需求→任务（AI-ready AC）|
+| 2.3 拆解立项 | to-tickets | ⭐⭐⭐ 需求→任务（垂直切片 ticket）|
 | 4.2 工程协作 | git-workflow | ⭐⭐ 提交一致性 |
 | ⑤ 上线 | product-launch | ⭐⭐⭐ 发布全流程 |
 | P.3 规则 | version-management | ⭐⭐⭐ 版本一致性底线（core-rules 已退役）|
@@ -356,35 +355,35 @@
 
 | 技能 | 版本 | 技能 | 版本 | 技能 | 版本 |
 |------|------|------|------|------|------|
-| `accessibility-auditor` | 1.0.0 | `api-contract-validator` | 1.0.0 | `architecture-patterns` | 1.0.0 |
-| `audit-item` | 1.0.0 | `autonomous-investigation` | 1.0.0 | `battle-card-builder` | 1.0.0 |
-| `cicd-pipeline` | 1.0.0 | `code-review` | 1.0.1 | `codebase-design` | 1.0.0 |
-| `company-intel` | 1.0.1 | `competitive-analysis-process` | 1.0.0 | `competitive-intel-watch` | 1.0.0 |
-| `competitive-research-snapshot` | 1.0.0 | `config-scan` | 1.0.0 | `core-rules` | 1.1.0 |
-| `coverage-matrix` | 1.0.0 | `customer-journey-map` | 1.0.0 | `ddd-aggregates` | 1.0.0 |
-| `ddd-context-map` | 1.0.0 | `ddd-contexts` | 1.0.0 | `ddd-discover` | 1.0.0 |
-| `ddd-domain-interactions` | 1.0.0 | `ddd-model-review` | 1.0.0 | `ddd-openspec-bridge` | 1.0.0 |
-| `ddd-qa-chain` | 1.0.0 | `ddd-scope` | 1.0.0 | `ddd-subdomains` | 1.0.0 |
-| `ddd-tactical-review` | 1.0.0 | `decision-log` | 1.0.0 | `deep-codebase-analysis` | 1.0.0 |
-| `delegated-research` | 1.0.0 | `dependency-scan` | 1.0.0 | `discovery-interview-prep` | 1.0.0 |
-| `electron-best-practices` | 1.0.0 | `event-storming` | 1.0.0 | `executing-plans` | 1.0.1 |
-| `frontend-design` | 1.0.0 | `git-workflow` | 1.0.0 | `grill-me` | 1.0.0 |
-| `intelligence-collection-disciplines` | 1.0.0 | `jobs-to-be-done` | 1.0.0 | `k6-performance` | 1.0.0 |
-| `market-landscape-scan` | 1.0.0 | `marketing-copywriting` | 1.0.0 | `pixel-perfect` | 1.0.0 |
-| `plan-grilling` | 1.0.0 | `playwright-best-practices` | 1.0.0 | `positioning-statement` | 1.0.0 |
-| `positioning-workshop` | 1.0.0 | `prd-development` | 1.0.0 | `prd-driven-ddd` | 4.5.4 |
-| `press-release` | 1.0.0 | `problem-handling` | 1.0.1 |  |  |
-| `problem-statement` | 1.0.0 | `product-doc-audit` | 1.0.0 | `product-launch` | 1.0.0 |
-| `product-marketing` | 1.0.0 | `project-handoff` | 1.3.0 | `project-intake` | 1.3.0 |
-| `proto-persona` | 1.0.0 | `react-vite-best-practices` | 1.0.2 | `roadmap-planning` | 1.0.0 |
-| `secrets-scan` | 1.0.0 | `security-scan` | 1.0.0 | `session-health` | 1.0.0 |
-| `skill-description-audit` | 1.9.1 | `skill-eval` | 1.0.0 | `stage-gate` | 1.0.0 |
-| `stage-spec` | 1.0.0 | `systematic-debugging` | 1.0.2 | `task-loop-progress` | 1.0.0 |
-| `test-data-generation` | 1.0.0 | `to-tickets` | 1.0.0 | `typescript-best-practices` | 1.0.0 |
-| `ui-animation` | 1.0.0 | `ui-typography` | 1.0.0 | `ui-ux-pro-max` | 1.0.0 |
-| `user-research` | 1.0.0 | `ux-heuristics` | 1.0.0 | `verification-before-completion` | 1.0.1 |
-| `visual-regression-tester` | 1.0.0 | `voice-of-customer-miner` | 1.0.0 | `web-design-guidelines` | 1.0.0 |
-| `workshop-facilitation` | 1.0.0 | `write-spec` | 1.0.0 | `writing-plans` | 1.0.1 |
-| `experiment-handoff` | 1.0.2 | `skill-fit` | 1.2.1 | `version-management` | 1.2.0 |
+| `accessibility-auditor` | 1.0.2 | `api-contract-validator` | 1.0.1 | `architecture-patterns` | 1.0.1 |
+| `audit-item` | 1.0.1 | `autonomous-investigation` | 1.0.2 | `battle-card-builder` | 1.0.1 |
+| `cicd-pipeline` | 1.0.1 | `code-review` | 1.0.2 | `codebase-design` | 1.0.1 |
+| `company-intel` | 1.0.7 | `competitive-analysis-process` | 1.0.3 | `competitive-intel-watch` | 1.0.3 |
+| `competitive-research-snapshot` | 1.0.3 | `config-scan` | 1.0.0 | `core-rules` | 1.1.1 |
+| `coverage-matrix` | 1.0.2 | `customer-journey-map` | 1.0.3 | `ddd-aggregates` | 1.0.1 |
+| `ddd-context-map` | 1.0.1 | `ddd-contexts` | 1.0.1 | `ddd-discover` | 1.0.2 |
+| `ddd-domain-interactions` | 1.0.1 | `ddd-model-review` | 1.0.1 | `ddd-openspec-bridge` | 1.0.1 |
+| `ddd-qa-chain` | 1.0.1 | `ddd-scope` | 1.0.1 | `ddd-subdomains` | 1.0.2 |
+| `ddd-tactical-review` | 1.0.0 | `decision-log` | 1.0.7 | `deep-codebase-analysis` | 1.0.0 |
+| `delegated-research` | 1.0.1 | `dependency-scan` | 1.0.1 | `discovery-interview-prep` | 1.0.4 |
+| `electron-best-practices` | 1.0.0 | `event-storming` | 1.0.3 | `executing-plans` | 1.0.2 |
+| `frontend-design` | 1.0.2 | `git-workflow` | 1.0.1 | `grill-me` | 1.0.1 |
+| `intelligence-collection-disciplines` | 1.0.3 | `jobs-to-be-done` | 1.0.2 | `k6-performance` | 1.0.0 |
+| `market-landscape-scan` | 1.0.1 | `marketing-copywriting` | 1.0.2 | `pixel-perfect` | 1.0.3 |
+| `plan-grilling` | 1.0.0 | `playwright-best-practices` | 1.0.0 | `positioning-statement` | 1.0.3 |
+| `positioning-workshop` | 1.0.3 | `prd-development` | 1.0.6 | `prd-driven-ddd` | 4.5.5 |
+| `press-release` | 1.0.3 | `problem-handling` | 1.0.2 |  |  |
+| `problem-statement` | 1.0.3 | `product-doc-audit` | 1.0.2 | `product-launch` | 1.0.4 |
+| `product-marketing` | 1.0.1 | `project-handoff` | 3.2.1 |  |  |
+| `proto-persona` | 1.0.3 | `react-vite-best-practices` | 1.0.2 | `roadmap-planning` | 1.0.1 |
+| `secrets-scan` | 1.0.1 | `security-scan` | 1.0.2 | `session-health` | 1.0.3 |
+| `skill-description-audit` | 1.11.0 | `skill-eval` | 1.0.2 | `stage-gate` | 1.0.2 |
+| `stage-spec` | 1.0.6 | `systematic-debugging` | 1.0.3 | `task-loop-progress` | 1.0.1 |
+| `test-data-generation` | 1.0.1 | `to-tickets` | 1.1.0 | `typescript-best-practices` | 1.0.1 |
+| `ui-animation` | 1.0.3 | `ui-typography` | 1.0.1 | `ui-ux-pro-max` | 1.0.4 |
+| `user-research` | 1.0.1 | `ux-heuristics` | 1.0.1 | `verification-before-completion` | 1.0.2 |
+| `visual-regression-tester` | 1.0.4 | `voice-of-customer-miner` | 1.0.3 | `web-design-guidelines` | 1.0.1 |
+| `workshop-facilitation` | 1.0.1 | `write-spec` | 1.0.2 | `writing-plans` | 1.0.2 |
+| `experiment-handoff` | 1.0.4 | `skill-fit` | 1.2.1 | `version-management` | 1.2.1 |
 
 

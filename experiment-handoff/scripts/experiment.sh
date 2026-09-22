@@ -114,8 +114,6 @@ cmd_init() {
 
   mkdir -p .experiments
   if is_git && [ -f .gitignore ] && ! grep -qx '.experiments/' .gitignore; then printf '.experiments/\n' >> .gitignore; fi
-  local fp=".handoff/fp.txt"; [ -f "$fp" ] || fp="(none - see handoff-lint)"
-
   cat > .experiments/"$slug".md <<EOF
 # Experiment: $slug
 
@@ -126,7 +124,6 @@ cmd_init() {
 - Method: <方法>
 - 隔离: $mode · 位置: $loc · 分支: $br
 - 基线: $basehash
-- 环境指纹: 复用 .handoff/fp.sha（清单 $fp）· 见 project-handoff/handoff-lint
 - Run: <命令>
 - 结论:
 - Next Steps:

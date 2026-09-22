@@ -6,13 +6,13 @@ source: self
 tags: "[ddd, strategic, context-map, integration]"
 date_added: "2026-05-08"
 slug: ddd-context-map
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-context-map
 ---
 
 # DDD Context Map
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

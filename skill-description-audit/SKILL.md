@@ -11,7 +11,7 @@ description: >-
   audited SKILL.md. USER-INVOKED ONLY, independent auditor required: run only on the user's
   explicit request — never auto-trigger. Use when auditing or cross-validating a skill
   description against its SKILL.md body, or running a skill-library compliance check. NOT
-  for: auditing product doc sets (PRDs/specs/launch docs) — use product-doc-audit.
+  for: auditing product doc sets (PRDs/specs/launch docs), which this skill does not cover.
 metadata:
   standard: agentskills.io
   scope: user
@@ -31,8 +31,10 @@ metadata:
     - "v1.8.0：自审修正——① §3 `name` 行补官方连字符规则（不以连字符开头/结尾、无 `--`）；② 章节编号去重（`### 6. 触发词与误触发`→§7、`### 6.5`→§7.5、`### 7./8.`→§8./§9.；报告模板 `三、问题`→四、并顺延至七）；③ description 补 `name semantics` 与第二个触发场景、`Verification`→`Acceptance-Criteria`；④ 硬约束 4 明确「默认只出报告，改动须用户显式授权，唯一例外为专门自动化流程」"
     - "v1.9.0：新增硬约束 6「独立审计（强制）」——审计员须独立于被审对象（作者/近期改写者不得自审），无独立方时先 `ask user` 并在报告注明独立性状态；description 精简（992→941 字符，余量 32→83，检查维度与主要信息全保留，补 `independent auditor`）；v1.5.0/v1.6.0 历史条目中的 `§6.5` 加注「今 §7.5」消除悬空引用"
     - "v1.9.1：独立方复检修正——报告模板头部补「审计独立性」字段、完成标准补独立性判定项（硬约束 6 落地到模板与清单）；description 还原 `Acceptance-Criteria`（原精简为 `Acceptance`，精度回补）"
+    - "v1.10.0：报告与内容绑定（治「先落笔后修正」）——报告头新增 `审计指纹` 字段，取值 `python3 skill-audit-fp.py <技能>`（description+正文 12 位哈希，版本号变更不计）；确立「报告＝该版最后一次写入」顺序：改正文 → 取指纹 → 出报告 → 只读校验 → 提交，出报告后再动正文即本次作废须重跑；门禁 `skill-executability-smoke.py` 按工作树内容比对，失配升为**硬失败**（原按日期比对看不出来，只留软告警）"
+    - "v1.11.0：新增 §7.6「前向引用视野（consumer scope）」——description 点名他技能按**接收方是否一定持有**判，不按本机是否实存判：悬空/退役/与本库名编辑距离≤2 的拼写漂移与客户端专有名（本地实存≠消费者可得）→ [中]；点名本库其它技能（同库分发≠同装）→ [低] 建议改能力表述；机器侧半壁入门禁（点名退役件·近似名硬失败，点名本库他件软警告）；源于 skill-fit `NOT for` 三次收敛（真源仓 pitfall p000018）"
 slug: skill-description-audit
-version: 1.9.1
+version: 1.11.0
 displayName: skill-description-audit
 disable-model-invocation: true
 ---
@@ -78,8 +80,14 @@ disable-model-invocation: true
 | 项 | 规则 |
 |----|------|
 | 路径 | `<被审技能目录>/DESCRIPTION-AUDIT.md` |
-| 已存在 | **覆盖**写入（报告头写明审计日期与对象路径） |
+| 已存在 | **覆盖**写入（报告头写明审计日期、**审计指纹**与对象路径；写完即冻结，再改正文＝本次作废） |
 | 其他名 | 仅当用户显式指定文件名时改用指定名（仍须同目录） |
+
+**报告＝该版最后一次写入**（硬约束）：
+
+- 出报告**前**完成全部正文/description 改动；出报告**后**再动被审技能一次，本次审计即作废，须重跑覆盖。
+- 用内容指纹绑定，别靠日期（同日「先落笔后修正」日期看不出来）：报告头写 `审计指纹：<12 hex>`，取值 `python3 <真源仓>/skill-audit-fp.py <技能名>`；门禁 `skill-executability-smoke.py` 以同一算法比对**工作树**内容，**失配即硬失败**（非软警告），版本号变更不计入指纹。
+- 顺序：改正文 → 跑 `skill-audit-fp.py` 取值 → 写报告（含指纹）→ 只读校验（`bash skill-smoke.sh`）→ 提交。校验若报失配，说明写报告后又改了正文，回去重跑审计，**不要**只手改指纹蒙过门禁。
 
 ## 工作流
 
@@ -93,7 +101,7 @@ disable-model-invocation: true
 - [ ] 5. 数据外置检查（易变数据分层）
 - [ ] 6. description ↔ 正文交叉验证
 - [ ] 7. 触发词 / 误触发风险评估
-- [ ] 8. 写入 DESCRIPTION-AUDIT.md（强制：问题+建议+验收标准；不改 SKILL.md）
+- [ ] 8. 写入 DESCRIPTION-AUDIT.md（强制：问题+建议+验收标准 + 审计日期 + 审计指纹；报告＝该版最后一次写入；不改 SKILL.md）
 - [ ] 9. 向用户摘要结论 + 报告路径
 ```
 
@@ -156,7 +164,7 @@ disable-model-invocation: true
 |--------|------|
 | 敏感/元技能是否收敛调用 | 审计 / 发布 / 凭据 / 删除类等**高影响或元技能**应有 frontmatter `disable-model-invocation: true`，并在 description 写明「仅用户显式调用」。缺失 → **[中]** |
 | `allowed-tools` 最小权限 | 若声明，应为最小必要集；`Bash(*)` 之类宽权预授权 → **[中]**（实验字段，各实现支持不一）|
-| 反触发边界 | 易与相邻技能混淆者应有 `NOT for:` 指向替代技能（见 §7）|
+| 反触发边界 | 易与相邻技能混淆者应有 `NOT for:` 以任务/能力划界（见 §7、§7.6）|
 
 判定：
 
@@ -221,8 +229,8 @@ disable-model-invocation: true
 
 **误触发防护（2026-08 加入——deep-codebase-analysis 被「审计技能」类请求误命中 3 次的教训）：**
 
-- **WHEN 过宽**：description 含泛动词+泛领域组合（如 `analyzing source code` + `maintenance/refactoring`）会命中不相关请求 → 建议**收窄 Use when**（明确「分析什么、何时用」）+ 加**反触发**（`NOT for` / `DO NOT TRIGGER when`——指向该用哪个替代技能）。判定：WHEN 过宽缺反触发 → **[中]**（实测误命中）或 **[低]**（潜在风险）。
-- 反触发格式示例：`NOT for: single-file edits, auditing one skill's SKILL.md — those belong to code-review / skill-description-audit.`
+- **WHEN 过宽**：description 含泛动词+泛领域组合（如 `analyzing source code` + `maintenance/refactoring`）会命中不相关请求 → 建议**收窄 Use when**（明确「分析什么、何时用」）+ 加**反触发**（`NOT for` / `DO NOT TRIGGER when`——以**能力/任务**划界，不点名替代技能，见 §7.6）。判定：WHEN 过宽缺反触发 → **[中]**（实测误命中）或 **[低]**（潜在风险）。
+- 反触发格式示例：`NOT for: single-file edits, or authoring/editing any skill's SKILL.md — no skill name implied (boundaries by task, not by who else could do it).`
 
 ### 7.5 description pushy 质量（场景/关键词密度——v1.5.0）
 
@@ -233,11 +241,26 @@ disable-model-invocation: true
 | **标志性能力有触发词** | 正文每条标志性能力（§4 抽取）都能在 description 找到对应触发词（用户可能的口头说法）| 缺 → **[中]**（标志性能力无触发词 = 该能力永远不被触发） |
 | **场景密度** | WHEN 含 ≥2 个具体使用场景/触发时刻（「何时/什么情况下用」），非泛泛「when needed/必要时」| 泛泛或只有 1 个场景 → **[低]**（建议补场景示例） |
 | **关键词覆盖** | 高频触发词（技能领域专有名词/常见短语）已在 WHEN | 高频词缺失 → **[低]** |
-| **反触发完整** | 易误触发技能（泛动词+泛领域组合）已有 NOT for 指向替代技能（见 §7）| 缺 → **[中]**（实测误命中）或 **[低]**（潜在） |
+| **反触发完整** | 易误触发技能（泛动词+泛领域组合）已有 NOT for 以任务/能力划界（见 §7、§7.6）| 缺 → **[中]**（实测误命中）或 **[低]**（潜在） |
 
 **与 skill-eval 的分工**：本维度是静态评估——「触发词写没写、够不够」；触发后行为是否真的正确（pass-rate）归 `skill-eval`（动态行为评估）。审计建议可写「若触发仍不理想，走 skill-eval 行为验证」。
 
 **动态触发测量（agentskills.io trigger-eval 方法）**：静态检查之外，触发可靠性可用官方推荐方法实测——构造约 20 条 eval 查询（8–10 条应触发 / 8–10 条**近似但不应触发**），每条跑 3 次算 **trigger rate**（阈值 0.5），按 60/40 切 **train / validation** 防过拟合，迭代约 5 轮。本技能只给静态判定与查询集设计建议；跑测与 pass-rate 归 `skill-eval`（来源：agentskills.io `skill-creation/optimizing-descriptions`）。
+
+### 7.6 前向引用视野（consumer scope · v1.11.0）
+
+description 里「use X / prefer X / see X」式点名**另一个技能**时，判据不是「这个名字在我这台机器上装了吗」，而是**接收方是否一定持有它**。跨渠道发布（SkillHub / skills.sh / 手工拷贝）后，三类名字依次失效：
+
+| 被点名的名字 | 判定 | 依据 |
+|---|---|---|
+| 本库不存在（悬空 / 已退役 / 与本库名编辑距离 ≤2 的拼写漂移） | **[中]** | 消费者照做会找不到；退役件说明链接已摘 |
+| 客户端或本机自带件（本地实存但本库不发布） | **[中]** | 本机视野是假证据——**必须问「这名字谁装的」**，别用 `ls ~/.agents/skills` 或自身环境验证 |
+| 本库其它技能 | **[低]** | 同库分发≠同装；只装本技能的用户没有它。建议改成不依赖名字的能力表述 |
+| 只按能力描述、不提名 | **通过** | 如 `no skill name implied — any client's own authoring tooling applies` |
+
+- 提名合法的唯一条件：**接收方一定持有**（同一安装包内的强制伴随件，或写明渠道与安装坐标）。
+- 机器侧半壁已有门禁兜底：`skill-executability-smoke.py` 扫 description 的前向引用——点名退役件/近似本库名 → **硬失败**；点名本库其它技能 → **软警告**。审计须解释成因并给改写建议，不得只转述门禁。
+- 教训来源：同一子句三次收敛（悬空名 → 客户端专有名 → 同库未装名），见真源仓 pitfall `p000018`。
 
 ### 8. 写报告（唯一产出）
 
@@ -264,6 +287,7 @@ disable-model-invocation: true
 
 - 审计对象：`<绝对路径>/SKILL.md`（frontmatter `description`）
 - 审计日期：YYYY-MM-DD
+- 审计指纹：<python3 skill-audit-fp.py <skill-name> 的 12 位输出>
 - 审计方式：description ↔ SKILL.md 正文交叉验证 + Agent Skills 描述合规检查
 - 审计独立性：独立（审计员 ≠ 作者/近期改写者） / 用户授权自审（注明授权来源）
 - 结论：<一句话总评；含是否严重误导 / 是否建议改描述>
@@ -285,6 +309,7 @@ disable-model-invocation: true
 | 调用与授权（user-invoked only）| 通过 已收敛 / 不适用 / 不通过 未收敛 |
 | 正文规模 / 引用层级 / 时效性 | 通过 / 注意 |
 | 无 emoji / 表情（description/metadata/正文）| 通过 / 不通过 |
+| 前向引用视野（§7.6）| 通过 无提名 / [低] 点名本库他件 / [中] 点名退役·近似·客户端专有件 |
 
 ## 二、数据外置检查（易变数据分层）
 
@@ -350,8 +375,8 @@ disable-model-invocation: true
 | 级 | 标准 |
 |----|------|
 | **高** | 空/超长描述；**frontmatter 未闭合 / description 吞正文（结构破坏）**；标志性强制能力缺失；描述与正文核心矛盾；严重假称；**`name` 含保留词（`anthropic`/`claude`）或 XML 标签** |
-| **中** | 缺 WHAT 或 WHEN；重要能力缺失；输入/术语与正文明显不一致；正文写死**快变**易变数据未外置；**WHEN 过宽已致误命中（缺反触发）**；**引用已改名旧名**；名称含工具/个人绑定；**description 含中文/CJK（中英混杂或中文残留——库规范纯英文，2026-08-05 提高）**；**高影响/元技能未收敛为 user-invoked**；`allowed-tools` 宽权预授权；`compatibility` 超 500 字符；`description`/`metadata` 含 emoji |
-| **低** | 触发词可补强；弱覆盖；双语重复；**单段泛名（匹配指向弱）**；WHEN 过宽仅潜在风险；细节未写入描述；慢变数据未外置；refreshInterval 一刀切；正文 ≥500 行未拆；引用链式嵌套；长 reference 缺 TOC；写死时点信息；术语不一致；正文含 emoji |
+| **中** | **description 前向引用点名退役件／与本库名近似漂移／客户端专有件（本地实存≠消费者可得，§7.6）**；缺 WHAT 或 WHEN；重要能力缺失；输入/术语与正文明显不一致；正文写死**快变**易变数据未外置；**WHEN 过宽已致误命中（缺反触发）**；**引用已改名旧名**；名称含工具/个人绑定；**description 含中文/CJK（中英混杂或中文残留——库规范纯英文，2026-08-05 提高）**；**高影响/元技能未收敛为 user-invoked**；`allowed-tools` 宽权预授权；`compatibility` 超 500 字符；`description`/`metadata` 含 emoji |
+| **低** | **description 点名本库其它技能（同库分发≠同装，应改能力表述，§7.6）**；触发词可补强；弱覆盖；双语重复；**单段泛名（匹配指向弱）**；WHEN 过宽仅潜在风险；细节未写入描述；慢变数据未外置；refreshInterval 一刀切；正文 ≥500 行未拆；引用链式嵌套；长 reference 缺 TOC；写死时点信息；术语不一致；正文含 emoji |
 | **信息** | 版本未 bump、旧报告过期、合理扩展触发等非缺陷备忘 |
 
 ## 反模式
@@ -377,12 +402,14 @@ disable-model-invocation: true
 - **把 `allowed-tools` 当形式字段**（不查最小权限，放过 `Bash(*)` 类宽权预授权）
 - **执行被审技能的脚本**（把只读审计变成执行——既是越界，也是 prompt-injection 面）
 - **用 emoji 排版**（图符字形与宽度跨平台不一——改用文字标记：`PASS` / `FAIL` / `注意` / `通过` / `不通过`）
+- 用「本机已装」证明引用合法（真事：`skill-fit` 的 `NOT for` 先指 `skill-builder`（本库无）→ 再指 `skill-creator`（客户端自带件，本库不发布），两轮审计都按本机视野放过——须按接收方视野判）
 
 ## 完成标准
 
 - [ ] 未修改被审 `SKILL.md`
 - [ ] 审计独立性已判定并在报告头注明（独立 / 用户授权自审；无独立方时已先 ask user）
 - [ ] 同目录存在更新后的 `DESCRIPTION-AUDIT.md`（或用户指定名）
+- [ ] 报告头带 `审计指纹`（`python3 skill-audit-fp.py <技能>` 取值），且**本文件是本轮对被审技能的最后一次写入**——出报告后又改正文则须重跑；提交前跑 `bash skill-smoke.sh` 确认无「audit not the last write」硬失败
 - [ ] 合规表 + 数据外置检查 + 交叉验证矩阵齐全
 - [ ] 报告含 **问题**、**建议**、**验收标准** 三节（内容允许为「无」/「无需改动」；有改写时建议回指问题、验收可复测）
 - [ ] 假称与标志性缺失已显式判定
@@ -391,6 +418,7 @@ disable-model-invocation: true
 - [ ] 正文非空已判定（或确认在 thin-allowlist.txt）
 - [ ] 语言一致性判定已给出（通过 纯英文 / 中文原生技能纯中文 / 不通过 含中文 [中]——CJK 扫描实证）
 - [ ] 误触发防护已评估（WHEN 过宽 → 反触发建议；名称语义/旧名残留已查）
+- [ ] 前向引用已按 §7.6 判（点名退役件/近似本库名/客户端专有件＝[中]；点名本库他件＝[低] 并给能力化改写；无提名＝通过）
 - [ ] pushy 质量已评估（§7.5：标志性能力触发词覆盖 / 场景密度 ≥2 / 高频关键词 / 反触发）
 - [ ] 正文层旧名残留已查（改名技能审计时：正文反引号/链接/对齐表引用）
 - [ ] 调用与授权已判定（高影响/元技能是否 user-invoked；`allowed-tools` 最小权限）

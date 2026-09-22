@@ -7,7 +7,7 @@ description: >-
   refactoring a monolith to bounded contexts, implementing hexagonal or onion
   architecture, or debugging dependency cycles between application layers.
 slug: architecture-patterns
-version: 1.0.0
+version: 1.0.1
 displayName: architecture-patterns
 ---
 
@@ -164,9 +164,11 @@ For detailed DDD bounded context mapping, full multi-service project trees, Anti
 
 - [`references/advanced-patterns.md`](references/advanced-patterns.md)
 
-## Related Skills
+## Related Pattern Families
 
-- `microservices-patterns` — Apply these architecture patterns when decomposing a monolith into services
-- `cqrs-implementation` — Use Clean Architecture as the structural foundation for CQRS command/query separation
-- `saga-orchestration` — Sagas require well-defined aggregate boundaries, which DDD tactical patterns provide
-- `event-store-design` — Domain events produced by aggregates feed directly into an event store
+These architecture patterns connect to broader pattern families that this skill does not itself cover:
+
+- **Microservices patterns** — apply these architecture patterns when decomposing a monolith into services
+- **CQRS** — use Clean Architecture as the structural foundation for command/query separation
+- **Saga orchestration** — sagas require well-defined aggregate boundaries, which DDD tactical patterns provide
+- **Event store design** — domain events produced by aggregates feed directly into an event store

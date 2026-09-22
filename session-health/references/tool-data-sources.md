@@ -65,8 +65,8 @@ jq -c '.entries[] | {id, usagePerModel}' ~/.deepcode/projects/<project-code>/ses
 ### 会话恢复能力
 
 - `/resume`：列出历史会话继续
-- `project-intake`：新会话输入「<项目名> 接手」恢复上下文
-- HANDOFF.md / 项目文档
+- `project-handoff`：新会话输入「<项目名> 接手」恢复上下文
+- `.handoff/`（现行工作存储）／`HANDOFF.md`、`HANDOFF-ARCHIVE/`（旧模型，出现即待迁移，别当现行）／项目文档
 
 ---
 
@@ -138,7 +138,7 @@ sqlite3 -header "$DB" \
 | 经济（每轮输入费）| ✅ 可算（≤快照上界）| ❌ 无法量化 → 标注 |
 | 模型 | ✅ `usagePerModel` | ⚠️ `ai_code_hashes.model`（常为 default，需确认）|
 | 活跃度/时间跨度 | ✅ `createTime`/`updateTime` | ✅ `ai_code_hashes.createdAt` / 转录 mtime |
-| 恢复能力 | ✅ `/resume` + project-intake | ⚠️ 历史面板 + rules + git |
+| 恢复能力 | ✅ `/resume` + project-handoff | ⚠️ 历史面板 + rules + git |
 | 模型窗口（分母）| 查 `references/model-contexts.md`（共用）| 同左 |
 
 ---

@@ -10,13 +10,13 @@ source: self
 tags: "[ddd, tactical, aggregates, invariants]"
 date_added: "2026-05-08"
 slug: ddd-aggregates
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-aggregates
 ---
 
 # DDD Aggregates
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

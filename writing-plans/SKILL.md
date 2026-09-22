@@ -3,12 +3,13 @@ name: writing-plans
 description: >-
   Write comprehensive implementation plans from a spec or requirements—break multi-step
   work into bite-sized tasks with exact file paths, complete code, and verification steps
-  (DRY, YAGNI, TDD, frequent commits; no placeholders). Save plans to
-  docs/superpowers/plans/. Use when you have a spec or requirements for a multi-step task,
+  (DRY, YAGNI, TDD, frequent commits; no placeholders). Plans are saved as dated markdown
+  docs under the project's plans directory (probe for an existing convention, default
+  docs/plans/; user preferences override). Use when you have a spec or requirements for a multi-step task,
   before touching code. NOT for: stage contract specs (DoD/gate assertions + TDD grid) —
   those are stage-spec, executed by stage-gate.
 slug: writing-plans
-version: 1.0.1
+version: 1.0.2
 displayName: writing-plans
 ---
 
@@ -22,9 +23,10 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
+**Context:** If working in an isolated git worktree, ensure one exists before execution starts — create it from the current branch if the project has no worktree yet.
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** the project's plans directory. Probe first: if the repo already has a plans directory or a documented plan-location convention, use that; otherwise default to `docs/plans/`.
+Filename: `YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
 
 ## Scope Check
@@ -67,7 +69,7 @@ independently testable deliverable.
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED WORKFLOW: implement this plan task-by-task — either dispatch a fresh subagent per task with a review gate between tasks (recommended), or execute inline with checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -166,18 +168,16 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 After saving the plan, offer execution choice:
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to `<plans-dir>/<filename>.md`. Two execution options:**
 
 **1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+**2. Inline Execution** - Execute tasks in this session, task-by-task with batch execution and checkpoints
 
 **Which approach?"**
 
 **If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
+- Dispatch a fresh subagent per task, with two-stage review between tasks
 
 **If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
-- Batch execution with checkpoints for review
+- Execute task-by-task in this session, with checkpoints for review

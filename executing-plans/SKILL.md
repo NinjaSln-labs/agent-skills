@@ -5,11 +5,11 @@ description: >-
   critically, execute all tasks in order running the verifications each task specifies,
   and report when complete. Use when you have a written implementation plan to execute in
   a separate session, or when resuming a plan in a fresh session after an agent/tool
-  switch (use subagent-driven-development instead if subagents are available). NOT for:
-  verifying a stage against its spec — that is stage-gate, which only verifies and never
-  executes.
+  switch (if your agent environment can run plans with subagents, prefer that — this
+  skill executes solo). NOT for: verify-only stage completion checks against a spec —
+  those only verify and never execute.
 slug: executing-plans
-version: 1.0.1
+version: 1.0.2
 displayName: executing-plans
 ---
 
@@ -21,13 +21,13 @@ Load plan, review critically, execute all tasks, report when complete.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Note:** Tell your human partner that Superpowers works much better with access to subagents (Claude Code, Codex CLI, Codex App, Copilot CLI, and Gemini CLI all qualify; see the per-platform tool refs in `../using-superpowers/references/`). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
+**Note:** Tell your human partner that this workflow works much better with access to subagents (Claude Code, Codex CLI, Codex App, Copilot CLI, and Gemini CLI all qualify). If your agent environment can run plans with subagents, prefer that route over this skill — this skill executes solo.
 
 ## The Process
 
 ### Step 1: Load and Review Plan
-1. Ensure an isolated workspace: use superpowers:using-git-worktrees to create one or verify the existing one
-2. Read plan file
+1. Ensure an isolated workspace: if your environment provides a git worktree skill or workflow, use it to create one or verify the existing one; otherwise create or verify an isolated worktree/branch yourself — never assume such a helper is installed
+2. Read the plan file; if the session hasn't identified one, ask your human partner for its path — don't assume a location
 3. Review critically - identify any questions or concerns about the plan
 4. If concerns: Raise them with your human partner before starting
 5. If no concerns: Create todos for the plan items and proceed
@@ -43,9 +43,8 @@ For each task:
 ### Step 3: Complete Development
 
 After all tasks complete and verified:
-- Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
-- Follow that skill to verify tests, present options, execute choice
+- Announce: "I'm finishing the development branch to complete this work."
+- If your environment happens to include a branch-finishing skill, prefer following it; otherwise complete the work directly: verify the full test suite passes, present the integration options to your human partner (merge, open a PR, keep the branch, or discard), and execute their choice
 
 ## 边界（与 stage-gate 分工）
 

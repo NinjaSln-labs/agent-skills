@@ -1,11 +1,13 @@
 ---
 name: autonomous-investigation
 description: >-
-  The protocol behind every investigation skill. Use when AI research must proceed without
-  you: search-plan gate, Fact/Inference/Assumption labels, confidence stacking, diffable
-  outputs.
+  The evidence protocol behind recurring competitive and market investigation skills —
+  market scans, competitive snapshots, intel watches, battle cards — not a research
+  executor. Use when AI research must proceed without you: search-plan gate,
+  Fact/Inference/Assumption labels, confidence stacking, diffable outputs. NOT for
+  answering a one-off research question or producing a single research report.
 slug: autonomous-investigation
-version: 1.0.0
+version: 1.0.2
 displayName: autonomous-investigation
 ---
 
@@ -13,7 +15,7 @@ displayName: autonomous-investigation
 
 ## Purpose
 
-Provide the canonical contract for **investigation skills** — delegated-research the AI performs in the world (web
+Provide the canonical contract for **investigation skills** — research the AI performs in the world (web
 search, published data, public filings) while you review the evidence instead of feeding it context.
 Where `workshop-facilitation` governs skills that ask you questions one at a time, this protocol governs
 skills that *proceed without you*: they budget their questions, show their plan, label every claim, and
@@ -24,7 +26,7 @@ investigation honoring this contract can run as an agent task, in a loop, or on 
 
 **Nothing required** — this skill defines the protocol other investigation skills follow.
 **Also useful when invoked standalone:** the target of the investigation and, above all, **the decision
-the delegated-research should support**. Research without a decision is a hobby; every investigation skill asks
+the research should support**. Research without a decision is a hobby; every investigation skill asks
 for the decision because it determines what "just enough" means.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an
@@ -149,7 +151,7 @@ briefing an agent or designing a new investigation skill — lives in [`template
 > - Source mix: company site, filings, credible press, review sites
 > - Facts get URLs; interpretations get labeled Inference; gaps become Assumptions to validate
 >
-> *(delegated-research happens)*
+> *(research happens)*
 >
 > **Key finding:** [TARGET] removed its mid-tier plan in May — **Fact**
 > ([pricing page diff, May 12](https://example.com/archive)). Packaging is consolidating toward
@@ -182,7 +184,7 @@ conflict case: four channels agree, one disagrees, and the dig changes the strat
   of two job posts. The label isn't decoration — it tells the reader what to check before betting on it.
 - **Invented citations.** A URL that doesn't resolve, a quote that doesn't exist. The do-not-invent list
   names the domain's temptations; honor it or the whole output is suspect.
-- **Skipping the plan gate.** Ten minutes of delegated-research in the wrong direction costs more than ten seconds
+- **Skipping the plan gate.** Ten minutes of research in the wrong direction costs more than ten seconds
   of plan review. The gate exists because redirecting a plan is cheap and redirecting a report is not.
 - **Announcement inflation.** Treating a press release as a commitment. Announcements are intent;
   corroborate with money, hiring, or contracts before you re-plan around them.

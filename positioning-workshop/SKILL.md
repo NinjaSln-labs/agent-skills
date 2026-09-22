@@ -5,21 +5,21 @@ description: >-
   benefits, and differentiation. Use when your product messaging feels fuzzy, generic, or
   misaligned.
 slug: positioning-workshop
-version: 1.0.0
+version: 1.0.3
 displayName: positioning-workshop
 ---
 
 # Positioning Workshop
 
 ## Purpose
-Guide product managers through discovering and articulating product positioning by asking adaptive questions about target customers, unmet needs, product category, benefits, and competitive differentiation. Use this to align stakeholders on strategic positioning before writing PRDs, product-launch plans, or marketing materials—ensuring you've made deliberate choices about who you serve, what need you address, and how you differ from alternatives.
+Guide product managers through discovering and articulating product positioning by asking adaptive questions about target customers, unmet needs, product category, benefits, and competitive differentiation. Use this to align stakeholders on strategic positioning before writing PRDs, launch plans, or marketing materials—ensuring you've made deliberate choices about who you serve, what need you address, and how you differ from alternatives.
 
 This is not a brainstorming session—it's a structured discovery process that outputs a Geoffrey Moore positioning statement backed by evidence and strategic choices.
 
 ## Input
 
 **Works best with:** The product (or feature) whose positioning feels fuzzy.
-**Also useful:** Current messaging, who you think the customer is, competitors, and where positioning breaks down today (sales calls, website, product-launch).
+**Also useful:** Current messaging, who you think the customer is, competitors, and where positioning breaks down today (sales calls, website, launch).
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
@@ -53,11 +53,11 @@ An interactive discovery process that:
 - Defining positioning for a new product
 - Repositioning an existing product (pivot, market shift)
 - Aligning stakeholders on product strategy
-- Preparing for product-launch or major release
+- Preparing for launch or major release
 - Before writing positioning-dependent artifacts (PRD, press release, sales deck)
 
 ### When NOT to Use This
-- Before customer delegated-research (positioning requires validated insights)
+- Before customer research (positioning requires validated insights)
 - For internal tools with captive users (no market positioning needed)
 - When positioning is already clear and validated
 
@@ -81,7 +81,7 @@ This file defines the domain-specific assessment content. If there is a conflict
 
 This interactive skill asks **up to 5 adaptive questions**, offering **3-4 enumerated context-aware options** at each step.
 
-Interaction pattern: Pair with `skills/workshop-facilitation/SKILL.md` when you want a one-step-at-a-time flow with numbered recommendations at decision points and quick-select options for regular questions. If the user asks for a single-shot output, skip the multi-turn facilitation.
+Interaction pattern: Pair with [`workshop-facilitation`](../workshop-facilitation/SKILL.md) when you want a one-step-at-a-time flow with numbered recommendations at decision points and quick-select options for regular questions. If the user asks for a single-shot output, skip the multi-turn facilitation.
 
 ---
 
@@ -145,7 +145,7 @@ Before we begin, let's gather product context to ground our positioning work:
 3. **Compliance or risk burden** — E.g., "Fear of tax penalties or legal issues due to manual errors" (accounting, HR compliance)
 4. **Costly inefficiency** — E.g., "Losing revenue due to slow processes or customer friction" (sales ops, customer onboarding)
 
-**Or describe the specific pain point/unmet need based on customer delegated-research, support tickets, or competitive gaps.**
+**Or describe the specific pain point/unmet need based on customer research, support tickets, or competitive gaps.**
 
 **Adaptation tip:** Use language from customer testimonials or case studies in the provided materials.
 
@@ -261,7 +261,7 @@ After collecting responses, the agent generates a positioning statement using th
 
 2. **Refine based on feedback:**
    - If target feels too broad → Narrow further (e.g., "SMB owners" → "SMB owners in service industries")
-   - If need isn't resonating → Validate with more customer delegated-research
+   - If need isn't resonating → Validate with more customer research
    - If category confuses → Pick a clearer category or commit to category creation
 
 3. **Apply to artifacts:**
@@ -356,7 +356,7 @@ Acme Workflows is a no-code automation platform for small business owners that r
 - Benefit is unmeasurable ("productivity" = how much?)
 - Differentiation is empty ("better features" = unverifiable)
 
-**How to fix:** Go back and answer with specificity. Use customer delegated-research, not guesses.
+**How to fix:** Go back and answer with specificity. Use customer research, not guesses.
 
 ---
 

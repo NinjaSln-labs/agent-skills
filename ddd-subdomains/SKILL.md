@@ -1,18 +1,18 @@
 ---
 name: ddd-subdomains
-description: "Identify business capabilities and classify subdomains (Core/Supporting/Generic), producing core-domain declarations and ownership recommendations. Use when partitioning core/supporting/generic subdomains."
+description: "Identify business capabilities and classify subdomains (Core/Supporting/Generic), producing core-domain declarations, ownership recommendations, and bounded-context boundary candidates. Use when partitioning core/supporting/generic subdomains, or re-partitioning when god-context or circular-dependency signals suggest a subdomain misfire."
 risk: safe
 source: self
 tags: "[ddd, strategic, subdomains]"
 date_added: "2026-05-08"
 slug: ddd-subdomains
-version: 1.0.0
+version: 1.0.2
 displayName: ddd-subdomains
 ---
 
 # DDD Subdomains
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

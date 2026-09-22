@@ -9,13 +9,13 @@ source: self
 tags: "[ddd, discovery, scope]"
 date_added: "2026-05-08"
 slug: ddd-scope
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-scope
 ---
 
 # DDD Scope
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

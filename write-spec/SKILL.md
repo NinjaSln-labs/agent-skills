@@ -6,7 +6,7 @@ description: >-
   non-goals, defining success metrics and acceptance criteria, or breaking a big ask into
   a phased spec.
 slug: write-spec
-version: 1.0.0
+version: 1.0.2
 displayName: write-spec
 ---
 
@@ -50,8 +50,8 @@ If **~~project tracker** is connected:
 - Identify dependencies on other work items
 
 If **~~knowledge base** is connected:
-- Search for related delegated-research documents, prior specs, or design docs
-- Pull in relevant user delegated-research findings
+- Search for related research documents, prior specs, or design docs
+- Pull in relevant user research findings
 - Find related meeting notes or decision records
 
 If **~~design** is connected:
@@ -86,7 +86,7 @@ After generating the PRD:
 - Describe the user problem in 2-3 sentences
 - Who experiences this problem and how often
 - What is the cost of not solving it (user pain, business impact, competitive risk)
-- Ground this in evidence: user delegated-research, support data, metrics, or customer feedback
+- Ground this in evidence: user research, support data, metrics, or customer feedback
 
 ### Goals
 - 3-5 specific, measurable outcomes this feature should achieve
@@ -120,7 +120,7 @@ Example:
 
 **Must-Have (P0)**: The feature cannot ship without these. These represent the minimum viable version of the feature. Ask: "If we cut this, does the feature still solve the core problem?" If no, it is P0.
 
-**Nice-to-Have (P1)**: Significantly improves the experience but the core use case works without them. These often become fast follow-ups after product-launch.
+**Nice-to-Have (P1)**: Significantly improves the experience but the core use case works without them. These often become fast follow-ups after launch.
 
 **Future Considerations (P2)**: Explicitly out of scope for v1 but we want to design in a way that supports them later. Documenting these prevents accidental architectural decisions that make them hard later.
 
@@ -161,7 +161,7 @@ Good user stories are:
 
 ### MoSCoW Framework
 - **Must have**: Without these, the feature is not viable. Non-negotiable.
-- **Should have**: Important but not critical for product-launch. High-priority fast follows.
+- **Should have**: Important but not critical for launch. High-priority fast follows.
 - **Could have**: Desirable if time permits. Will not delay delivery if cut.
 - **Won't have (this time)**: Explicitly out of scope. May revisit in future versions.
 
@@ -174,7 +174,7 @@ Good user stories are:
 ## Success Metrics Definition
 
 ### Leading Indicators
-Metrics that change quickly after product-launch (days to weeks):
+Metrics that change quickly after launch (days to weeks):
 - **Adoption rate**: % of eligible users who try the feature
 - **Activation rate**: % of users who complete the core action
 - **Task completion rate**: % of users who successfully accomplish their goal
@@ -232,7 +232,7 @@ Scope creep happens when:
 - Requirements keep getting added after the spec is approved
 - "Small" additions accumulate into a significantly larger project
 - The team is building features no user asked for ("while we're at it...")
-- The product-launch date keeps moving without explicit re-scoping
+- The launch date keeps moving without explicit re-scoping
 - Stakeholders add requirements without removing anything
 
 ### Preventing Scope Creep

@@ -2,16 +2,20 @@
 name: frontend-design
 description: >-
   Guidance for distinctive, intentional visual design when building new UI or reshaping an
-  existing one. Helps with aesthetic direction, typography, and making choices that don't
-  read as templated defaults. Use when working with this skill's domain.
+  existing one. Helps with aesthetic direction, typography, color, motion, and interface copy
+  that doesn't read as templated defaults. Use when designing or restyling a web page, landing
+  page, dashboard, or app UI; when choosing fonts, palettes, layout, or a signature visual
+  element; or when generated design looks generic and needs a stronger point of view. NOT for:
+  accessibility/WCAG compliance review, UI code review against style guides, or marketing sales
+  copy (boundaries by task; no other skill implied).
 slug: frontend-design
-version: 1.0.0
+version: 1.0.2
 displayName: frontend-design
 ---
 
 # Frontend Design
 
-Approach this as the design lead at a small studio known for giving every client a visual identity that could not be mistaken for anyone else's. This client has already rejected proposals that felt templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, ui-typography, and layout that are specific to this brief, and take one real aesthetic risk you can justify.
+Approach this as the design lead at a small studio known for giving every client a visual identity that could not be mistaken for anyone else's. This client has already rejected proposals that felt templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, typography, and layout that are specific to this brief, and take one real aesthetic risk you can justify.
 
 ## Ground it in the subject
 
@@ -19,13 +23,13 @@ If the brief does not pin down what the product or subject is, pin it yourself b
 
 ## Design principles
 
-For web designs, the hero is a thesis. Open with the most characteristic thing in the subject's world, in whatever form makes sense for it: a headline, an image, an ui-animation, a live demo, an interactive moment. Be deliberate with your choice: a big number with a small label, supporting stats, and a gradient accent is the template answer, only use if that's truly the best option.
+For web designs, the hero is a thesis. Open with the most characteristic thing in the subject's world, in whatever form makes sense for it: a headline, an image, an animation, a live demo, an interactive moment. Be deliberate with your choice: a big number with a small label, supporting stats, and a gradient accent is the template answer, only use if that's truly the best option.
 
 Typography carries the personality of the page. Pair the display and body faces deliberately, not the same families you would reach for on any other project, and set a clear type scale with intentional weights, widths, and spacing. Make the type treatment itself a memorable part of the design, not a neutral delivery vehicle for the content.
 
 Structure is information. Structural devices, numbering, eyebrows, dividers, labels, should encode something true about the content, not decorate it. Many generic designs use numbered markers (01 / 02 / 03), but that's only appropriate if the content actually is a sequence - like a real process or a typed timeline where order carries information the reader needs. Question if choices like numbered markers actually make sense before incorporating them.
 
-Leverage motion deliberately. Think about where and if ui-animation can serve the subject: a page-load sequence, a scroll-triggered reveal, hover micro-interactions, ambient atmosphere. An orchestrated moment usually lands harder than scattered effects; choose what the direction calls for. However, sometimes less is more, and extra ui-animation contributes to the feeling that the design is AI-generated.
+Leverage motion deliberately. Think about where and if animation can serve the subject: a page-load sequence, a scroll-triggered reveal, hover micro-interactions, ambient atmosphere. An orchestrated moment usually lands harder than scattered effects; choose what the direction calls for. However, sometimes less is more, and extra animation contributes to the feeling that the design is AI-generated.
 
 Match complexity to the vision. Maximalist directions need elaborate execution; minimal directions need precision in spacing, type, and detail. Elegance is executing the chosen vision well.
 

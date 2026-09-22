@@ -10,7 +10,7 @@ description: >-
   for: email copy, popup copy, or offer framing (bonuses/guarantees) — those belong to
   dedicated email/popup/offers skills when available.
 slug: marketing-copywriting
-version: 1.0.0
+version: 1.0.2
 displayName: marketing-copywriting
 ---
 
@@ -94,9 +94,9 @@ For thorough line-by-line review, use the **copy-editing** skill after your draf
 ### Be Direct
 Get to the point. Don't bury the value in qualifications.
 
-❌ Slack lets you share files instantly, from documents to images, directly in your conversations
+✗ Slack lets you share files instantly, from documents to images, directly in your conversations
 
-✅ Need to share a screenshot? Send as many documents, images, and audio files as your heart desires.
+✓ Need to share a screenshot? Send as many documents, images, and audio files as your heart desires.
 
 ### Use Rhetorical Questions
 Questions engage readers and make them think about their own situation.
@@ -255,6 +255,6 @@ For headlines and CTAs, provide 2-3 options:
 
 - **copy-editing**: For polishing existing copy (use after your draft)
 - **cro**: If page structure/strategy needs work, not just copy
-- **emails**: For email marketing-copywriting
+- **emails**: For email copywriting
 - **popups**: For popup and modal copy
 - **ab-testing**: To test copy variations

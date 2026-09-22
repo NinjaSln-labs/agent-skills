@@ -1,10 +1,17 @@
 ---
 name: competitive-analysis-process
 description: >-
-  Orchestrate a complete competitive analysis across six steps, from landscape to
-  strategic direction. Use when you need the full picture, not a single scan or card.
+  Orchestrate a complete competitive analysis end to end: market landscape, product-level
+  comparison, ability to fulfill customer needs, business and financial baseline, relative
+  positioning, and competitors' strategic direction — closing with the artifacts owners
+  consume: battle cards, an executive comparison matrix, positioning counter-moves, a
+  threat assessment. Use when a decision needs the whole competitive picture — market
+  entry, a roadmap bet, a positioning refresh, deal defense — or when the real question is
+  which steps to run and what to skip. NOT for: a one-off competitor snapshot, a single
+  field-action card, scheduled monitoring of an existing snapshot, or market sizing alone
+  — boundaries by task, no skill name implied.
 slug: competitive-analysis-process
-version: 1.0.0
+version: 1.0.3
 displayName: competitive-analysis-process
 ---
 
@@ -15,7 +22,7 @@ displayName: competitive-analysis-process
 Orchestrate rigorous, repeatable competitive analysis across **six analytical steps**, producing four
 actionable output types (battle cards, comparison matrices, positioning counter-moves, threat
 assessments). This is the umbrella: each step names its purpose, its frameworks, and the skill that
-does the work — the way `discovery-process` orchestrates the discovery skills. Run all six for a
+does the work — the way a discovery pipeline orchestrates its discovery skills. Run all six for a
 strategy cycle; run one when a specific question walks in the door. The steps build on each other, but
 the sequence bends to the decision.
 
@@ -42,7 +49,7 @@ decision: whether we defend down-market or push up. We have last quarter's lands
   matrices, positioning moves, threat assessments) are what sales, execs, and roadmap owners actually
   consume. A step that doesn't feed an output is a detour.
 - **Steps delegate; this skill orchestrates.** Each step below names the skill that does the work.
-  This file holds the sequence, the frameworks, and the decision points — not the delegated-research mechanics.
+  This file holds the sequence, the frameworks, and the decision points — not the research mechanics.
 - **Evidence discipline throughout.** Every step honors the
   [`autonomous-investigation`](../autonomous-investigation/SKILL.md) protocol
   (Fact/Inference/Assumption labels, real URLs, confidence stacking), drawing signals from the
@@ -175,11 +182,11 @@ steps merged, one run out of order, cadence slowed — with each call's reasonin
 - **Running all six on autopilot.** The steps are a menu, not a mandate. Scope to the decision or the
   analysis ships after the decision got made without it.
 - **Skipping Step 6.** Present-state analysis ages the moment it ships; direction analysis is what
-  buys you a quarter of lead time. Teams that skip it are perpetually surprised on product-launch day.
+  buys you a quarter of lead time. Teams that skip it are perpetually surprised on launch day.
 - **Framework name-dropping.** Citing Five Forces without rating the forces, or Kano without
   classifying a single feature. A framework earns its mention by producing a judgment.
 - **Analysis without outputs.** Six beautiful steps and no battle card, no matrix, no brief. Step 7
-  isn't optional — delegated-research is only done when it names the artifact it changes.
+  isn't optional — research is only done when it names the artifact it changes.
 - **One-time heroics.** A grand annual analysis that's stale by month three. The process ends by
   installing the watch cadence, or it didn't end — it just stopped.
 

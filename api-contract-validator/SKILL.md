@@ -1,11 +1,14 @@
 ---
 name: api-contract-validator
 description: >-
-  Validate API responses against OpenAPI/Swagger specifications, JSON Schema definitions,
-  and consumer-driven contracts to prevent breaking changes Use when validating API
-  responses against OpenAPI/JSON Schema/consumer contracts.
+  Validate API responses against OpenAPI/Swagger specifications, JSON Schema
+  definitions, and GraphQL schemas to prevent breaking changes. Use when checking
+  whether an API change removes fields, changes types, or breaks backward
+  compatibility; when validating responses against a published contract in CI;
+  when detecting GraphQL schema breaking changes; or when reviewing
+  consumer-driven contract tests.
 slug: api-contract-validator
-version: 1.0.0
+version: 1.0.1
 displayName: api-contract-validator
 ---
 

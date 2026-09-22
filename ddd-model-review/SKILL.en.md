@@ -1,6 +1,6 @@
 ---
 name: ddd-model-review
-description: "Holistic model quality assessment: consistency, completeness, coupling analysis, and feedback loop triggers."
+description: "Global model quality assessment: consistency, completeness, coupling analysis, and feedback-loop triggers. Use when evaluating domain model quality, consistency/completeness/coupling checks, or model evolution review."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Model Review
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

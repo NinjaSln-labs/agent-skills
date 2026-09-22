@@ -1,7 +1,7 @@
 ---
 name: product-marketing
 description: >-
-  > Creates and updates `.agents/product-marketing.md` — shared product, audience, and
+  Creates and updates `.agents/product-marketing.md` — shared product, audience, and
   positioning context that other marketing skills reference so users avoid repeating
   foundational information. Use when the user wants to create or update their product
   marketing context document, or mentions 'product context,' 'marketing context,' 'set up
@@ -9,7 +9,7 @@ description: >-
   'ideal customer profile.' Use at the start of any new project before other marketing
   skills.
 slug: product-marketing
-version: 1.0.0
+version: 1.0.1
 displayName: product-marketing
 ---
 

@@ -1,16 +1,19 @@
 ---
 name: event-storming
 description: >-
-  EventStorming facilitation knowledge and reference across Big Picture, Process Modeling,
-  and Design-Level formats. Use when: 'run EventStorming', 'model a domain', 'discover
-  bounded contexts', 'Big Picture session', 'map domain events', 'find aggregates', 'DDD
-  workshop', 'bounded context heuristics'. Actions: --big-picture / --process /
-  --design-level (format guidance), --patterns (facilitation patterns/anti-patterns),
-  --glossary, --notation, --remote. No args: interactive discovery — checks Miro for
-  boards (if available), asks goal, recommends format. Not for agentic simulation — use
-  /event-storming:simulation.
+  EventStorming facilitation knowledge and reference across Big Picture,
+  Process Modeling, and Design-Level formats. Use when: 'run EventStorming',
+  'model a domain', 'discover bounded contexts', 'Big Picture session', 'map
+  domain events', 'find aggregates', 'DDD workshop', 'bounded context
+  heuristics'. Actions: --big-picture / --process / --design-level (format
+  guidance), --patterns (facilitation patterns/anti-patterns), --glossary,
+  --notation, --remote. No args: interactive discovery — checks Miro for
+  boards (if available), asks goal, recommends format. NOT for: actually
+  running an agentic multi-persona workshop simulation or executing a
+  domain-discovery session with deliverables — facilitation reference and
+  guidance only; no skill name implied (any client's own tooling applies).
 slug: event-storming
-version: 1.0.0
+version: 1.0.3
 displayName: event-storming
 ---
 
@@ -36,7 +39,7 @@ Parse `$ARGUMENTS` for:
 
 If no filter is specified, run the **Interactive Discovery** flow below.
 
-To *run* an agentic AI-driven workshop (multi-persona simulation on Miro) rather than read facilitation guidance, use `/event-storming:simulation`.
+To *run* an agentic AI-driven workshop (multi-persona simulation) rather than read facilitation guidance: that is outside this skill's scope — this skill provides facilitation reference and guidance only. If the user's client happens to have its own simulation tooling, point them there; otherwise guide a human-facilitated session with the reference docs below.
 
 ---
 
@@ -64,8 +67,8 @@ If recent boards exist, present them:
 
 If the user picks an existing board, read it via `miro_list_board_items` (full pagination) to understand what's there — what format was used, what phase it's in, what building blocks are present. Then suggest next steps:
 
-- If it's a Big Picture with no PM/DL follow-up → suggest `/event-storming:simulation --process-model` or `/event-storming:simulation --value` on the winning problem
-- If it's a Big Picture with PM done → suggest `/event-storming:simulation --design-level` or `/event-storming:simulation --crc`
+- If it's a Big Picture with no PM/DL follow-up → suggest facilitating a Process Modeling pass next (`--process`, see `@./reference/process-modeling.md`) or a Value Exploration on the winning problem
+- If it's a Big Picture with PM done → suggest a Design-Level session (`--design-level`, see `@./reference/design-level.md`, which covers CRC-card style modeling of aggregates)
 - If it has value stickies → suggest contrasting/diverging perspectives
 - If it looks incomplete → suggest resuming where it left off
 
@@ -97,7 +100,7 @@ Then do 3+ web-research searches for domain context before proceeding — use th
 Based on goal + domain, recommend the specific format and confirm:
 > "Based on [goal], I recommend starting with [format]. This will involve [brief description].
 >
-> To read the facilitation guidance, use `/event-storming:methodology --[format]`. To run it as an agentic multi-persona simulation on Miro, use `/event-storming:simulation --[mode] [domain]`."
+> To read the facilitation guidance, run this skill with the `--[format]` action (e.g. `--big-picture`, see `@./reference/big-picture-workshop.md`; the Reference Documents section maps every format to its file). Actually running the session as an agentic multi-persona simulation is outside this skill's scope — facilitation reference and guidance only."
 
 If the user said "I'm not sure" in Step 2, ask clarifying questions:
 
@@ -123,7 +126,7 @@ EventStorming is a flexible workshop format for collaborative exploration of com
 
 ### Source authority hierarchy
 
-Brandolini's book (*Introducing EventStorming*, Leanpub) is the **canonical source** for all methodology content. When delegated-research returns step orderings, procedures, or workflow modifications from secondary sources (Bourgau, MrPicky, practitioners):
+Brandolini's book (*Introducing EventStorming*, Leanpub) is the **canonical source** for all methodology content. When research returns step orderings, procedures, or workflow modifications from secondary sources (Bourgau, MrPicky, practitioners):
 
 1. **Always cross-check against Brandolini** before adopting into the skill
 2. Secondary sources are **enrichments** tagged `[BOURGAU]` or `[SUPPLEMENTED]`, never replacements for canonical content

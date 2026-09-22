@@ -4,21 +4,21 @@ description: >-
   Create a proto-persona from current research, market signals, and team knowledge. Use
   when you need a working customer profile before deeper validation.
 slug: proto-persona
-version: 1.0.0
+version: 1.0.3
 displayName: proto-persona
 ---
 
 # Proto Persona
 
 ## Purpose
-Create an initial, assumption-based persona profile that synthesizes available user delegated-research, market data, and stakeholder knowledge into a working hypothesis about your target user. Use this to align teams early in product development, guide initial design decisions, and identify gaps in understanding that require validation through delegated-research.
+Create an initial, assumption-based persona profile that synthesizes available user research, market data, and stakeholder knowledge into a working hypothesis about your target user. Use this to align teams early in product development, guide initial design decisions, and identify gaps in understanding that require validation through research.
 
 This is not a validated persona—it's a "proto" (prototype) persona that evolves as you learn more. Think of it as a structured placeholder that prevents design-by-committee while acknowledging you don't have all the answers yet.
 
 ## Input
 
 **Works best with:** The target user or segment you need a working profile for.
-**Also useful:** Whatever signal exists — support themes, sales anecdotes, analytics, prior delegated-research — plus the decision the persona will guide.
+**Also useful:** Whatever signal exists — support themes, sales anecdotes, analytics, prior research — plus the decision the persona will guide.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
@@ -30,7 +30,7 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 
 ### What is a Proto-Persona?
 A proto-persona is a lightweight, hypothesis-driven persona created from:
-- **Existing delegated-research:** User interviews, surveys, analytics (if available)
+- **Existing research:** User interviews, surveys, analytics (if available)
 - **Market data:** Industry reports, competitor analysis, demographic trends
 - **Stakeholder knowledge:** Sales, support, and team insights
 - **Informed assumptions:** Best guesses that need validation
@@ -39,33 +39,33 @@ A proto-persona is a lightweight, hypothesis-driven persona created from:
 | Proto-Persona | Validated Persona |
 |---------------|-------------------|
 | Created in hours/days | Created over weeks/months |
-| Based on assumptions + limited delegated-research | Based on extensive user delegated-research |
+| Based on assumptions + limited research | Based on extensive user research |
 | Used to align teams early | Used to guide detailed design |
 | Evolves rapidly | Stable over time |
 | Good enough to start | High confidence |
 
 ### Why Use Proto-Personas?
-- **Speed:** Align teams quickly without waiting for months of delegated-research
+- **Speed:** Align teams quickly without waiting for months of research
 - **Focus:** Provides a shared reference point for "who we're building for"
 - **Hypothesis framing:** Makes assumptions explicit, which can then be validated
 - **Prevents generic design:** "Design for everyone" = design for no one
 
 ### Anti-Patterns (What This Is NOT)
-- **Not validated delegated-research:** Don't treat it as fact—it's a hypothesis
-- **Not a replacement for user delegated-research:** Use it to *guide* delegated-research, not avoid it
+- **Not validated research:** Don't treat it as fact—it's a hypothesis
+- **Not a replacement for user research:** Use it to *guide* research, not avoid it
 - **Not demographic data alone:** Age and location don't explain behavior
 - **Not permanent:** Proto-personas should evolve as you learn
 
 ### When to Use This
-- Early-stage product development (before extensive user delegated-research)
+- Early-stage product development (before extensive user research)
 - Kicking off a new feature or pivot
 - Aligning stakeholders on target users
-- Identifying delegated-research gaps (who do we need to interview?)
+- Identifying research gaps (who do we need to interview?)
 
 ### When NOT to Use This
-- After you've done extensive user delegated-research (create a validated persona instead)
+- After you've done extensive user research (create a validated persona instead)
 - For mature products with known user segments (you should already have validated personas)
-- As a substitute for quantitative data (proto-personas inform delegated-research; delegated-research validates them)
+- As a substitute for quantitative data (proto-personas inform research; research validates them)
 
 ---
 
@@ -75,13 +75,13 @@ Use `template.md` for the full fill-in structure.
 
 ### Step 1: Gather Available Context
 Before creating a proto-persona, collect:
-- **User delegated-research:** Interview notes, survey results, support tickets
+- **User research:** Interview notes, survey results, support tickets
 - **Analytics:** Usage data, demographics, behavioral patterns
 - **Market data:** Industry reports, competitor user bases
 - **Stakeholder insights:** Sales/support/CS teams who interact with users
-- **Product context:** What problem are you solving? (reference `skills/problem-statement/SKILL.md`)
+- **Product context:** What problem are you solving? (reference [`problem-statement`](../problem-statement/SKILL.md))
 
-**If missing context:** Don't fabricate—note gaps and plan delegated-research to fill them.
+**If missing context:** Don't fabricate—note gaps and plan research to fill them.
 
 ---
 
@@ -153,7 +153,7 @@ Use real or representative quotes that reveal how they think and speak.
 ### Step 4: Document Their Context
 
 #### Pains
-What problems or frustrations does this persona experience? (Reference `skills/jobs-to-be-done/SKILL.md` for structure.)
+What problems or frustrations does this persona experience? (Reference [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) for structure.)
 
 ```markdown
 ### Pains
@@ -244,7 +244,7 @@ What beliefs and attitudes shape their decisions?
 
 - **Share with the team:** Does this persona resonate? Do they recognize this person?
 - **Identify gaps:** What don't we know? (Add "[ASSUMPTION—VALIDATE]" tags where uncertain)
-- **Plan delegated-research:** Use the proto-persona to guide who to interview next
+- **Plan research:** Use the proto-persona to guide who to interview next
 - **Evolve it:** As you learn, update the proto-persona (or graduate it to a validated persona)
 
 ---
@@ -279,7 +279,7 @@ Mini example excerpt:
 ### Pitfall 2: Treating Proto-Persona as Fact
 **Symptom:** "Manager Mike would never use feature X because he hates complexity"
 
-**Consequence:** You're treating an assumption as validated delegated-research.
+**Consequence:** You're treating an assumption as validated research.
 
 **Fix:** Add "[ASSUMPTION—VALIDATE]" tags and plan interviews to test hypotheses.
 
@@ -308,21 +308,21 @@ Mini example excerpt:
 
 **Consequence:** You're designing for a hypothesis that may be wrong.
 
-**Fix:** Plan delegated-research sprints to validate key assumptions. Evolve the proto-persona as you learn. Graduate it to a validated persona when confidence is high.
+**Fix:** Plan research sprints to validate key assumptions. Evolve the proto-persona as you learn. Graduate it to a validated persona when confidence is high.
 
 ---
 
 ## References
 
 ### Related Skills
-- `skills/problem-statement/SKILL.md` — Persona informs the "I am" section
-- `skills/jobs-to-be-done/SKILL.md` — JTBD informs persona pains/goals
-- `skills/positioning-statement/SKILL.md` — Persona is the "For [target]"
-- `skills/user-story/SKILL.md` — Stories use "As a [persona]"
+- [`problem-statement`](../problem-statement/SKILL.md) — Persona informs the "I am" section
+- [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) — JTBD informs persona pains/goals
+- [`positioning-statement`](../positioning-statement/SKILL.md) — Persona is the "For [target]"
+- User stories — Stories use "As a [persona]"
 
 ### External Frameworks
 - Alan Cooper, *The Inmates Are Running the Asylum* (1998) — Origin of persona concept
-- Jeff Gothelf, *Lean UX* (2013) — Proto-personas as hypothesis-driven delegated-research tools
+- Jeff Gothelf, *Lean UX* (2013) — Proto-personas as hypothesis-driven research tools
 - Indi Young, *Mental Models* (2008) — Behavior-driven persona development
 
 ### Dean's Work
@@ -336,5 +336,5 @@ Mini example excerpt:
 **Skill type:** Component
 **Suggested filename:** `proto-persona.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/jobs-to-be-done/SKILL.md`, `skills/problem-statement/SKILL.md`
-**Used by:** `skills/positioning-statement/SKILL.md`, `skills/user-story/SKILL.md`, `skills/problem-statement/SKILL.md`
+**Dependencies:** References [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md), [`problem-statement`](../problem-statement/SKILL.md)
+**Used by:** [`positioning-statement`](../positioning-statement/SKILL.md), user stories, [`problem-statement`](../problem-statement/SKILL.md)

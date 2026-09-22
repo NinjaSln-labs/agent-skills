@@ -14,7 +14,7 @@
 - Estimated effort: Onboarding = M (3 weeks), SSO = M (4 weeks), Mobile = L (2 months)
 
 **Phase 3 - Prioritize:**
-- Used RICE framework (recommended by `prioritization-advisor.md`)
+- Used RICE framework (the prioritisation activity in this playbook)
 - Scored: Onboarding (24,000), SSO (675), Mobile (2,000), Reporting (1,000)
 - Strategic override: Boosted SSO priority (critical for enterprise expansion)
 

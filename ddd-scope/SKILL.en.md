@@ -1,6 +1,6 @@
 ---
 name: ddd-scope
-description: "Converge fuzzy requirements into actionable DDD modeling inputs: problem statement, goals/non-goals, constraints, terminology seeds, and risk inventory."
+description: "DDD scope: converge vague requirements into executable DDD modeling inputs — problem statement, goals/non-goals, constraints, term seeds, and risk list. Use when converging fuzzy requirements into DDD modeling inputs or defining modeling scope."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Scope
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

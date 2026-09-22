@@ -6,14 +6,14 @@
 
 > 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
 
-共 **89 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
+共 **88 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
 
 技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
 ## 快速开始
 
 ```bash
-npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 89 个技能
+npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 88 个技能
 ```
 
 ```bash
@@ -54,7 +54,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | writing-plans | 实施计划编写（任务拆解/文件路径/验证步骤） |
 | write-spec | 规格编写（背景/范围/成功标准/接口契约） |
 | executing-plans | 计划执行（加载→批判性审查→逐任务执行→汇报） |
-| to-tickets | 需求拆解为 ticket（垂直切片 + AI-ready 验收标准 predicates） |
+| to-tickets | 需求拆解为 ticket（垂直切片 + 阻塞边 + 逐票验收清单，仅用户调用） |
 
 ### DDD / 领域驱动设计（13）
 
@@ -110,14 +110,14 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | 技能 | 说明 |
 |------|------|
 | accessibility-auditor | 可及性审计（WCAG 2.1 AA——axe + 键盘/焦点） |
-| api-contract-validator | API 契约验证（OpenAPI/JSON Schema/消费者契约） |
+| api-contract-validator | API 契约验证（OpenAPI/JSON Schema/GraphQL/消费者契约） |
 | coverage-matrix | 覆盖矩阵（不变量↔测试 / 事件↔测试 / DoD↔门禁 三向表 + 缺口入审计项） |
 | dependency-scan | 依赖扫描（漏洞/许可证） |
 | k6-performance | 性能测试（k6——阈值/场景/自定义指标） |
 | playwright-best-practices | Playwright 最佳实践（选择器/断言/稳定性） |
 | pixel-perfect | 视觉回归（像素对比——默认免费） |
 | test-data-generation | 测试数据生成（Faker/工厂/构建器/种子） |
-| visual-regression-tester | 视觉回归（双路线——Playwright 免费 + Chromatic/Percy 商业） |
+| visual-regression-tester | 视觉回归（双路线——Playwright 免费 + Chromatic 托管商业） |
 
 ### 安全（3）
 
@@ -132,18 +132,17 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | 技能 | 说明 |
 |------|------|
 | ui-ux-pro-max | UI/UX 交互设计（设计系统/一致性） |
-| web-design-guidelines | Web 设计规范（排版/色彩/可及性——WebFetch 降级） |
+| web-design-guidelines | Web 设计规范（排版/色彩/可及性——需网络取回，不可达时用已有本地副本否则中止） |
 | ui-animation | 设计工程与动效决策（Emil Kowalski——动画框架/组件原则/隐形细节） |
 | ui-typography | 专业排版规则（引号/破折号/间距/层级——ENFORCEMENT+AUDIT 双模式——Butterick） |
 | ux-heuristics | 可用性启发式审计（Nielsen 10/Krug 定律/严重度评级——wondelai v1.6.0） |
 | marketing-copywriting | 营销文案（价值主张/情感/转化——15 节） |
 
-### Agent 会话与个人效率（11）
+### Agent 会话与个人效率（10）
 
 | 技能 | 说明 |
 |------|------|
-| project-handoff | 交接文档（引用型 delta 5 节 + ≤1K token 硬预算——交接方；环境指纹最小化接手复验） |
-| project-intake | 项目接手（读 HANDOFF 恢复上下文；指纹门控：环境未变即跳过复验——接收方） |
+| project-handoff | 项目交接存储（.handoff/ 多维交接：status/summary/actions/pitfalls/decisions/comman… |
 | experiment-handoff | 实验性交接（worktree/branch/copy 隔离 → 交接 → 反馈驱动合并回主… |
 | decision-log | 决策日志（ADR）（Nygard 模板 + proposed/accepted/superseded/rejected 状态机——记录/查询… |
 | delegated-research | 通用调研（广度→深度→核实——证据链） |
@@ -169,6 +168,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | `sin-rules` | 已更名至 `core-rules` |
 | `problem-dive` | 已合并至 `problem-handling` |
 | `problem-resolution-flow` | 已合并至 `problem-handling` |
+| `project-intake` | 已更名至 `project-handoff` |
 
 ## 目录结构
 

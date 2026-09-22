@@ -5,10 +5,13 @@ description: >-
   with and without the skill loaded in fresh agents, compare pass rates, and report a
   comparison table plus concrete improvement items that feed back into the skill's
   SKILL.md. Use when a skill changes, at quarterly evaluation, or when accepting a new
-  skill. NOT for: static description compliance — use skill-description-audit.
+  skill. Because it writes back into other skills' SKILL.md it is USER-INVOKED ONLY: the
+  agent must not auto-invoke it — the user runs it explicitly. NOT for: static
+  description-vs-body compliance review of a SKILL.md.
 slug: skill-eval
-version: 1.0.0
+version: 1.0.2
 displayName: skill-eval
+disable-model-invocation: true
 ---
 
 # Skill Eval（高频 skill 行为评估）

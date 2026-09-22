@@ -5,20 +5,20 @@ description: >-
   method. Use when preparing interviews for problem validation, churn research, or new
   product ideas.
 slug: discovery-interview-prep
-version: 1.0.0
+version: 1.0.4
 displayName: discovery-interview-prep
 ---
 
 # Discovery Interview Prep
 
 ## Purpose
-Guide product managers through preparing for customer discovery interviews by asking adaptive questions about delegated-research goals, customer segments, constraints, and methodologies. Use this to design effective interview plans, craft targeted questions, avoid common biases, and maximize learning from limited customer access—ensuring discovery interviews yield actionable insights rather than confirmation bias or surface-level feedback.
+Guide product managers through preparing for customer discovery interviews by asking adaptive questions about research goals, customer segments, constraints, and methodologies. Use this to design effective interview plans, craft targeted questions, avoid common biases, and maximize learning from limited customer access—ensuring discovery interviews yield actionable insights rather than confirmation bias or surface-level feedback.
 
 This is not a script generator—it's a strategic prep process that outputs a tailored interview plan with methodology, question framework, and success criteria.
 
 ## Input
 
-**Works best with:** Your delegated-research goal — what you need to learn from customers.
+**Works best with:** Your research goal — what you need to learn from customers.
 **Also useful:** Customer segment, access constraints (how many interviews, by when), and any hypotheses you're carrying in.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
@@ -32,7 +32,7 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 ### The Discovery Interview Prep Flow
 An interactive process that:
 1. Gathers product/problem context (marketing materials, assumptions)
-2. Defines delegated-research goals (what you're trying to learn)
+2. Defines research goals (what you're trying to learn)
 3. Identifies target customer segment and access constraints
 4. Recommends interview methodology (Jobs-to-be-Done, problem validation, switch interviews, etc.)
 5. Generates interview framework with questions, biases to avoid, and success metrics
@@ -57,7 +57,7 @@ An interactive process that:
 
 ### When NOT to Use This
 - User testing a prototype (use usability testing frameworks instead)
-- Quantitative delegated-research at scale (use surveys, analytics)
+- Quantitative research at scale (use surveys, analytics)
 - When you already know the problem (move to solution validation)
 
 ---
@@ -91,7 +91,7 @@ Before we design your interview plan, let's gather context:
 **For Your Own Product (Existing or Planned):**
 - Problem hypothesis or product concept description
 - Target customer segment (if known)
-- Existing delegated-research (support tickets, churn data, user feedback)
+- Existing research (support tickets, churn data, user feedback)
 - Product website or positioning materials
 - Key assumptions you're trying to validate
 
@@ -121,7 +121,7 @@ Before we design your interview plan, let's gather context:
 3. **Retention/churn investigation** — "Figure out why customers leave or don't activate" (for existing products with churn issues)
 4. **Feature prioritization** — "Validate which problems/features matter most to customers" (for roadmap planning)
 
-**Or describe your own delegated-research goal (be specific: what question are you trying to answer?).**
+**Or describe your own research goal (be specific: what question are you trying to answer?).**
 
 **User response:** [Selection or custom]
 
@@ -158,7 +158,7 @@ Before we design your interview plan, let's gather context:
 1. **Limited access** — "Can only interview 5-10 customers, need results in 2 weeks" (common for startups or fast timelines)
 2. **Existing customer base** — "Have 100+ active customers, can recruit easily" (mature product advantage)
 3. **Cold outreach required** — "No existing customers; need to recruit from scratch via LinkedIn, ads, or communities" (new product challenge)
-4. **Internal stakeholders only** — "Can interview sales/support teams who talk to customers daily" (proxy delegated-research, less ideal but pragmatic)
+4. **Internal stakeholders only** — "Can interview sales/support teams who talk to customers daily" (proxy research, less ideal but pragmatic)
 
 **Or describe your specific constraints (budget, time, access, team capacity).**
 
@@ -188,7 +188,7 @@ Before we design your interview plan, let's gather context:
 **Adaptation examples:**
 - If Q1 = Retention/churn → Prioritize "Exit interviews" or "Switch interviews (away from your product)"
 - If Q1 = Feature prioritization → Prioritize "Opportunity solution tree interviews" or "Kano model interviews"
-- If Q3 = Internal stakeholders only → Add caveat: "Proxy delegated-research (talking to sales/support) is better than nothing, but validate with real customers ASAP"
+- If Q3 = Internal stakeholders only → Add caveat: "Proxy research (talking to sales/support) is better than nothing, but validate with real customers ASAP"
 
 **User response:** [Selection or custom]
 
@@ -279,7 +279,7 @@ After collecting responses, the agent generates a tailored interview plan:
 1. **Confirmation bias:** Don't ask "Don't you think X is a problem?" → Ask "Tell me about your experience with X."
 2. **Leading questions:** Don't ask "Would you use this?" → Ask "What have you tried? Why did it work/fail?"
 3. **Hypothetical questions:** Don't ask "If we built Y, would you pay?" → Ask "What do you currently pay for? Why?"
-4. **Pitching disguised as delegated-research:** Don't say "We're building Z to solve X" → Say "I'm researching X. Tell me about your experience."
+4. **Pitching disguised as research:** Don't say "We're building Z to solve X" → Say "I'm researching X. Tell me about your experience."
 5. **Yes/no questions:** Don't ask "Is invoicing hard?" → Ask "Walk me through your invoicing process."
 
 ---
@@ -288,11 +288,11 @@ After collecting responses, the agent generates a tailored interview plan:
 
 You'll know these interviews are successful if:
 
-✅ **You hear specific stories, not generic complaints** — "Last Tuesday, I spent 3 hours..." vs. "Invoicing is annoying"
-✅ **You uncover past behavior, not hypothetical wishes** — "I tried Zapier but quit after 2 weeks" vs. "I'd probably use automation"
-✅ **You identify patterns across 3+ interviews** — Same pain points emerge independently
-✅ **You're surprised by something** — If everything confirms your assumptions, you're asking leading questions
-✅ **You can quote customers verbatim** — Actual language = authentic insights
+✓ **You hear specific stories, not generic complaints** — "Last Tuesday, I spent 3 hours..." vs. "Invoicing is annoying"
+✓ **You uncover past behavior, not hypothetical wishes** — "I tried Zapier but quit after 2 weeks" vs. "I'd probably use automation"
+✓ **You identify patterns across 3+ interviews** — Same pain points emerge independently
+✓ **You're surprised by something** — If everything confirms your assumptions, you're asking leading questions
+✓ **You can quote customers verbatim** — Actual language = authentic insights
 
 ---
 

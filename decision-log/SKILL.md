@@ -3,12 +3,12 @@ name: decision-log
 description: >-
   Record or query architecture decision records (ADR) — Nygard template
   (context/decision/consequences) with a proposed/accepted/superseded/rejected status
-  state machine, written to docs/decisions/NNN-slug.md plus the index table update and
-  HANDOFF reference sync. Use when a semantic ruling or adjudication happens in a stage,
-  or on "记录裁定" / "写进决策日志" / "ADR" / querying "决策 X 的现状". NOT for: writing
-  handoff docs (use project-handoff) — HANDOFF references ADR numbers, never copies them.
+  state machine, written to docs/decisions/NNN-slug.md plus the index table update —
+  and, where the project keeps a handoff store, a reference line in it. Use when a semantic ruling or adjudication happens in
+  a stage, or on "记录裁定" / "写进决策日志" / "ADR" / querying "决策 X 的现状". NOT for:
+  writing the session handoff itself — the store references ADR numbers, never copies them.
 slug: decision-log
-version: 1.0.0
+version: 1.0.7
 displayName: decision-log
 ---
 
@@ -36,7 +36,11 @@ displayName: decision-log
 - [ ] 2. 文件名：NNN-slug.md（slug = 决策主题 kebab-case，如 001-rejectstreak-semantics.md）
 - [ ] 3. 写 ADR（Nygard 模板 + 状态机，见下）
 - [ ] 4. 更新 000-decision-log.md 索引表（# | 标题 | 状态 | 日期）
-- [ ] 5. HANDOFF §5 同步：决策日志行已存在则更新（引用编号，不复制内容）
+- [ ] 5. 交接存储同步（**条件步**）：项目**已有** `.handoff/` 存储时，为这条 ADR 登记**一条编号引用**（不复制内容）——
+      条目标题镜像 ADR 序号（`NNN — {标题}`）便于两侧对照，正文写 ADR 位置 `docs/decisions/NNN-slug.md`；
+      决策条目**不收独立引用字段**（把路径写进标题/正文即可），改判**另开一条**、取代关系由存储侧承载。
+      写入口与命令形见 [`project-handoff`](../project-handoff/SKILL.md) 的写槽表（唯一权威面，本件不复制其参数面）。
+      **无该存储 → 跳过本步**（只留 ADR 与索引），**不自主建存储**：建/迁由该件定义、须用户显式调用
 ```
 
 ## ADR 模板（Nygard）
@@ -77,14 +81,14 @@ proposed ──→ accepted ──→ superseded
 
 ## 防双源
 
-- HANDOFF / 设计文档只引用 ADR 编号（如「001 已定」），不复制 ADR 内容。
+- `.handoff/`（项目工作存储）与设计文档只引用 ADR 编号（如「001 已定」），不复制 ADR 内容。
 - spec（stage-spec）引用 ADR 编号记录 DoD 变更来源。
 
 ## 边界（分工）
 
 | 相邻技能 | 分工 |
 |---------|------|
-| `project-handoff` | handoff 引用决策日志（§5 一行），不复制；阶段裁定 → 本技能写 ADR |
+| [`project-handoff`](../project-handoff/SKILL.md) | **交接存储的工具方**：本件只定「引一条编号引用、不复制内容」这条契约，`.handoff/` 结构与写命令参数面归它定义；阶段裁定 → 本技能写 ADR |
 | `stage-spec` | DoD 变更需当阶段 ADR 记录——spec 引用编号 |
 | `stage-gate` | 门禁检查「决策日志同步」断言 = 索引最新 |
 
@@ -105,5 +109,6 @@ proposed ──→ accepted ──→ superseded
 - 裁定发生但不记录（等「有空」——历史链断）
 - 记录超过 3 分钟（过度润色；ADR 不是论文）
 - superseded 后删除旧 ADR（链断）
-- HANDOFF 里复制 ADR 内容（双源）
+- 往 `.handoff/` 复制 ADR 内容（双源）
+- 项目无 `.handoff/` 就为登记引用而自建存储（建/迁须用户显式调用；本件**不建存储**——有存储时它照常经该件写入条目）
 - 编号跳号/覆盖旧文件

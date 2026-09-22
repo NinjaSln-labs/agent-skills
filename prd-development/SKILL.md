@@ -5,21 +5,21 @@ description: >-
   users, solution, and success criteria. Use when turning discovery notes into an
   engineering-ready document for a major initiative or feature.
 slug: prd-development
-version: 1.0.0
+version: 1.0.6
 displayName: prd-development
 ---
 
 # PRD Development
 
 ## Purpose
-Guide product managers through structured PRD (Product Requirements Document) creation by orchestrating problem framing, user delegated-research synthesis, solution definition, and success criteria into a cohesive document. Use this to move from scattered notes and Slack threads to a clear, comprehensive PRD that aligns stakeholders, provides engineering context, and serves as a source of truth—avoiding ambiguity, scope creep, and the "build what's in my head" trap.
+Guide product managers through structured PRD (Product Requirements Document) creation by orchestrating problem framing, user research synthesis, solution definition, and success criteria into a cohesive document. Use this to move from scattered notes and Slack threads to a clear, comprehensive PRD that aligns stakeholders, provides engineering context, and serves as a source of truth—avoiding ambiguity, scope creep, and the "build what's in my head" trap.
 
 This is not a waterfall spec—it's a living document that captures strategic context, customer problems, proposed solutions, and success criteria, evolving as you learn through delivery.
 
 ## Input
 
 **Works best with:** The feature or initiative the PRD covers.
-**Also useful:** Discovery notes, problem statements, user delegated-research, success metrics, and constraints — paste whatever exists; the workflow slots it into the right phases and skips what's already answered.
+**Also useful:** Discovery notes, problem statements, user research, success metrics, and constraints — paste whatever exists; the workflow slots it into the right phases and skips what's already answered.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
@@ -52,7 +52,7 @@ A PRD (Product Requirements Document) is a structured document that answers:
 - Who has this problem?
 - What is the problem?
 - Why is it painful?
-- Evidence (customer quotes, data, delegated-research)
+- Evidence (customer quotes, data, research)
 
 ## 3. Target Users & Personas
 - Primary persona(s)
@@ -95,7 +95,7 @@ A PRD (Product Requirements Document) is a structured document that answers:
 
 ### Why This Works
 - **Alignment:** Ensures everyone (PM, design, eng, stakeholders) understands the "why"
-- **Context preservation:** Captures delegated-research and strategic rationale for future reference
+- **Context preservation:** Captures research and strategic rationale for future reference
 - **Decision log:** Documents what's in scope, out of scope, and why
 - **Execution clarity:** Provides engineering with user stories and acceptance criteria
 
@@ -136,10 +136,10 @@ This file defines the workflow sequence and domain-specific outputs. If there is
 Use `template.md` as the fill-in document. The template includes:
 
 - **Per-section coaching blocks** — each section has its own Instructions, Steps, Contributing Skills, and Activities so the template is self-guiding even without this workflow.
-- **Inline gap tagging** — tag every gap as 🔶 **Assumption** (plausible but unvalidated) or 🔵 **Open Question** (unknown, needs discovery). Tag inline where the gap appears, not just at the end.
+- **Inline gap tagging** — tag every gap as **Assumption** (plausible but unvalidated) or **Open Question** (unknown, needs discovery). Tag inline where the gap appears, not just at the end.
 - **Cross-section recommendation prompts** — after completing each section, a "Before moving on" block checks consistency with prior sections and warns about what the next section will need.
 - **Self-assessment** — after Section 10, a diagnostic captures the strongest section, weakest section, top assumptions to validate, and the recommended next step before sharing the PRD.
-- **Skill cross-reference table** — maps 15 skills to the specific sections they feed (e.g., `problem-framing-canvas` → Section 2, `epic-breakdown-advisor` → Section 7).
+- **Skill cross-reference table** — maps 15 skills to the specific sections they feed (e.g., problem framing canvas → Section 2, epic breakdown patterns → Section 7).
 
 This workflow orchestrates **8 phases** over **2-4 days**, using multiple component and interactive skills. The phases below describe the facilitation sequence; the template captures the output.
 
@@ -171,8 +171,8 @@ This workflow orchestrates **8 phases** over **2-4 days**, using multiple compon
 ### Activities
 
 **1. Write Problem Statement**
-- **Use:** `skills/problem-statement/SKILL.md` (component)
-- **Input:** Discovery insights from `skills/discovery-process/SKILL.md` or `skills/problem-framing-canvas/SKILL.md`
+- **Use:** [`problem-statement`](../problem-statement/SKILL.md) (component)
+- **Input:** Discovery insights from problem discovery work (framing canvas or interview synthesis)
 - **Participants:** PM
 - **Duration:** 30 minutes
 - **Output:** Structured problem statement
@@ -201,9 +201,9 @@ Non-technical small business owners (solopreneurs, 1-10 employees) who sign up f
 
 **2. Add Supporting Context (Optional)**
 - **Customer journey map:** If problem spans multiple touchpoints
-- **Use:** `skills/customer-journey-mapping-workshop/SKILL.md` output
+- **Use:** [`customer-journey-map`](../customer-journey-map/SKILL.md) output
 - **Jobs-to-be-done:** If motivations are key
-- **Use:** `skills/jobs-to-be-done/SKILL.md` output
+- **Use:** [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) output
 
 ### Outputs from Phase 2
 
@@ -219,7 +219,7 @@ Non-technical small business owners (solopreneurs, 1-10 employees) who sign up f
 ### Activities
 
 **1. Document Personas**
-- **Use:** `skills/proto-persona/SKILL.md` (component) output
+- **Use:** [`proto-persona`](../proto-persona/SKILL.md) (component) output
 - **Participants:** PM
 - **Duration:** 30 minutes
 - **Format:** Include persona name, role, goals, pain points, behaviors
@@ -263,13 +263,13 @@ Non-technical small business owners (solopreneurs, 1-10 employees) who sign up f
   > "This initiative supports our Q1 OKR: Reduce churn from 15% to 8%. Improving onboarding activation directly impacts retention."
 
 **2. Size Market Opportunity (Optional)**
-- **Use:** `skills/tam-sam-som-calculator/SKILL.md` (interactive) output
+- **Use:** market sizing (TAM/SAM/SOM) output
 - **When:** For major initiatives, new products, exec presentations
 - **Example:**
   > "TAM: 50M small businesses globally. SAM: 5M using SaaS tools. SOM: 500K solopreneurs in our target segments. Improving onboarding could unlock 30% of SAM (1.5M potential customers)."
 
 **3. Document Competitive Landscape (Optional)**
-- **Source:** Competitor delegated-research, G2/Capterra reviews
+- **Source:** Competitor research, G2/Capterra reviews
 - **Example:**
   > "Competitors (Competitor A, B) have guided onboarding. Our lack of guidance is cited as a churn reason in exit surveys."
 
@@ -325,7 +325,7 @@ We're building a **guided onboarding checklist** that walks new users through co
 - **Output:** Embedded in PRD or linked
 
 **3. Reference Story Map (Optional)**
-- **Use:** `skills/user-story-mapping-workshop/SKILL.md` output
+- **Use:** story map from a story-mapping activity output
 - **When:** For complex features with multiple release slices
 - **Output:** Link to story map
 
@@ -368,7 +368,7 @@ We're building a **guided onboarding checklist** that walks new users through co
 **Activation rate** (% of users completing first action within 24 hours)
 - **Current:** 40%
 - **Target:** 60%
-- **Timeline:** Measure 30 days after product-launch
+- **Timeline:** Measure 30 days after product launch
 
 ### Secondary Metrics
 - **Time-to-first-action:** Reduce from 3 days to 1 day
@@ -394,7 +394,7 @@ We're building a **guided onboarding checklist** that walks new users through co
 ### Activities
 
 **1. Write Epic Hypothesis**
-- **Use:** `skills/epic-hypothesis/SKILL.md` (component)
+- **Use:** epic hypothesis statement (component-style activity)
 - **Participants:** PM
 - **Duration:** 30 minutes
 - **Output:** Epic hypothesis statement
@@ -403,13 +403,13 @@ We're building a **guided onboarding checklist** that walks new users through co
 > "We believe that adding a guided onboarding checklist for non-technical users will increase activation rate from 40% to 60% because users currently drop off due to lack of guidance. We'll measure success by activation rate 30 days post-launch."
 
 **2. Break Down Epic into User Stories**
-- **Use:** `skills/epic-breakdown-advisor/SKILL.md` (interactive - with Richard Lawrence's 9 patterns)
+- **Use:** epic breakdown (interactive - with Richard Lawrence's 9 patterns)
 - **Participants:** PM, design, engineering
 - **Duration:** 90 minutes
 - **Output:** User stories split by patterns (workflow, CRUD, business rules, etc.)
 
 **3. Write User Stories**
-- **Use:** `skills/user-story/SKILL.md` (component)
+- **Use:** user story + acceptance criteria (component-style activity)
 - **Participants:** PM
 - **Duration:** 30 minutes per story
 - **Format:** User story + acceptance criteria
@@ -447,7 +447,7 @@ As a new user, I want to receive positive feedback when I complete the checklist
 **Acceptance Criteria:**
 - [ ] When user completes all 3 steps, celebration modal appears
 - [ ] Message: "You're all set! Here's what to do next: [suggested next actions]"
-- [ ] Confetti ui-animation (optional, nice-to-have)
+- [ ] Confetti animation (optional, nice-to-have)
 ```
 
 **4. Document Constraints & Edge Cases**
@@ -535,20 +535,20 @@ As a new user, I want to receive positive feedback when I complete the checklist
 Day 1:
 ├─ Phase 1: Executive Summary (30 min)
 ├─ Phase 2: Problem Statement (60 min)
-│  └─ Use: skills/problem-statement/SKILL.md
+│  └─ Use: problem-statement skill
 ├─ Phase 3: Target Users & Personas (30 min)
-│  └─ Use: skills/proto-persona/SKILL.md
+│  └─ Use: proto-persona skill
 └─ Phase 4: Strategic Context (45 min)
-   └─ Use: skills/tam-sam-som-calculator/SKILL.md (optional)
+   └─ Use: market sizing TAM/SAM/SOM (optional)
 
 Day 2:
 ├─ Phase 5: Solution Overview (60 min)
-│  └─ Use: skills/user-story-mapping-workshop/SKILL.md (optional)
+│  └─ Use: user story mapping workshop (optional)
 ├─ Phase 6: Success Metrics (30 min)
 └─ Phase 7: User Stories & Requirements (90-120 min)
-   ├─ Use: skills/epic-hypothesis/SKILL.md
-   ├─ Use: skills/epic-breakdown-advisor/SKILL.md
-   └─ Use: skills/user-story/SKILL.md
+   ├─ Use: epic hypothesis statement
+   ├─ Use: epic breakdown patterns
+   └─ Use: user story + acceptance criteria
 
 Day 3:
 ├─ Phase 8: Out of Scope & Dependencies (30 min)
@@ -596,7 +596,7 @@ Mini example excerpt:
 
 **Consequence:** Team questions whether problem is real
 
-**Fix:** Use discovery insights from `skills/discovery-process/SKILL.md`; include customer quotes, analytics, support tickets
+**Fix:** Use discovery insights from your discovery work; include customer quotes, analytics, support tickets
 
 ---
 
@@ -632,24 +632,24 @@ Mini example excerpt:
 ### Related Skills (Orchestrated by This Workflow)
 
 **Phase 2:**
-- `skills/problem-statement/SKILL.md` (component)
-- `skills/problem-framing-canvas/SKILL.md` (interactive, for context)
-- `skills/customer-journey-mapping-workshop/SKILL.md` (interactive, optional)
+- [`problem-statement`](../problem-statement/SKILL.md) (component)
+- problem framing canvas (interactive, for context)
+- [`customer-journey-map`](../customer-journey-map/SKILL.md) (optional)
 
 **Phase 3:**
-- `skills/proto-persona/SKILL.md` (component)
-- `skills/jobs-to-be-done/SKILL.md` (component, optional)
+- [`proto-persona`](../proto-persona/SKILL.md) (component)
+- [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) (component, optional)
 
 **Phase 4:**
-- `skills/tam-sam-som-calculator/SKILL.md` (interactive, optional)
+- market sizing TAM/SAM/SOM (interactive, optional)
 
 **Phase 5:**
-- `skills/user-story-mapping-workshop/SKILL.md` (interactive, optional)
+- user story mapping workshop (interactive, optional)
 
 **Phase 7:**
-- `skills/epic-hypothesis/SKILL.md` (component)
-- `skills/epic-breakdown-advisor/SKILL.md` (interactive)
-- `skills/user-story/SKILL.md` (component)
+- epic hypothesis statement (component-style)
+- epic breakdown patterns (interactive)
+- user story + acceptance criteria (component-style)
 
 ### External Frameworks
 - Martin Eriksson, "How to Write a Good PRD" (2012) — PRD structure

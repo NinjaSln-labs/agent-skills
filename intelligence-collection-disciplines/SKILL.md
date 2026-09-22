@@ -5,7 +5,7 @@ description: >-
   (OSINT to MASINT), signal-to-inference chains, and fusion. Use when one-source research
   isn't enough.
 slug: intelligence-collection-disciplines
-version: 1.0.0
+version: 1.0.3
 displayName: intelligence-collection-disciplines
 ---
 
@@ -13,7 +13,7 @@ displayName: intelligence-collection-disciplines
 
 ## Purpose
 
-Stop doing competitive delegated-research like a term paper. The intelligence community solved this problem
+Stop doing competitive research like a term paper. The intelligence community solved this problem
 decades ago: they don't collect "data," they run **collection disciplines** — independent channels,
 each with its own sources, tradecraft, and blind spots — and then they *fuse* them. This skill gives
 product managers that playbook: eight disciplines, each telling you (1) what to collect, (2) where to
@@ -33,7 +33,7 @@ becomes engagement-specific. Leave them blank and this stays a teaching artifact
 [BUYER]       = Who signs the check (drives review sites, job titles, conferences)
 [CAPABILITY]  = The strategic move you suspect (platform play, market entry,
                 pricing shift, compliance land-grab, etc.)
-[DECISION]    = What this delegated-research will change (roadmap bet, positioning,
+[DECISION]    = What this research will change (roadmap bet, positioning,
                 pricing, market entry, deal defense, ICP refresh)
 ~~~
 
@@ -90,7 +90,7 @@ integration roadmap.`
 
 **Signal → inference chains:**
 
-- [TARGET] exec suddenly posting about a new problem space → positioning pivot incoming (execs test messaging on social 3-6 months before product-launch)
+- [TARGET] exec suddenly posting about a new problem space → positioning pivot incoming (execs test messaging on social 3-6 months before launch)
 - Sponsor tier jump at a [MARKET] conference → market entry or doubling down
 - Review complaints clustering on one feature → their roadmap pressure point = your battle card ammo
 - Analyst briefing requests (visible via analyst posts) → category creation attempt
@@ -169,7 +169,7 @@ SOM: SAM × realistic capture rate derived from [TARGET] public filings via FINI
      (their revenue ÷ their claimed customer count = deal size reality check)
 ~~~
 
-**Feeds:** TAM/SAM/SOM (the backbone — see `tam-sam-som-calculator`), ICP definition, personas,
+**Feeds:** TAM/SAM/SOM (the backbone — see the market-sizing activity), ICP definition, personas,
 messaging localization, market entry prioritization, pricing corridor validation.
 
 ### 4. TECHINT — The Patent Examiner
@@ -182,7 +182,7 @@ messaging localization, market entry prioritization, pricing corridor validation
 | Technographics | BuiltWith free lookups, Wappalyzer | HG Insights, BuiltWith Pro, 6sense |
 | Product telemetry | Public changelogs, API docs diffs, status pages, GitHub org activity | n/a |
 | Standards bodies | Whichever govern [MARKET]: IETF, W3C, ISO committees, CEN/CENELEC/ETSI work programs, industry consortia | n/a |
-| Funded delegated-research | CORDIS and Horizon Europe project databases, university project repositories | n/a |
+| Funded research | CORDIS and Horizon Europe project databases, university project repositories | n/a |
 | Academic & preprints | arXiv, Google Scholar, Semantic Scholar, SSRN, the conferences that matter to [MARKET] | Dimensions, Scopus |
 | Trademark filings | USPTO TESS, EUIPO, WIPO Global Brand Database | Corsearch |
 
@@ -190,9 +190,9 @@ messaging localization, market entry prioritization, pricing corridor validation
 
 - Patent **clusters** (5+ filings in one classification in 12 months) → committed bet on [CAPABILITY], not exploration
 - Inventor names repeating across filings → the actual product team behind the initiative; track their conference talks and LinkedIn
-- Trademark filing for a product-sounding name → product-launch inside 6-12 months (trademarks are cheap; companies file close to product-launch)
+- Trademark filing for a product-sounding name → launch inside 6-12 months (trademarks are cheap; companies file close to launch)
 - [TARGET] repeatedly appearing in funded consortia → their long-range bet, 12-48 months of lead time
-- Research pilot sites → likely product-launch customers, named in public deliverables
+- Research pilot sites → likely launch customers, named in public deliverables
 - [TARGET] chairing a standards committee → they intend to shape the rules of [MARKET], not just play by them
 - [TARGET]-affiliated authors publishing preprints → R&D direction 6-24 months before patents; a paper cluster plus a hiring surge in the same specialty is one of the strongest fusion pairs available
 - Author affiliations shifting from university to [TARGET] on successive papers → they hired the lab, not just the idea
@@ -242,7 +242,7 @@ countdown clocks), build/buy/partner decisions.
 
 **Signal → inference chains:**
 
-- New subdomain SSL cert (e.g., `[capability].[target].com`) → product product-launch staging, often weeks ahead
+- New subdomain SSL cert (e.g., `[capability].[target].com`) → product launch staging, often weeks ahead
 - Pricing page removes a tier → packaging overhaul, usually toward enterprise
 - Sudden SEM bidding on *your* brand terms → they consider you the threat now (congratulations)
 - Case study page pattern shifts (new vertical or [GEOGRAPHY] appearing) → segment push
@@ -268,14 +268,14 @@ strategy, positioning counter-moves.
 - New supplier geographies or country-of-origin shifts → market entry, tariff hedging, or resilience play
 - Compliance certification "in process" listings → 12-36 month runway into a regulated segment, visible to anyone who checks the registry
 - Product recalls or repeated safety-alert patterns → quality strain; battle card ammunition with a public citation
-- Land allocation, power/water capacity reservations, or engineering-design contracts preceding equipment procurement → facility buildout 6-36 months before any product-launch announcement
+- Land allocation, power/water capacity reservations, or engineering-design contracts preceding equipment procurement → facility buildout 6-36 months before any launch announcement
 - Support response times stretching + hiring freeze in support roles → cash constraint or overwhelmed by growth (disambiguate via employee sentiment)
 - Office consolidations → cost compression; expect pricing aggression to follow
 
 **Note:** supply chain and facility signals are strongest for hardware and industrial players. The
 software equivalent is ops capacity plus infrastructure-scale language in job postings.
 
-**Feeds:** threat assessment, product-launch prediction and capacity estimates, battle cards (capacity-stretch
+**Feeds:** threat assessment, launch prediction and capacity estimates, battle cards (capacity-stretch
 objections: "ask them about their support SLAs lately").
 
 ### 8. All-Source Fusion — The Situation Room
@@ -343,7 +343,7 @@ platform engineers hired in a quarter (**HUMINT**, Fact), a new `robotics.meridi
 cert (**SIGINT**, Fact), the CFO dodging an analyst's capex question (**FININT**, Inference), and
 establishment counts confirming the addressable segment supports the investment math
 (**GEOINT/DEMOINT**, Fact). Six disciplines, one story: high-confidence platform threat. Response:
-accelerate your own platform roadmap and arm sales with a maturity battle card *before* their product-launch,
+accelerate your own platform roadmap and arm sales with a maturity battle card *before* their launch,
 not after.
 
 **Single-discipline quick win:** your battle card claims a competitor is "financially strong." One
@@ -380,23 +380,14 @@ customs, registries, permits — and an absence enters the fusion table as a Fac
 
 - [`autonomous-investigation`](../autonomous-investigation/SKILL.md) (Workflow) — the protocol that
   labels and stacks what these disciplines collect
-- [`tam-sam-som-calculator`](../tam-sam-som-calculator/SKILL.md) (Component) — consumes the
+- Market sizing TAM/SAM/SOM (optional companion activity) — consumes the
   GEOINT/DEMOINT sizing recipe
-- [`company-research`](../company-delegated-research/SKILL.md) and [`company-intel`](../company-intel/SKILL.md)
+- [`company-intel`](../company-intel/SKILL.md)
   — single-company deep dives built largely on OSINT + FININT + HUMINT
-- Investigation skills that run these disciplines: `market-landscape-scan`,
-  `competitive-research-snapshot`, `competitive-intel-watch`, `battle-card-builder`
+- Investigation skills that run these disciplines: [`market-landscape-scan`](../market-landscape-scan/SKILL.md),
+  [`competitive-research-snapshot`](../competitive-research-snapshot/SKILL.md), [`competitive-intel-watch`](../competitive-intel-watch/SKILL.md), [`battle-card-builder`](../battle-card-builder/SKILL.md)
 - SCIP Code of Ethics — the competitive-intelligence profession's reference standard
 - Regional Source Overlays (EU/MENA companion; planned as a future component skill)
 - Adapted from Dean Peters' "Competitive Research on Steroids" compendium and the Competitive Analysis
   Playbook (Productside).
-
-## 相关技能说明（2026-08-02）
-
-正文引用的以下技能**不在本技能库**（deanpeters 同库**可选参考**——为保持技能库克制未接入）：
-
-- `tam-sam-som-calculator` —— 需要时按需接入（deanpeters 同库可选参考）
-- `company-research` —— 需要时按需接入（deanpeters 同库可选参考）
-
-**情况说明**：这些引用仅为参考方向（如「可用 X 做市场量化」），**不阻塞本技能独立使用**；实际需要时再按需接入对应技能。
 

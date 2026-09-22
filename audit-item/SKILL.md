@@ -4,11 +4,11 @@ description: >-
   Track audit/review findings as numbered issue files
   (.scratch/neonforge-v1/audit-items/NNN-slug.md) with id, severity, source audit,
   status (open/fixed/recorded), fix commit, regression test, and closing evidence,
-  plus a summary index README that stage-gate enumerates. Use when an audit or review
+  plus a summary index README that the stage-completion gate enumerates. Use when an audit or review
   produces findings ("把审计发现入账" / "审计项"). NOT for: finding the issues
-  (use code-review or the audit itself) — this skill only tracks them.
+  (that is the review or audit pass itself) — this skill only tracks them.
 slug: audit-item
-version: 1.0.0
+version: 1.0.1
 displayName: audit-item
 ---
 

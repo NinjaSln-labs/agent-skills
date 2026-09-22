@@ -5,7 +5,7 @@ description: >-
   snapshot. Use when tracking competitors on a cadence: material shifts only, cited
   evidence, battle-card update flags, runs unattended.
 slug: competitive-intel-watch
-version: 1.0.0
+version: 1.0.3
 displayName: competitive-intel-watch
 ---
 
@@ -15,7 +15,7 @@ displayName: competitive-intel-watch
 
 Monitor a competitive landscape for **material shifts** since the last run. Diff the world against the
 previous snapshot; report only what changed, with evidence; flag which downstream artifacts need
-updating. This is the skill that turns competitive delegated-research from a document into a cadence — the
+updating. This is the skill that turns competitive research from a document into a cadence — the
 weekly SIGINT sweep and monthly OSINT digest from the fusion cadence live here. A watch reports
 *change*, not *state*: regenerating the same report weekly is theater, and "no material shifts this
 cycle" is a valid, useful result.
@@ -164,7 +164,7 @@ reported as material.
 - **Diffing a stale scope.** The market pivoted, you entered a new segment — and the watch keeps
   diffing the old frame. Re-baseline when the scope changes; say so in the run header.
 - **Orphaned intelligence.** A changelog with no update flags. If no artifact needs updating, the
-  shift probably didn't clear the bar — flags are how delegated-research becomes action.
+  shift probably didn't clear the bar — flags are how research becomes action.
 
 ## References
 
@@ -172,15 +172,7 @@ reported as material.
 - [`intelligence-collection-disciplines`](../intelligence-collection-disciplines/SKILL.md) (Component) — the fusion cadence this watch runs on
 - [`competitive-research-snapshot`](../competitive-research-snapshot/SKILL.md) (Workflow) — produces the baseline this skill diffs against
 - [`battle-card-builder`](../battle-card-builder/SKILL.md) (Workflow) — consumes the update flags
-- [`pestel-analysis`](../pestel-analysis/SKILL.md) (Component) — the macro-environment sibling of this competitor-level watch
+- PESTEL analysis (optional companion activity) — the macro-environment sibling of this competitor-level watch
 - Adapted from `market-intelligence/competitive-intel-watch-prompt.md` in the
   `https://github.com/deanpeters/product-manager-prompts` repo.
-
-## 相关技能说明（2026-08-02）
-
-正文引用的以下技能**不在本技能库**（deanpeters 同库**可选参考**——为保持技能库克制未接入）：
-
-- `pestel-analysis` —— 需要时按需接入（deanpeters 同库可选参考）
-
-**情况说明**：这些引用仅为参考方向（如「可用 X 做市场量化」），**不阻塞本技能独立使用**；实际需要时再按需接入对应技能。
 

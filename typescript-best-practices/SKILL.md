@@ -6,10 +6,11 @@ description: >-
   generating TypeScript code, reviewing TypeScript files, creating new TypeScript modules,
   refactoring JavaScript to TypeScript, or when the user asks about TypeScript patterns,
   types, or coding standards. Keywords: typescript, types, coding standards, best
-  practices, type safety, generics, architecture, refactoring. Use when working with this
-  skill's domain.
+  practices, type safety, generics, architecture, refactoring. Use when scaffolding a
+  TypeScript module, generating TypeScript types from JSON data, or analyzing TypeScript
+  code for quality issues.
 slug: typescript-best-practices
-version: 1.0.0
+version: 1.0.1
 displayName: typescript-best-practices
 ---
 

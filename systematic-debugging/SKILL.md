@@ -7,7 +7,7 @@ description: >-
   For a reported problem that is not yet a confirmed technical code defect, start with
   problem-handling; this skill is the code-bug root-cause protocol used inside it.
 slug: systematic-debugging
-version: 1.0.2
+version: 1.0.3
 displayName: systematic-debugging
 ---
 
@@ -182,7 +182,7 @@ You MUST complete each phase before proceeding to the next.
    - Automated test if possible
    - One-off test script if no framework
    - MUST have before fixing
-   - Use the `superpowers:test-driven-development` skill for writing proper failing tests
+   - Write the test first, minimal and specific, before fixing
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -194,7 +194,7 @@ You MUST complete each phase before proceeding to the next.
    - Test passes now?
    - No other tests broken?
    - Issue actually resolved?
-   - Use the `superpowers:verification-before-completion` skill before claiming success
+   - Run [`verification-before-completion`](../verification-before-completion/SKILL.md) before claiming success
 
 4. **If Fix Doesn't Work**
    - STOP

@@ -1,16 +1,18 @@
 ---
 name: ddd-discover
-description: "Collaborative domain discovery: produce event flows, command/event candidates, hotspots, and ambiguity lists through event storming or domain storytelling."
+description: "Collaborative domain discovery via event storming, producing event streams, command/event candidates, hotspots, ambiguity lists, and preliminary context-boundary clues for downstream subdomain classification. Use when doing domain discovery — identifying domain events and commands, aligning core business flows and exception paths, or re-running discovery after bounded-context term conflicts. NOT for: facilitating live EventStorming workshops (formats and facilitation patterns are separate reference material), designing aggregate boundaries, or partitioning/classifying subdomains — deliverables, not facilitation."
 lang: en
 risk: safe
 source: self
-tags: "[ddd, discovery, event-storming, domain-storytelling]"
+tags: "[ddd, discovery, event-storming]"
 date_added: "2026-05-08"
 ---
 
 # DDD Discover
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

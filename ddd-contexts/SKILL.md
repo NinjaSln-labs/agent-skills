@@ -6,13 +6,13 @@ source: self
 tags: "[ddd, strategic, bounded-context, ubiquitous-language]"
 date_added: "2026-05-08"
 slug: ddd-contexts
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-contexts
 ---
 
 # DDD Contexts
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

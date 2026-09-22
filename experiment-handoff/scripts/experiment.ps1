@@ -136,7 +136,6 @@ function Cmd-Init {
   if ((Is-Git) -and (Test-Path $gi)) {
     if (-not (Select-String -Path $gi -Pattern '^\.experiments/$' -Quiet)) { Add-Content -Path $gi -Value '.experiments/' }
   }
-  $fp = if (Test-Path (Join-Path $root '.handoff/fp.txt')) { '.handoff/fp.txt' } else { '(none - see handoff-lint)' }
   $clean = if ($mode -eq 'copy') { "rm -rf $loc" } else { "git worktree remove $loc ; git branch -d $br" }
   $doc = @"
 # Experiment: $slug
@@ -148,7 +147,6 @@ function Cmd-Init {
 - Method: <方法>
 - 隔离: $mode · 位置: $loc · 分支: $br
 - 基线: $basehash
-- 环境指纹: 复用 .handoff/fp.sha（清单 $fp）· 见 project-handoff/handoff-lint
 - Run: <命令>
 - 结论:
 - Next Steps:

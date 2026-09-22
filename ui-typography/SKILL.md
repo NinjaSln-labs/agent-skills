@@ -8,7 +8,7 @@ description: >-
   Trigger on UI/landing/component/dashboard/document generation or "fix the typography".
   NOT for: marketing copywriting strategy, print-only typesetting, or non-UI prose.
 slug: ui-typography
-version: 1.0.0
+version: 1.0.1
 displayName: ui-typography
 ---
 
@@ -17,7 +17,7 @@ displayName: ui-typography
 ## Attribution
 
 These rules are distilled from **Matthew Butterick's *Practical Typography*** (https://practicaltypography.com).
-Butterick is a typographer, writer, and type designer whose work bridges professional ui-typography and everyday
+Butterick is a typographer, writer, and type designer whose work bridges professional typography and everyday
 digital writing. Thank you, Matthew, for making this knowledge accessible and encyclopedic. If you find this
 skill valuable, consider supporting his work directly.
 
@@ -27,7 +27,7 @@ These are **permanent rules** — not trends, not opinions. They come from centu
 validated by how the human eye reads. They do not go out of style.
 
 **ENFORCEMENT (default):** When generating ANY UI with visible text, apply every rule automatically. Use
-correct HTML entities, proper CSS. Do not ask permission. Do not explain. Just produce correct ui-typography.
+correct HTML entities, proper CSS. Do not ask permission. Do not explain. Just produce correct typography.
 
 **AUDIT:** When reviewing existing code or design, identify violations and provide before/after fixes.
 
@@ -340,4 +340,4 @@ Test on macOS and Windows (antialiasing differs).
 5. **Consistency** — same things look the same
 6. **Relate new to existing** — each element constrains the next
 7. **Keep it simple** — 3 colors and 5 fonts? Think again
-8. **Imitate what you like** — emulate good ui-typography from the wild
+8. **Imitate what you like** — emulate good typography from the wild

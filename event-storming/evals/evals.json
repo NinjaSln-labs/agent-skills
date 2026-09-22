@@ -5,25 +5,25 @@
       "id": 1,
       "name": "recommend-big-picture-for-domain-discovery",
       "prompt": "I want to explore our whole insurance-claims business, figure out what we don't understand yet, and find the natural bounded contexts. Where do we start with EventStorming?",
-      "expected_output": "Interactive discovery: the skill identifies the goal as whole-domain exploration and recommends starting with Big Picture (Brandolini's transition funnel almost always starts there), then points the user at the reference path (/event-storming:methodology --big-picture) for facilitation guidance and the agentic path (/event-storming:simulation) to run it as a multi-persona simulation. It does not dump all seven formats.",
+      "expected_output": "Interactive discovery: the skill identifies the goal as whole-domain exploration and recommends starting with Big Picture (Brandolini's transition funnel almost always starts there), then points the user at the `--big-picture` facilitation guidance / reference, and notes that actually running the session as an agentic multi-persona simulation is outside this skill's scope (guide a human-facilitated session, or point to the client's own simulation tooling if it has one). It does not dump all seven formats.",
       "files": [],
       "expectations": [
         "Output recommends starting with the Big Picture format for whole-domain exploration and bounded-context discovery",
         "The recommendation is framed as starting broad (Brandolini's transition funnel / 'almost always start with Big Picture'), not jumping straight to Design-Level or Process Modeling",
-        "Output distinguishes the reference path (/event-storming:methodology --big-picture) from the agentic simulation path (/event-storming:simulation)",
+        "Output distinguishes facilitation guidance (the --big-picture action / reference) from actually running an agentic multi-persona simulation, which is outside this skill's scope",
         "Output does not dump the full catalog of all formats as an undifferentiated information dump"
       ]
     },
     {
       "id": 2,
-      "name": "agentic-request-routes-to-simulation",
+      "name": "agentic-request-declined-as-out-of-scope",
       "prompt": "Run an agentic multi-persona EventStorming simulation of a developer-conference domain on a Miro board for me.",
-      "expected_output": "The skill recognizes this is a request to RUN an agentic simulation, not to read facilitation reference, and routes the user to /event-storming:simulation rather than executing the multi-persona simulation itself.",
+      "expected_output": "The skill recognizes this is a request to RUN an agentic simulation, not to read facilitation reference, declines it as outside this skill's scope, and offers a human-facilitated session (or points to the client's own simulation tooling if available) rather than executing the multi-persona simulation itself.",
       "files": [],
       "expectations": [
-        "Output routes the user to /event-storming:simulation for the agentic multi-persona run",
+        "Output declines the agentic multi-persona simulation as out of scope and offers human facilitation or the client's own tooling",
         "Output does NOT itself execute an agentic multi-persona simulation or start placing stickies on a Miro board",
-        "Output makes the reference-vs-agentic distinction clear (this skill is facilitation knowledge; simulation is the agentic driver)"
+        "Output makes the reference-vs-agentic distinction clear (this skill is facilitation reference/guidance only; running an agentic simulation is outside its scope)"
       ]
     },
     {
@@ -77,11 +77,11 @@
     {
       "id": 7,
       "name": "glossary-graduation-delegates-not-discovers",
-      "prompt": "At Big Picture wrap-up we resolved two domain terms and already established their bounded contexts. /domain-driven-design:curate-language is available in this session. Graduate the terms without re-running context discovery.",
-      "expected_output": "Delegates each resolved term to /domain-driven-design:curate-language for consumer-convention glossary maintenance and routing among the already-established contexts. It does not apply bounded-context discovery heuristics or prescribe a glossary filename.",
+      "prompt": "At Big Picture wrap-up we resolved two domain terms and already established their bounded contexts. A glossary / ubiquitous-language curation capability is available in this session. Graduate the terms without re-running context discovery.",
+      "expected_output": "Delegates each resolved term to the session's glossary / ubiquitous-language curation capability for consumer-convention glossary maintenance and routing among the already-established contexts. If no such capability is present, it applies this skill's own graduation shape instead (term + 1-2 sentence definition + plain Avoid: line, discovery-first lazy creation, never a prescribed filename) - and either way it does not apply bounded-context discovery heuristics.",
       "files": [],
       "expectations": [
-        "Invokes /domain-driven-design:curate-language for active glossary graduation",
+        "Defers active glossary maintenance to the available curation capability; with none present, applies the skill's own graduation shape (term, definition, Avoid: line) rather than emitting the --glossary notation reference",
         "Uses the contexts already established by the workshop rather than discovering new ones",
         "Does not run, repeat, or inline bounded-context discovery heuristics",
         "Does not prescribe a universal glossary or map filename"

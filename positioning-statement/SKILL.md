@@ -4,7 +4,7 @@ description: >-
   Create a Geoffrey Moore-style positioning statement. Use when clarifying who you serve,
   what problem you solve, your category, and why you're different from alternatives.
 slug: positioning-statement
-version: 1.0.0
+version: 1.0.3
 displayName: positioning-statement
 ---
 
@@ -59,12 +59,12 @@ From *Crossing the Chasm*, Moore's framework splits positioning into two parts:
 - Defining a new product or major pivot
 - Aligning exec/founder/PM/marketing on strategy
 - Testing if your differentiation is real or imagined
-- Before writing PRDs, product-launch plans, or sales collateral
+- Before writing PRDs, launch plans, or sales collateral
 
 ### When NOT to Use This
 - For internal tools with captive users (positioning is for markets)
 - When you're still in problem validation (position after you know the problem)
-- As a substitute for customer delegated-research (this synthesizes insights, doesn't create them)
+- As a substitute for customer research (this synthesizes insights, doesn't create them)
 
 ---
 
@@ -75,11 +75,11 @@ Use `template.md` for the full fill-in structure.
 ### Step 1: Gather Context
 Before drafting, ensure you have:
 - **Target customer segment:** Demographics, behaviors, role (not just "SMBs" or "developers")
-- **Underserved need:** Pains, gains, jobs-to-be-done (reference `skills/jobs-to-be-done/SKILL.md` if needed)
+- **Underserved need:** Pains, gains, jobs-to-be-done (reference [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) if needed)
 - **Product category:** How buyers mentally file your solution (CRM, analytics platform, etc.)
 - **Competitive landscape:** Direct competitors AND substitute behaviors (e.g., "Excel" is often the real competitor)
 
-**If missing context:** Use discovery interviews, market delegated-research, or customer interviews to fill gaps. Don't guess.
+**If missing context:** Use discovery interviews, market research, or customer interviews to fill gaps. Don't guess.
 
 ---
 
@@ -128,7 +128,7 @@ Fill in the template:
 
 Ask these questions:
 1. **Would a customer recognize themselves?** Read the "For [target]" aloud. Does it feel specific or generic?
-2. **Is the need defensible?** Can you point to delegated-research, interviews, or data that validates this need?
+2. **Is the need defensible?** Can you point to research, interviews, or data that validates this need?
 3. **Does the category help or hurt?** Does it anchor you against the right competitors? Or does it box you in?
 4. **Is differentiation believable?** Could you prove this claim with a demo, case study, or data?
 5. **Does this guide decisions?** If someone asked "Should we build feature X?" would this positioning help answer it?
@@ -211,10 +211,10 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/problem-statement/SKILL.md` — Defines the problem positioning addresses
-- `skills/jobs-to-be-done/SKILL.md` — Informs the "that need" statement
-- `skills/proto-persona/SKILL.md` — Defines the "For [target]" segment
-- `skills/press-release/SKILL.md` — Positioning informs press release messaging
+- [`problem-statement`](../problem-statement/SKILL.md) — Defines the problem positioning addresses
+- [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) — Informs the "that need" statement
+- [`proto-persona`](../proto-persona/SKILL.md) — Defines the "For [target]" segment
+- [`press-release`](../press-release/SKILL.md) — Positioning informs press release messaging
 
 ### External Frameworks
 - Geoffrey Moore, *Crossing the Chasm* (1991) — Origin of this framework
@@ -232,4 +232,4 @@ Mini example excerpt:
 **Skill type:** Component
 **Suggested filename:** `positioning-statement.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/problem-statement/SKILL.md`, `skills/jobs-to-be-done/SKILL.md`, `skills/proto-persona/SKILL.md`
+**Dependencies:** References [`problem-statement`](../problem-statement/SKILL.md), [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md), [`proto-persona`](../proto-persona/SKILL.md)

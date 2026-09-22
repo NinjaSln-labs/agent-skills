@@ -9,7 +9,7 @@ description: >-
   accessibility, animation, or data visualization — including design system and
   stack-guideline steps.
 slug: ui-ux-pro-max
-version: 1.0.0
+version: 1.0.4
 displayName: ui-ux-pro-max
 ---
 
@@ -19,7 +19,7 @@ Searchable database of UI/UX design rules with priority-based recommendations: 8
 
 ## When to Apply
 
-Use this Skill when the task involves **UI structure, visual design decisions, interaction patterns, or user experience quality control**: designing new pages, creating/refactoring UI components, choosing color/ui-typography/spacing/layout systems, reviewing UI for UX/accessibility/consistency, implementing navigation/ui-animation/responsive behavior, or improving perceived quality and usability.
+Use this Skill when the task involves **UI structure, visual design decisions, interaction patterns, or user experience quality control**: designing new pages, creating/refactoring UI components, choosing color/typography/spacing/layout systems, reviewing UI for UX/accessibility/consistency, implementing navigation/animation/responsive behavior, or improving perceived quality and usability.
 
 Skip it for pure backend logic, API/database design, non-visual performance work, infrastructure/DevOps, or non-visual scripts — unless the task changes how something **looks, feels, moves, or is interacted with**.
 
@@ -34,8 +34,8 @@ Skip it for pure backend logic, API/database design, non-visual performance work
 | 3 | Performance | HIGH | `ux` | WebP/AVIF, Lazy loading, Reserve space (CLS &lt; 0.1) | Layout thrashing, Cumulative Layout Shift |
 | 4 | Style Selection | HIGH | `style`, `product` | Match product type, Consistency, SVG icons (no emoji) | Mixing flat & skeuomorphic randomly, Emoji as icons |
 | 5 | Layout & Responsive | HIGH | `ux` | Mobile-first breakpoints, Viewport meta, No horizontal scroll | Horizontal scroll, Fixed px container widths, Disable zoom |
-| 6 | Typography & Color | MEDIUM | `ui-typography`, `color` | Base 16px, Line-height 1.5, Semantic color tokens | Text &lt; 12px body, Gray-on-gray, Raw hex in components |
-| 7 | Animation | MEDIUM | `ux`, `gsap` | Duration 150–300ms, Motion conveys meaning, Spatial continuity | Decorative-only ui-animation, Animating width/height, No reduced-motion |
+| 6 | Typography & Color | MEDIUM | `typography`, `color` | Base 16px, Line-height 1.5, Semantic color tokens | Text &lt; 12px body, Gray-on-gray, Raw hex in components |
+| 7 | Animation | MEDIUM | `ux`, `gsap` | Duration 150–300ms, Motion conveys meaning, Spatial continuity | Decorative-only animation, Animating width/height, No reduced-motion |
 | 8 | Forms & Feedback | MEDIUM | `ux` | Visible labels, Error near field, Helper text, Progressive disclosure | Placeholder-only label, Errors only at top, Overwhelm upfront |
 | 9 | Navigation Patterns | HIGH | `ux` | Predictable back, Bottom nav ≤5, Deep linking | Overloaded nav, Broken back behavior, No deep links |
 | 10 | Charts & Data | LOW | `chart` | Legends, Tooltips, Accessible colors | Relying on color alone to convey meaning |
@@ -46,13 +46,13 @@ For the full rule list per category (all ~98 UX guidelines with rationale), read
 
 ## Running the search tool
 
-The search script lives inside this skill's own directory, not the project directory. Always invoke it by its full path relative to this skill's root (do not assume the working directory is the skill dir, and do not hardcode a Claude-specific path — this skill works across Claude Code / Deep Code / Cursor):
+The search script lives inside this skill's own directory, not the project directory. Throughout this document, `<skill-root>` means **the directory containing this `SKILL.md`** — locate it once at the start of the workflow (it is wherever this skill was installed: a skills folder, a plugin folder, etc.), then invoke the script and read any data/reference files by path relative to it. Do not assume your current working directory is the skill directory, and do not hardcode any host-specific install path — this skill works across skill hosts (Claude Code / Deep Code / Cursor / others):
 
 ```bash
-python "scripts/search.py" "<query>" --domain <domain>
+python "<skill-root>/scripts/search.py" "<query>" --domain <domain>
 ```
 
-If the script is not found, resolve it via this skill's own directory (e.g. `<skill-root>/scripts/search.py`).
+If your runtime happens to expose a plugin/skill-root variable, you may substitute it for `<skill-root>` (e.g. `CLAUDE_PLUGIN_ROOT` in a Claude Code plugin install) — an optional convenience, never a requirement; the placeholder form above works everywhere.
 
 If `python` is not found, try `python3`, then `py -3`. Requires Python 3.x, no external dependencies (see README for install instructions if Python is missing).
 
@@ -71,14 +71,14 @@ Extract from the user request:
 Always start with `--design-system` to get comprehensive recommendations with reasoning:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
+python "<skill-root>/scripts/search.py" "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
 ```
 
-This searches product/style/color/landing/ui-typography domains in parallel, applies reasoning rules from `ui-reasoning.csv`, and returns pattern, style, colors, ui-typography, effects, and anti-patterns to avoid.
+This searches product/style/color/landing/typography domains in parallel, applies reasoning rules from `ui-reasoning.csv`, and returns pattern, style, colors, typography, effects, and anti-patterns to avoid.
 
 **Example:**
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "beauty spa wellness service" --design-system -p "Serenity Spa"
+python "<skill-root>/scripts/search.py" "beauty spa wellness service" --design-system -p "Serenity Spa"
 ```
 
 ### Step 2b: Persist Design System (Master + Overrides Pattern)
@@ -86,7 +86,7 @@ python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "b
 To save the design system for retrieval across sessions, add `--persist` **and always pass `--output-dir` pointed at the project root** — without it, files are written relative to whatever directory the tool happens to run from:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<query>" --design-system --persist -p "Project Name" --output-dir "<project-root>"
+python "<skill-root>/scripts/search.py" "<query>" --design-system --persist -p "Project Name" --output-dir "<project-root>"
 ```
 
 This creates:
@@ -107,7 +107,7 @@ If `design-system/<project-slug>/MASTER.md` already exists, `--persist` **skips 
 Three optional 1-10 sliders that tune `--design-system` output without changing your query. Add any combination of them to the same command:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<query>" --design-system --variance <1-10> --motion <1-10> --density <1-10>
+python "<skill-root>/scripts/search.py" "<query>" --design-system --variance <1-10> --motion <1-10> --density <1-10>
 ```
 
 | Dial | Low (1-3) | Mid (4-7) | High (8-10) |
@@ -122,13 +122,13 @@ python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<
 
 **Example:**
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "internal analytics dashboard" --design-system --variance 8 --motion 7 --density 8 -p "Ops Console"
+python "<skill-root>/scripts/search.py" "internal analytics dashboard" --design-system --variance 8 --motion 7 --density 8 -p "Ops Console"
 ```
 
 ### Step 3: Supplement with Detailed Searches (as needed)
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<keyword>" --domain <domain> [-n <max_results>]
+python "<skill-root>/scripts/search.py" "<keyword>" --domain <domain> [-n <max_results>]
 ```
 
 | Need | Domain | Example |
@@ -136,22 +136,22 @@ python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<
 | Product type patterns | `product` | `--domain product "entertainment social"` |
 | More style options | `style` | `--domain style "glassmorphism dark"` |
 | Color palettes | `color` | `--domain color "entertainment vibrant"` |
-| Font pairings | `ui-typography` | `--domain ui-typography "playful modern"` |
+| Font pairings | `typography` | `--domain typography "playful modern"` |
 | Individual Google Fonts | `google-fonts` | `--domain google-fonts "sans serif popular variable"` |
 | Chart recommendations | `chart` | `--domain chart "real-time dashboard"` |
-| UX best practices | `ux` | `--domain ux "ui-animation accessibility"` |
+| UX best practices | `ux` | `--domain ux "animation accessibility"` |
 | Landing page structure | `landing` | `--domain landing "hero social-proof"` |
 | Icon recommendations | `icons` | `--domain icons "navigation outline"` |
-| GSAP ui-animation presets | `gsap` | `--domain gsap "scroll reveal stagger"` |
+| GSAP animation presets | `gsap` | `--domain gsap "scroll reveal stagger"` |
 | React/Next.js performance | `react` | `--domain react "rerender memo list"` |
 | App/native interface guidelines | `web` | `--domain web "accessibilityLabel touch safe-areas"` |
 
-Domain is auto-detected from the query if `--domain` is omitted — but auto-detection can misroute overlapping terms (e.g. "font" matches both `ui-typography` and `google-fonts`). If results look off-topic, pass `--domain` explicitly.
+Domain is auto-detected from the query if `--domain` is omitted — but auto-detection can misroute overlapping terms (e.g. "font" matches both `typography` and `google-fonts`). If results look off-topic, pass `--domain` explicitly.
 
 ### Step 4: Stack Guidelines
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "<keyword>" --stack <stack>
+python "<skill-root>/scripts/search.py" "<keyword>" --stack <stack>
 ```
 
 **Available stacks:** `react`, `nextjs`, `vue`, `svelte`, `astro`, `nuxtjs`, `nuxt-ui`, `angular`, `laravel`, `swiftui`, `react-native`, `flutter`, `jetpack-compose`, `html-tailwind`, `shadcn`, `threejs`, `javafx`, `wpf`, `winui`, `avalonia`, `uno`, `uwp`. Use the stack detected in Step 1.
@@ -171,13 +171,13 @@ Do not fabricate output. Instead:
 
 ```bash
 ## Step 2: design system
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "AI search tool modern minimal" --design-system -p "AI Search"
+python "<skill-root>/scripts/search.py" "AI search tool modern minimal" --design-system -p "AI Search"
 
 ## Step 3: supplement
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "search loading ui-animation" --domain ux
+python "<skill-root>/scripts/search.py" "search loading animation" --domain ux
 
 ## Step 4: stack guidelines
-python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" "suspense streaming bundle" --stack nextjs
+python "<skill-root>/scripts/search.py" "suspense streaming bundle" --stack nextjs
 ```
 
 Then synthesize the design system + detailed searches and implement.

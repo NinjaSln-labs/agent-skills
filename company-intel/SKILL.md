@@ -4,7 +4,7 @@ description: >-
   Research a company, industry, or competitor set using web search and seven analytical
   lenses. Use when you need structured intel that feeds downstream PM skills.
 slug: company-intel
-version: 1.0.1
+version: 1.0.7
 displayName: company-intel
 ---
 
@@ -14,12 +14,12 @@ displayName: company-intel
 
 Research engine that builds deep, structured understanding of companies, industries, and competitor sets. Produces a stable output format that you can hand off to other skills and agents to generate battlecards, SWOT analyses, positioning statements, PESTEL assessments, market sizing, and workshop content.
 
-This is not a generic encyclopedia lookup. Every section pushes toward commercial understanding, product implications, and actionable intelligence. The output is a delegated-research primitive — structured data other skills consume — not a final deliverable.
+This is not a generic encyclopedia lookup. Every section pushes toward commercial understanding, product implications, and actionable intelligence. The output is a research primitive — structured data other skills consume — not a final deliverable.
 
 ## Input
 
-**Works best with:** The delegated-research target: a company, an industry, or a set of competitors.
-**Also useful:** The downstream use (battlecard, SWOT, positioning, market sizing) so the delegated-research emphasizes the right lenses, plus any constraints on depth or recency.
+**Works best with:** The research target: a company, an industry, or a set of competitors.
+**Also useful:** The downstream use (battlecard, SWOT, positioning, market sizing) so the research emphasizes the right lenses, plus any constraints on depth or recency.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
@@ -41,11 +41,11 @@ The skill auto-detects entry point from the user's input. If ambiguous, ask one 
 
 **Discover Competitors** — User names a company plus the word "competitors" (e.g., "helix-motion.com competitors" or "Helix Motion Systems competitors"). The skill:
 1. Researches the named company first — enough to understand what it does, who it serves, and what market it plays in (a lightweight pass through Lenses 1-4)
-2. Identifies 3-5 likely competitors based on that delegated-research, citing why each is a competitor (direct, adjacent, substitute, or emerging disruptor)
-3. Presents the list for confirmation: "Based on my delegated-research, [Company]'s closest competitors appear to be [A, B, C, D, E]. Want me to run the full competitor set on these, or adjust the list first?"
+2. Identifies 3-5 likely competitors based on that research, citing why each is a competitor (direct, adjacent, substitute, or emerging disruptor)
+3. Presents the list for confirmation: "Based on my research, [Company]'s closest competitors appear to be [A, B, C, D, E]. Want me to run the full competitor set on these, or adjust the list first?"
 4. Once confirmed, proceeds with the Named Competitor Set flow — full 11-section output for each company plus Section 12 cross-company comparison
 
-The user can also provide a URL instead of a company name (e.g., "helix-motion.com"). The skill should resolve the URL to the company, delegated-research accordingly, and proceed.
+The user can also provide a URL instead of a company name (e.g., "helix-motion.com"). The skill should resolve the URL to the company, research accordingly, and proceed.
 
 ---
 
@@ -86,7 +86,7 @@ Sharp heuristics for reading the product organization specifically:
 intel supports a conversation with the company — a partnership, a sales motion, a job interview — add
 the distress read: what's the most likely **presenting problem** (what they'd say is wrong) versus the
 probable **underlying problem** (what the evidence suggests is actually wrong)? Was there a **trigger
-event** — missed guidance, a failed product-launch, a reorg, a new executive inheriting a mess? Calibrate the
+event** — missed guidance, a failed launch, a reorg, a new executive inheriting a mess? Calibrate the
 distress level: *doing fine and optimizing* → *knows something's wrong* → *in trouble and doesn't know
 it yet*. Label the whole read as Inference; it's the most useful and least certain section in the file.
 
@@ -135,7 +135,7 @@ Highlight conflicts and tradeoffs wherever they appear:
 
 - **Not a Wikipedia summary:** Push past "what they do" to "what this means for product decisions"
 - **Not financial analysis:** Focus is product strategy and commercial dynamics, not valuation or stock picks
-- **Not a prompt generator:** The output is actual delegated-research with citations, not prompts for a future session
+- **Not a prompt generator:** The output is actual research with citations, not prompts for a future session
 - **Not a one-time exercise:** Design for quarterly refresh — run it again, compare the delta
 
 ---
@@ -189,14 +189,14 @@ If the user provides additional context (e.g., "I'm preparing for a client engag
 
 1. **Research the named company** using web search. Do a lightweight pass through Lenses 1-4 — enough to understand what the company does, who it serves, what market it plays in, and how it creates value.
 
-2. **Identify 3-5 likely competitors** based on that delegated-research. For each, state:
+2. **Identify 3-5 likely competitors** based on that research. For each, state:
    - Company name
    - Why it's a competitor (direct, adjacent, substitute, or emerging disruptor)
    - One-sentence description of how it competes
 
 3. **Present the list for confirmation:**
 
-   "Based on my delegated-research, [Company] is [brief description — what it does and who it serves].
+   "Based on my research, [Company] is [brief description — what it does and who it serves].
 
    Its closest competitors appear to be:
    1. **[Competitor A]** — [relationship: direct/adjacent/substitute/disruptor]. [Why.]
@@ -309,16 +309,16 @@ Which is most constrained by legacy?]
 
 ### Step 4: Handoff Menu
 
-After producing the output, offer the user a handoff menu. Each option names what gets built and which skill or agent consumes the delegated-research:
+After producing the output, offer the user a handoff menu. Each option names what gets built and which skill or agent consumes the research:
 
-"Your delegated-research is ready. What do you want to build from it?
+"Your research is ready. What do you want to build from it?
 
 1. **Competitive battlecard** — I'll structure a head-to-head comparison for your sales or strategy team
-2. **SWOT analysis** — I'll run strengths, weaknesses, opportunities, and threats using the delegated-research as input
+2. **SWOT analysis** — I'll run strengths, weaknesses, opportunities, and threats using the research as input
 3. **Positioning statement** — Use `positioning-statement` skill with this company/market context loaded
-4. **PESTEL assessment** — Use `pestel-analysis` skill with the trends and pressures from Sections 6 and 8
-5. **Market sizing (TAM/SAM/SOM)** — Use `tam-sam-som-calculator` skill with the market and segment data from Sections 2-3
-6. **Research prompts for deeper investigation** — Generate 3-5 targeted delegated-research prompts per lens for a follow-up session
+4. **PESTEL assessment** — run a PESTEL pass over the trends and pressures from Sections 6 and 8
+5. **Market sizing (TAM/SAM/SOM)** — size the opportunity from the market and segment data in Sections 2-3
+6. **Research prompts for deeper investigation** — Generate 3-5 targeted research prompts per lens for a follow-up session
 7. **PM briefing memo** — Condense the 11 sections into a 1-page executive summary for a PM audience
 8. **Workshop discussion guide** — Extract teachable tensions and case study angles for training use
 
@@ -362,51 +362,8 @@ but the pattern holds.
 
 ## Examples
 
-### Example: Single Company — Helix Motion Systems *(fictional, as are all companies in these examples)*
-
-**Trigger:** "Run company-intel on Helix Motion Systems"
-
-**Entry point:** Single Company
-
-**Section 1 excerpt:**
-Helix Motion Systems is a large diversified industrial manufacturer specializing in motion and control technologies. A century-old firm, it operates across two segments: Diversified Industrial (~85% of revenue) and Aerospace Systems (~15%). A recent multi-billion-dollar aerospace acquisition significantly expanded that second segment.
-
-**Section 9 excerpt:**
-- **Patents:** Clustering in electro-hydraulic controls and hydrogen fuel cell components. R&D investment in electrification outpacing public product announcements — signals a bet on industrial decarbonization. *(Source: Google Patents, 2024-2025 filings)*
-- **Hiring:** Volume hiring for "digital twin" engineers and IoT platform architects in the Diversified Industrial segment. Job descriptions reference AWS IoT and Azure Digital Twins. *(Source: LinkedIn, Indeed — June 2026)*
-- **Leadership:** New VP of Digital Transformation hired from a platform-oriented automation rival (2025). New Group President for Engineered Materials from a diversified conglomerate (2024). Pattern: importing talent from platform-first industrials. *(Source: company press releases)*
-
-**Section 10 excerpt:**
-PMs at Helix face the classic industrial tension: long product lifecycles (10-20 years) vs. pressure to digitize and create recurring-revenue service layers. Product management is historically engineering-led, not customer-led. Discovery is constrained by the fact that customers (OEMs, utilities, defense contractors) have long procurement cycles and low tolerance for experimentation. The hiring signals suggest a push toward platform thinking, but the org structure (segment-based P&Ls) creates incentives to optimize locally rather than build horizontal platforms. *Inference: the digital twin hiring is likely ahead of organizational readiness to consume it.*
-
----
-
-### Example: Competitor Set — Industrial Motion Control
-
-**Trigger:** "Compare Helix Motion, Northfield Automation, and Corvid Industrial on company-intel"
-
-**Entry point:** Competitor Set (3 companies)
-
-**Section 12 excerpt (Cross-Company Comparison):**
-
-**Where They're Betting Differently:**
-- Helix is investing heavily in electrification and hydrogen (patent evidence). Northfield is betting on software-defined automation (a major industrial-software acquisition). Corvid is splitting into three companies and doubling down on aerospace autonomy.
-
-**Gaps and White Space:**
-- None of the three have a credible PLG motion for their digital products — all rely on enterprise sales. A startup that cracks self-serve industrial IoT tooling could undercut all three on adoption speed.
-
-**PM Implications Across the Set:**
-- Helix PM = engineer-first, platform-curious but segment-siloed
-- Northfield PM = software-led post-acquisition, navigating legacy OT culture
-- Corvid PM = post-split identity crisis, aerospace PMs and industrial PMs now in different companies
-
----
-
-### Anti-Pattern Example
-
-**Weak:** "Helix Motion Systems makes industrial equipment and has strong financials."
-
-**Strong:** Identifies the tension between Helix's motion-and-control platform business (recurring revenue, long service cycles) and its push into intelligent manufacturing and IIoT — and explains why that tension creates specific PM challenges around build-vs-partner decisions, aftermarket monetization, and the pace of digital product adoption in asset-intensive industries.
+Two worked excerpts (single company · competitor set) plus the anti-pattern example live in
+[`references/worked-examples.md`](references/worked-examples.md).
 
 ## Common Pitfalls
 
@@ -427,7 +384,7 @@ PMs at Helix face the classic industrial tension: long product lifecycles (10-20
 
 ### Pitfall 4: No Citations
 **Symptom:** "The CEO said the company is focused on AI." No source, no date, no context.
-**Consequence:** Unverifiable claims. Downstream consumers can't trust the delegated-research.
+**Consequence:** Unverifiable claims. Downstream consumers can't trust the research.
 **Fix:** Cite source and date. "CEO Jane Doe stated X in Q1 2026 earnings call (Source: Seeking Alpha transcript, Feb 2026)."
 
 ### Pitfall 5: Treating All Industries as Identical
@@ -442,59 +399,23 @@ PMs at Helix face the classic industrial tension: long product lifecycles (10-20
 
 ## Downstream Composition Guide
 
-This section is for other skill authors and agent builders who want to consume company-intel output.
-
-### What This Skill Produces
-
-A structured markdown document with 11 numbered sections (12 for competitor sets). Each section has a stable heading and defined content type:
-
-| Section | Content Type | Downstream Use |
-|---------|-------------|----------------|
-| 1. What This Entity Is | Entity definition, scale, market position | Context setting for any downstream skill |
-| 2. How It Makes Money | Revenue, costs, margins, financial logic | `business-health-diagnostic`, `feature-investment-advisor` |
-| 3. Who It Serves | Buyers, users, segments, stakeholder map | `proto-persona`, `jobs-to-be-done`, `positioning-statement` |
-| 4. What It Sells or Delivers | Value propositions, core offers | `positioning-statement`, battlecards |
-| 5. Key Product Lines | Product families, platforms, services | Competitive analysis, portfolio mapping |
-| 6. Business and Market Pressures | Competitive, regulatory, technology forces | `pestel-analysis`, `derisk-measurement-advisor` |
-| 7. Competitors and Alternatives | Direct, adjacent, substitutes, disruptors | Battlecards, competitive positioning |
-| 8. Important Trends and Risks | Macro forces, AI impact, consolidation | `pestel-analysis`, `derisk-measurement-advisor` |
-| 9. Strategic Signals | Patents, hiring, leadership changes | Competitive intelligence, trend analysis |
-| 10. What This Means for PM | Org dynamics, discovery maturity, PM challenges | Workshop content, coaching, engagement prep |
-| 11. Sources and Confidence | Citations, assumptions, data quality flags | Quality assurance for all downstream use |
-| 12. Cross-Company Comparison | Divergence, convergence, gaps, tensions | Battlecards, SWOT, competitive strategy |
-
-### How to Reference This Skill
-
-In your skill's References section:
-```markdown
-- **[company-intel](../company-intel/SKILL.md)** (Workflow) — Run first to generate structured company/industry delegated-research; this skill consumes Sections [X, Y, Z] as input
-```
-
-### Passing Output to Downstream Skills
-
-When handing off to a downstream skill, pass the relevant sections explicitly:
-- **Battlecard** → Sections 4, 5, 7, 9, 12
-- **SWOT** → Sections 2, 6, 7, 8, 9
-- **Positioning** → Sections 3, 4, 7
-- **PESTEL** → Sections 6, 8, 9
-- **TAM/SAM/SOM** → Sections 2, 3, 5
-- **Business health** → Sections 2, 5, 8
-- **PM briefing** → Sections 1, 5, 9, 10
-- **Workshop guide** → Sections 6, 9, 10 (tensions and PM implications)
+For other skill authors and agent builders consuming this output — the 11/12-section structure,
+per-section downstream use, and which sections to pass to which consumer — see
+[`references/downstream-composition.md`](references/downstream-composition.md).
 
 ## References
 
 ### Related Skills
-- **[company-research](../company-delegated-research/SKILL.md)** (Component) — Lighter-weight company profile focused on executive quotes and product strategy; `company-intel` is deeper and broader, producing structured output for downstream consumption
-- **[autonomous-investigation](../autonomous-investigation/SKILL.md)** (Workflow) — The evidence-label and confidence protocol this skill's delegated-research follows
+- Lighter-weight company profile (executive quotes, product strategy) — this skill is deeper and broader, producing structured output for downstream consumption
+- **[autonomous-investigation](../autonomous-investigation/SKILL.md)** (Workflow) — The evidence-label and confidence protocol this skill's research follows
 - **[intelligence-collection-disciplines](../intelligence-collection-disciplines/SKILL.md)** (Component) — OSINT/FININT/HUMINT source tables and signal chains behind Lenses 1, 6, and 7
 - **[competitive-intel-watch](../competitive-intel-watch/SKILL.md)** (Workflow) — Breadth sibling: monitors the whole competitor set on a cadence while this skill goes deep on one entity
-- **[pestel-analysis](../pestel-analysis/SKILL.md)** (Component) — Deep PESTEL template; consumes Sections 6 and 8 from company-intel
-- **[derisk-measurement-advisor](../derisk-measurement-advisor/SKILL.md)** (Interactive) — Risk scan that benefits from Sections 6 and 8 as context input
-- **[tam-sam-som-calculator](../tam-sam-som-calculator/SKILL.md)** (Component) — Market sizing; consumes Sections 2, 3, 5
-- **[business-health-diagnostic](../business-health-diagnostic/SKILL.md)** (Interactive) — SaaS health diagnosis; consumes Section 2
+- PESTEL analysis template (optional companion activity) — consumes Sections 6 and 8 from company-intel
+- De-risk / measurement scan (optional companion activity) — benefits from Sections 6 and 8 as context input
+- Market sizing TAM/SAM/SOM (optional companion activity) — consumes Sections 2, 3, 5
+- SaaS business-health diagnosis (optional companion activity) — consumes Section 2
 - **[positioning-statement](../positioning-statement/SKILL.md)** (Component) — Positioning; consumes Sections 3, 4, 7
-- **[acquisition-channel-advisor](../acquisition-channel-advisor/SKILL.md)** (Interactive) — Go-to-market analysis; consumes Sections 2, 3, 7
+- Go-to-market channel analysis (optional companion activity) — consumes Sections 2, 3, 7
 - **[proto-persona](../proto-persona/SKILL.md)** (Component) — Persona creation; consumes Section 3
 
 ### Research Sources
@@ -508,17 +429,4 @@ When handing off to a downstream skill, pass the relevant sections explicitly:
 ### Provenance
 - Adapted from Dean Peters' company-profile-executive-insights-research prompt and TAM-SAM-SOM prompt generator in the product-manager-prompts repo
 - Incorporates the Seven Research Lenses framework developed for Productside enterprise PM training
-
-## 相关技能说明（2026-08-02）
-
-正文引用的以下技能**不在本技能库**（deanpeters 同库**可选参考**——为保持技能库克制未接入）：
-
-- `company-research` —— 需要时按需接入（deanpeters 同库可选参考）
-- `pestel-analysis` —— 需要时按需接入（deanpeters 同库可选参考）
-- `derisk-measurement-advisor` —— 需要时按需接入（deanpeters 同库可选参考）
-- `tam-sam-som-calculator` —— 需要时按需接入（deanpeters 同库可选参考）
-- `business-health-diagnostic` —— 需要时按需接入（deanpeters 同库可选参考）
-- `acquisition-channel-advisor` —— 需要时按需接入（deanpeters 同库可选参考）
-
-**情况说明**：这些引用仅为参考方向（如「可用 X 做市场量化」），**不阻塞本技能独立使用**；实际需要时再按需接入对应技能。
 

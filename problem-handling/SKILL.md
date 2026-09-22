@@ -7,9 +7,9 @@ description: >-
   path, classify and scope, workaround-vs-permanent-fix decision, TDD fix, verification, and a
   blameless close with known-error capture plus a 3-strikes design escalation. Use when a problem,
   bug, error, UX complaint, or behavior gap is reported, before jumping to a fix. NOT for:
-  code-bug root cause alone — use systematic-debugging.
+  a pure code bug whose root cause is all you need — reproduce, isolate, fix.
 slug: problem-handling
-version: 1.0.1
+version: 1.0.2
 displayName: problem-handling
 ---
 

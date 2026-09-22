@@ -6,13 +6,13 @@ source: self
 tags: "[ddd, tactical, events, services, repositories]"
 date_added: "2026-05-08"
 slug: ddd-domain-interactions
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-domain-interactions
 ---
 
 # DDD Domain Interactions
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

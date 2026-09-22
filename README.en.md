@@ -6,14 +6,14 @@
 
 > Portable Agent Skills (following the [Agent Skills](https://agentskills.io) open spec, `SKILL.md`), installable on any AI coding agent that supports the spec (Claude Code / Cursor / Deep Code / Copilot CLI, etc.).
 
-**89 skills** covering the full product 0-1 lifecycle (discovery → definition → design → delivery → launch → operations), plus cross-cutting layers for DDD, engineering, QA, security, and UI/UX. Each skill is one directory with a `SKILL.md` (frontmatter `name`/`description` + body), progressive disclosure (body <500 lines; deeper content lives in `references/`).
+**88 skills** covering the full product 0-1 lifecycle (discovery → definition → design → delivery → launch → operations), plus cross-cutting layers for DDD, engineering, QA, security, and UI/UX. Each skill is one directory with a `SKILL.md` (frontmatter `name`/`description` + body), progressive disclosure (body <500 lines; deeper content lives in `references/`).
 
 The full map (skills classified by product-0-1 stage with orchestration paths — including the "stage-gate chain" and "problem-resolution chain") is in [SKILLS-MAP.md](SKILLS-MAP.md).
 
 ## Quick Start
 
 ```bash
-npx skills add NinjaSln-labs/agent-skills   # one command installs all 89 skills via skills.sh
+npx skills add NinjaSln-labs/agent-skills   # one command installs all 88 skills via skills.sh
 ```
 
 ```bash
@@ -63,7 +63,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | ddd-aggregates | Design DDD aggregates and aggregate boundaries from invariants: aggregate roots, entities… |
 | ddd-context-map | Map relationships and integration strategies between bounded contexts: pattern selection… |
 | ddd-contexts | Design bounded contexts and their ubiquitous language: boundaries, responsibilities, glossary… |
-| ddd-discover | Collaborative domain discovery via event storming or domain storytelling, producing event… |
+| ddd-discover | Collaborative domain discovery via event storming, producing event streams, command/event… |
 | ddd-domain-interactions | Design collaboration mechanisms between building blocks: domain events, domain services… |
 | ddd-model-review | Global model quality assessment: consistency, completeness, coupling analysis, and… |
 | ddd-openspec-bridge | Map DDD tactical modeling artifacts into OpenSpec structured specifications for a smooth… |
@@ -78,10 +78,10 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 
 | Skill | Description |
 |-------|-------------|
-| autonomous-investigation | The protocol behind every investigation skill. |
+| autonomous-investigation | The evidence protocol behind recurring competitive and market investigation skills — market… |
 | battle-card-builder | Research and draft a competitive battle card from public evidence — every claim labeled and… |
 | company-intel | Research a company, industry, or competitor set using web search and seven analytical lenses. |
-| competitive-analysis-process | Orchestrate a complete competitive analysis across six steps, from landscape to strategic… |
+| competitive-analysis-process | Orchestrate a complete competitive analysis end to end: market landscape, product-level… |
 | competitive-intel-watch | Competitive Intel Watch: scheduled delta monitoring against a prior competitive snapshot. |
 | competitive-research-snapshot | Research a competitive landscape with cited snapshots, a comparison matrix, and so-what… |
 | customer-journey-map | Create a customer journey map across stages, touchpoints, actions, emotions, and metrics. |
@@ -98,7 +98,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | press-release | Write an Amazon-style press release that defines customer value before building. |
 | problem-statement | Write a user-centered problem statement with who is blocked, what they are trying to do, why it… |
 | product-doc-audit | Product Document Audit: three-layer audit of a product documentation set (0-1 phase docs): 1)… |
-| product-marketing | > Creates and updates `.agents/product-marketing.md` — shared product, audience, and… |
+| product-marketing | Creates and updates `.agents/product-marketing.md` — shared product, audience, and positioning… |
 | proto-persona | Create a proto-persona from current research, market signals, and team knowledge. |
 | roadmap-planning | Plan a strategic roadmap across prioritization, epic definition, stakeholder alignment, and… |
 | user-research | Plan, conduct, and synthesize user research. |
@@ -111,12 +111,12 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 |-------|-------------|
 | accessibility-auditor | Comprehensive WCAG 2.1 AA compliance testing combining automated axe-core scans with manual… |
 | api-contract-validator | Validate API responses against OpenAPI/Swagger specifications, JSON Schema definitions, and… |
-| coverage-matrix | Generate or maintain the coverage matrix (docs/tests/coverage-matrix.md): scan unit test names… |
-| dependency-scan | Dependency scan: detect CVEs and security issues in project dependencies. |
+| coverage-matrix | Generate or maintain the three-way coverage matrix (invariants<->tests / events<->tests /… |
+| dependency-scan | Dependency scan: detect CVEs and security issues in project dependencies, report severity with… |
 | k6-performance | k6 performance testing: modern load testing with thresholds, scenarios, custom metrics, and… |
 | playwright-best-practices | Playwright best practices for E2E, component, API, visual, and accessibility testing… |
-| pixel-perfect | Visual regression testing — pixel-by-pixel screenshot comparison against a baseline. |
-| test-data-generation | Test data strategies using Faker.js, factories, builders, and database seeding Use when… |
+| pixel-perfect | Visual regression testing — pixel-by-pixel screenshot comparison against a baseline, free and… |
+| test-data-generation | Test data strategies using Faker.js, factories, builders, and database seeding. |
 | visual-regression-tester | Visual Regression Tester: screenshot comparison, diff detection, and CI integration using… |
 
 ### Security (3)
@@ -124,26 +124,25 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | Skill | Description |
 |-------|-------------|
 | config-scan | Config scan: detect security misconfigurations in config files, Docker, and IaC. |
-| secrets-scan | Secrets scan: detect API keys, passwords, tokens, and other secrets in code. |
-| security-scan | Security scan: scan code for security vulnerabilities including OWASP Top 10, secrets, and… |
+| secrets-scan | Secrets scan: detect hardcoded API keys, passwords, tokens, private keys, and connection… |
+| security-scan | Security scan: one comprehensive pass over a whole codebase — OWASP Top 10 detection (access… |
 
 ### UI/UX & Content (6)
 
 | Skill | Description |
 |-------|-------------|
 | ui-ux-pro-max | UI/UX Pro Max design intelligence for web and mobile: searchable local database with styles… |
-| web-design-guidelines | Review UI code for Web Interface Guidelines compliance (Vercel Labs guidelines via WebFetch or… |
-| ui-animation | > Encodes Emil Kowalski's design-engineering philosophy: UI polish, component design, animation… |
+| web-design-guidelines | Review UI code files against the Vercel Labs Web Interface Guidelines, fetched live at runtime… |
+| ui-animation | Encodes Emil Kowalski's design-engineering philosophy: UI polish, component design, animation… |
 | ui-typography | UI Typography: professional typography rules for UI design, web apps, software interfaces, and… |
 | ux-heuristics | Evaluate and improve interface usability using heuristic analysis. |
 | marketing-copywriting | Marketing copywriting: write, rewrite, or improve marketing copy for any page — homepage… |
 
-### Agent Session & Personal Efficiency (11)
+### Agent Session & Personal Efficiency (10)
 
 | Skill | Description |
 |-------|-------------|
-| project-handoff | Generate/update a project engineering handoff document (HANDOFF.md) — reference-style delta… |
-| project-intake | Take over a project as the receiving side — read HANDOFF.md and restore context by its five… |
+| project-handoff | Maintain a project's handoff store (.handoff/, plain text): a multi-dimensional project handoff… |
 | experiment-handoff | Experiment handoff for mid-project experiments and spikes. |
 | decision-log | Record or query architecture decision records (ADR) — Nygard template… |
 | delegated-research | Investigate a question against high-trust primary sources and capture the findings as a… |
@@ -169,6 +168,7 @@ These names were renamed or merged and are no longer published on their own (old
 | `sin-rules` | renamed to `core-rules` |
 | `problem-dive` | merged into `problem-handling` |
 | `problem-resolution-flow` | merged into `problem-handling` |
+| `project-intake` | renamed to `project-handoff` |
 
 ## Directory Layout
 

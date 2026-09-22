@@ -1,6 +1,6 @@
 ---
 name: ddd-subdomains
-description: "Identify business capabilities and classify subdomains (Core/Supporting/Generic), producing core domain declarations and ownership recommendations."
+description: "Identify business capabilities and classify subdomains (Core/Supporting/Generic), producing core-domain declarations, ownership recommendations, and bounded-context boundary candidates. Use when partitioning core/supporting/generic subdomains, or re-partitioning when god-context or circular-dependency signals suggest a subdomain misfire."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Subdomains
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

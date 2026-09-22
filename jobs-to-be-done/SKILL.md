@@ -4,7 +4,7 @@ description: >-
   Uncover customer jobs, pains, and gains in a structured JTBD format. Use when clarifying
   unmet needs, repositioning a product, or improving discovery and messaging.
 slug: jobs-to-be-done
-version: 1.0.0
+version: 1.0.2
 displayName: jobs-to-be-done
 ---
 
@@ -18,7 +18,7 @@ This is not a survey—it's a structured lens for understanding *why* customers 
 ## Input
 
 **Works best with:** The customer segment (or product whose customers) you're analyzing.
-**Also useful:** Interview notes, support tickets, or delegated-research to mine for jobs, pains, and gains; the situation or trigger you care about.
+**Also useful:** Interview notes, support tickets, or research to mine for jobs, pains, and gains; the situation or trigger you care about.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
@@ -80,7 +80,7 @@ Use `template.md` for the full fill-in structure.
 
 ### Step 1: Define the Context
 Before exploring JTBD, clarify:
-- **Target customer segment:** Who are you studying? (reference `skills/proto-persona/SKILL.md`)
+- **Target customer segment:** Who are you studying? (reference [`proto-persona`](../proto-persona/SKILL.md))
 - **Situation:** In what context does the job arise? (e.g., "When managing a project deadline...")
 - **Current solutions:** What do they use today? (competitors, workarounds, doing nothing)
 
@@ -150,7 +150,7 @@ Ask: "What emotional state do you want to achieve or avoid?"
 
 **Quality checks:**
 - **Positive and negative:** Include both what they seek ("feel in control") and what they avoid ("avoid embarrassment")
-- **Rooted in delegated-research:** Don't fabricate emotions—use customer quotes
+- **Rooted in research:** Don't fabricate emotions—use customer quotes
 
 ---
 
@@ -291,7 +291,7 @@ Ask: "How would your life be better if this job were easier?"
 
 - **Rank pains by intensity:** Which pains are acute vs. mild annoyances?
 - **Identify must-have vs. nice-to-have gains:** What would drive adoption vs. what's just a bonus?
-- **Cross-reference with personas:** Do different personas have different jobs/pains/gains? (reference `skills/proto-persona/SKILL.md`)
+- **Cross-reference with personas:** Do different personas have different jobs/pains/gains? (reference [`proto-persona`](../proto-persona/SKILL.md))
 - **Validate with data:** Survey a broader audience to confirm JTBD insights from interviews
 
 ---
@@ -360,9 +360,9 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/proto-persona/SKILL.md` — Defines who has these jobs/pains/gains
-- `skills/problem-statement/SKILL.md` — JTBD informs the "Trying to" and "But" sections
-- `skills/positioning-statement/SKILL.md` — JTBD informs the "that need" statement
+- [`proto-persona`](../proto-persona/SKILL.md) — Defines who has these jobs/pains/gains
+- [`problem-statement`](../problem-statement/SKILL.md) — JTBD informs the "Trying to" and "But" sections
+- [`positioning-statement`](../positioning-statement/SKILL.md) — JTBD informs the "that need" statement
 
 ### External Frameworks
 - Clayton Christensen, *Competing Against Luck* (2016) — Origin of Jobs-to-be-Done theory
@@ -380,5 +380,5 @@ Mini example excerpt:
 **Skill type:** Component
 **Suggested filename:** `jobs-to-be-done.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/proto-persona/SKILL.md`
-**Used by:** `skills/positioning-statement/SKILL.md`, `skills/problem-statement/SKILL.md`, `skills/epic-hypothesis/SKILL.md`
+**Dependencies:** References [`proto-persona`](../proto-persona/SKILL.md)
+**Used by:** [`positioning-statement`](../positioning-statement/SKILL.md), [`problem-statement`](../problem-statement/SKILL.md), epic hypothesis statements

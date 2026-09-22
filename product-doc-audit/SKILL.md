@@ -4,14 +4,20 @@ description: >-
   Product Document Audit: three-layer audit of a product documentation set (0-1
   phase docs): 1) completeness against the 0-1 delivery doc panorama (required/optional),
   2) each doc by type-specific checkpoints and core review dimensions, 3) cross-validate
-  alignment. Produces readiness score (0-100), Critical/Major/Minor grading, authority
-  rulings, deliverability judgment, and PRODUCT-DOC-AUDIT.md without modifying audited
-  docs. Supports final project acceptance (four-layer go/no-go). Use when auditing or
-  cross-validating product docs (PRDs, design docs, specs, domain docs, launch docs) for
-  readiness, grading, contradictions, or go/no-go delivery decisions.
+  alignment, incl. spot-checking prior audit conclusions. Produces readiness score (0-100),
+  Critical/Major/Minor grading, authority rulings, deliverability judgment, and
+  PRODUCT-DOC-AUDIT.md without modifying audited docs. Supports final project acceptance
+  (four-layer go/no-go). USER-INVOKED ONLY — audit skill writing into the audited doc
+  set; never auto-trigger, run only on explicit user request. Use when auditing or
+  cross-validating a product doc set (PRDs, design docs, specs, domain docs, launch docs)
+  for readiness, grading, contradictions, or go/no-go delivery decisions (asks like
+  "is the doc set complete / can we start building"). NOT for: code review,
+  single-document review, or auditing a skill's own SKILL.md — boundaries by task,
+  no skill name implied.
 slug: product-doc-audit
-version: 1.0.0
+version: 1.0.2
 displayName: product-doc-audit
+disable-model-invocation: true
 ---
 
 # 产品文档审计（Product Document Audit）
@@ -19,6 +25,9 @@ displayName: product-doc-audit
 ## 角色
 
 你是产品文档审计员。对**文档集**（0-1 各阶段相互引用的产品文档）做三层审计，产出就绪度结论与可交付判断。**只读被审文档，不修改。**
+
+**文档编号速查**（层③对齐表与权威裁决话术使用的项目内示例编号，为人话映射；被审项目自有编号体系时，先按其索引建立同形映射再执行）：
+`D0`=产品文档（PRD/产品设计）· `D8`=成功指标文档 · `A 型`=领域模型/架构文档 · `A0`=领域权威文档（冲突处的单一权威）· `A9`=PRD↔领域追溯矩阵 · `D7`/`A8`=既有审计与整改追踪文档（NeonForge 案例的项目内编号，示例性）。
 
 ## 何时使用
 
@@ -98,7 +107,7 @@ displayName: product-doc-audit
 
 | 检查点 | 通过标准 |
 |--------|---------|
-| 结构完整 | 按 PRD 骨架：问题→目标→用户→范围→需求→指标→开放问题→时间线（write-spec 模式） |
+| 结构完整 | 按 PRD 骨架：问题→目标→用户→范围→需求→指标→开放问题→时间线（通用 PRD 写法，不依赖特定技能） |
 | 范围明确 | V1 做 / 明确不做 清单齐（防范围蔓延） |
 | 用户故事可测 | As a/want/so that + AC（Given/When/Then），INVEST |
 | 成功指标可量 | 北极星 + leading/lagging + 阈值 + 评估时点；有反指标防做坏 |
@@ -214,7 +223,7 @@ displayName: product-doc-audit
 | 验收层 | 检查 | 工具/方法 |
 |--------|------|----------|
 | ① 定义就绪 | 文档就绪度（本审计层①-③）——Critical/Major 清零 | product-doc-audit |
-| ② 质量就绪 | 全链测试通过（DoD：确定性断言 + 概率性样本/阈值） | ddd-qa-chain |
+| ② 质量就绪 | 全链测试通过（DoD：确定性断言 + 概率性样本/阈值） | 质量验证链（项目自有测试栈：单元/契约/组件/E2E/视觉回归） |
 | ③ 发布就绪 | 缺陷清零 + 测试全过 + 发布条件（上线清单/回滚预案） | release readiness 清单 |
 | ④ AI 就绪（AI 应用） | observability（追踪工具调用/推理）+ evals（回归基准）+ guardrails（输入/输出护栏）+ 明确归属 | AI agent readiness 清单 |
 
@@ -252,7 +261,7 @@ displayName: product-doc-audit
 ## 一、文档全景核查（层①）
 | 文档 | 阶段 | 必需性 | 现状 | 判定 |
 |------|------|--------|------|------|
-| … | … | 必需/可选 | 有/缺 | ✅/⚠️/❌ |
+| … | … | 必需/可选 | 有/缺 | ✓/部分/✗ |
 
 ## 二、逐类独立审计（层②）
 | 文档 | 类型检查点 | 核心审查维度（高维判据） | 速评 |

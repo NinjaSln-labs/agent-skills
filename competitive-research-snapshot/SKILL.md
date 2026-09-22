@@ -5,7 +5,7 @@ description: >-
   implications. Use when a product decision needs competitive grounding, not a market
   report.
 slug: competitive-research-snapshot
-version: 1.0.0
+version: 1.0.3
 displayName: competitive-research-snapshot
 ---
 
@@ -14,7 +14,7 @@ displayName: competitive-research-snapshot
 ## Purpose
 
 Research a company's competitive landscape using a workflow, not a one-shot answer: **search plan →
-competitor selection → just-enough delegated-research → fact/inference labels → real URL citations → next-step
+competitor selection → just-enough research → fact/inference labels → real URL citations → next-step
 options.** The output is a decision-support snapshot, not a market report — and because its schema is
 stable, downstream skills (battle cards, delta monitors) can consume it and diff it. Because it
 proceeds on labeled assumptions when questions go unanswered, it can run as an agent task or on a
@@ -22,7 +22,7 @@ schedule; re-run it and diff against the prior snapshot.
 
 ## Input
 
-**Works best with:** the company, product, or segment to delegated-research, and **the decision this delegated-research
+**Works best with:** the company, product, or segment to research, and **the decision this research
 should support** (positioning, roadmap bet, deal support, board prep) — the decision determines what
 "just enough" means.
 **Also useful:** known competitors (or explicit permission to identify them), and any prior snapshot
@@ -36,7 +36,7 @@ don't re-ask.
 **Arriving empty-handed? That works too.** The skill opens with at most 3 questions (subject,
 decision, competitors) and proceeds on labeled assumptions if they go unanswered.
 
-**Example invocation:** `Competitive delegated-research snapshot on our expense-automation product — decision:
+**Example invocation:** `competitive research snapshot on our expense-automation product — decision:
 which roadmap bet wins Q1. Competitors: [Competitor A], [Competitor B]; find a third if one matters.`
 
 ## Key Concepts
@@ -56,9 +56,9 @@ which roadmap bet wins Q1. Competitors: [Competitor A], [Competitor B]; find a t
   with name, why relevant, source URL, and confidence.
 - **Do-not-invent list (this domain's fabrication risks):** competitors, features, pricing, market
   share, customer wins, roadmap items, product claims.
-- **When NOT to use:** you need market *sizing* → [`tam-sam-som-calculator`](../tam-sam-som-calculator/SKILL.md);
+- **When NOT to use:** you need market *sizing* → run a TAM/SAM/SOM pass;
   you need deep intel on *one* company's strategy and executives →
-  [`company-research`](../company-delegated-research/SKILL.md) / [`company-intel`](../company-intel/SKILL.md);
+  [`company-intel`](../company-intel/SKILL.md);
   the facts are already gathered → go straight to the battle card.
 
 ## Application
@@ -163,16 +163,7 @@ absence-of-evidence.
 - [`market-landscape-scan`](../market-landscape-scan/SKILL.md) (Workflow) — upstream: surfaces which players deserve this snapshot
 - [`competitive-intel-watch`](../competitive-intel-watch/SKILL.md) (Workflow) — downstream: diffs future runs against this baseline
 - [`battle-card-builder`](../battle-card-builder/SKILL.md) (Workflow) — downstream: turns the snapshot into a field-action card
-- [`company-research`](../company-delegated-research/SKILL.md), [`company-intel`](../company-intel/SKILL.md) — single-company deep dives
+- [`company-intel`](../company-intel/SKILL.md) — single-company deep dive
 - Adapted from `market-intelligence/competitive-research-snapshot-prompt.md` in the
   `https://github.com/deanpeters/product-manager-prompts` repo.
-
-## 相关技能说明（2026-08-02）
-
-正文引用的以下技能**不在本技能库**（deanpeters 同库**可选参考**——为保持技能库克制未接入）：
-
-- `tam-sam-som-calculator` —— 需要时按需接入（deanpeters 同库可选参考）
-- `company-research` —— 需要时按需接入（deanpeters 同库可选参考）
-
-**情况说明**：这些引用仅为参考方向（如「可用 X 做市场量化」），**不阻塞本技能独立使用**；实际需要时再按需接入对应技能。
 

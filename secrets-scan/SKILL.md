@@ -1,11 +1,19 @@
 ---
 name: secrets-scan
 description: >-
-  Secrets scan: detect API keys, passwords, tokens, and other secrets in code. Use when
-  you need to find hardcoded credentials and sensitive data in source code.
+  Secrets scan: detect hardcoded API keys, passwords, tokens, private keys, and
+  connection strings in source code, git history, and config files, with
+  high-entropy analysis. Findings are reported redacted (type plus file:line, never
+  full credential values). Use when hunting leaked credentials in a repo, checking
+  whether a secret committed and later removed is still recoverable from history, or
+  wiring a pre-commit / CI secret gate. NOT for: dependency CVEs, config or IaC
+  misconfiguration review, or whole-codebase security audits. USER-INVOKED ONLY:
+  credentials-class skill; remediation such as rotation or history rewriting requires
+  explicit user approval.
 slug: secrets-scan
-version: 1.0.0
+version: 1.0.1
 displayName: secrets-scan
+disable-model-invocation: true
 ---
 
 # Secrets Scan
@@ -185,6 +193,23 @@ Scans commit history for secrets that were committed and later removed.
 
 ## Output Format
 
+### Redaction Rule (MANDATORY)
+
+Raw matched credential values must NEVER appear in scan output, terminal logs,
+saved report files, or chat/issue summaries — leaked credentials are irreversible.
+Every finding MUST be reported in this exact shape:
+
+- **Type + `file:line` + masked value** — identifying where the finding is, never what it is verbatim.
+- **Masked value form:** first 4 characters + `****` + last 4 characters (e.g. `AKIA****MPLE`).
+- **`(redacted)` instead of 4+4** whenever the value is a password, passphrase, short token,
+  or any value where 4+4 characters carry a meaningful share of its entropy.
+- **Connection strings:** mask the password segment entirely (`postgres://user:****@host/db`);
+  never reveal user plus password together unmasked.
+
+This rule admits no convenience exception: reports pasted into issues, chat, or CI logs stay redacted.
+The only permitted verbatim credential-shaped text is a documented public example value
+(e.g. the AWS example key) inside the false-positive/ignore reference lists below — never in scan results.
+
 ### Finding Report
 
 ```
@@ -197,22 +222,22 @@ Entropy Findings: 3
 
 [!] CRITICAL: AWS Access Key
     File: src/config/aws.ts:15
-    Pattern: AKIAIOSFODNN7EXAMPLE
+    Pattern: AKIA****MPLE
     Action: Rotate immediately, check CloudTrail
 
 [!] CRITICAL: GitHub Token
     File: .env.example:8
-    Pattern: ghp_xxxx...xxxx (redacted)
+    Pattern: ghp_****f42k
     Action: Revoke token, remove from history
 
 [H] HIGH: Database Password
     File: docker-compose.yml:23
-    Pattern: password: supersecret
+    Pattern: password: (redacted)
     Action: Use environment variable
 
 [M] MEDIUM: Possible API Key
     File: src/services/api.ts:44
-    Pattern: apiKey = "a1b2c3..."
+    Pattern: apiKey = "a1b2****x7Yz"
     Context: May be test value
 ```
 
@@ -283,6 +308,13 @@ const EXAMPLE_KEY = "AKIAIOSFODNN7EXAMPLE";
 ```
 
 ## Remediation Steps
+
+**Approval gate (MANDATORY):** this skill is user-invoked only. Scanning and
+redacted reporting need no approval, but NO remediation action below may be
+executed without the user's explicit approval for that specific action —
+in particular credential rotation, git history rewriting (`git filter-branch`,
+BFG), and hook/CI installation. Propose the action, state its blast radius, wait
+for approval.
 
 ### When Secrets Are Found
 

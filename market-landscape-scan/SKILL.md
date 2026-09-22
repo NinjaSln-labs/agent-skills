@@ -5,7 +5,7 @@ description: >-
   with cited evidence. Use when entering or re-evaluating a market before sizing,
   positioning, or picking competitors to study.
 slug: market-landscape-scan
-version: 1.0.0
+version: 1.0.1
 displayName: market-landscape-scan
 ---
 
@@ -118,7 +118,7 @@ A copy/paste fill-in version of this schema, with quality checks, lives in [`tem
 ### Final Step (offer exactly 4 options)
 
 1. Run [`competitive-research-snapshot`](../competitive-research-snapshot/SKILL.md) on the deep-dive players
-2. Run [`tam-sam-som-calculator`](../tam-sam-som-calculator/SKILL.md) sizing on the most promising segment
+2. Size the most promising segment with a TAM/SAM/SOM pass
 3. Draft a positioning hypothesis against this landscape ([`positioning-statement`](../positioning-statement/SKILL.md))
 4. Schedule-ready version: what should a quarterly re-scan watch?
 
@@ -169,16 +169,8 @@ completely.
 - [`autonomous-investigation`](../autonomous-investigation/SKILL.md) (Workflow) — the governing protocol
 - [`intelligence-collection-disciplines`](../intelligence-collection-disciplines/SKILL.md) (Component) — discipline sources and signal chains
 - [`competitive-research-snapshot`](../competitive-research-snapshot/SKILL.md) (Workflow) — deep-dive on the players this scan surfaces
-- [`tam-sam-som-calculator`](../tam-sam-som-calculator/SKILL.md) (Component) — sizes the segments this scan maps
+- Market sizing TAM/SAM/SOM (optional companion activity) — sizes the segments this scan maps
 - [`positioning-statement`](../positioning-statement/SKILL.md) (Component) — positions against this landscape
 - Adapted from `market-intelligence/market-landscape-scan-prompt.md` in the
   `https://github.com/deanpeters/product-manager-prompts` repo.
-
-## 相关技能说明（2026-08-02）
-
-正文引用的以下技能**不在本技能库**（deanpeters 同库**可选参考**——为保持技能库克制未接入）：
-
-- `tam-sam-som-calculator` —— 需要时按需接入（deanpeters 同库可选参考）
-
-**情况说明**：这些引用仅为参考方向（如「可用 X 做市场量化」），**不阻塞本技能独立使用**；实际需要时再按需接入对应技能。
 

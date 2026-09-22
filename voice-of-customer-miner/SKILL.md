@@ -5,7 +5,7 @@ description: >-
   switching triggers — with quoted evidence. Use when you want customer voice without
   waiting on interviews.
 slug: voice-of-customer-miner
-version: 1.0.0
+version: 1.0.3
 displayName: voice-of-customer-miner
 ---
 
@@ -56,7 +56,7 @@ onboarding — informs whether our Q1 bet is a migration tool.`
   vivid*. Say which; one articulate ranter is not a theme.
 - **When NOT to use:** no meaningful public footprint (early-stage, niche enterprise) → run
   [`discovery-interview-prep`](../discovery-interview-prep/SKILL.md) instead; you need *your* users'
-  voice on a private area → mine your own tickets and delegated-research; statistical confidence required →
+  voice on a private area → mine your own tickets and research; statistical confidence required →
   this is qualitative theming.
 
 ## Application
@@ -110,7 +110,8 @@ A copy/paste fill-in version of this schema, with quality checks, lives in [`tem
 
 1. Generate discovery interview questions from the top theme ([`discovery-interview-prep`](../discovery-interview-prep/SKILL.md))
 2. Feed the weaknesses into a competitive battle card ([`battle-card-builder`](../battle-card-builder/SKILL.md))
-3. Build an opportunity solution tree from the top hypothesis ([`opportunity-solution-tree`](../opportunity-solution-tree/SKILL.md))
+3. Organize the top unmet needs into an opportunity → solution tree, then hand that tree to
+   downstream opportunity/solution decomposition
 4. Re-run scoped to one theme in Verbose Mode
 
 Accept `1`, `2`, `3`, `4`, `1 and 2`, `Verbose Mode`, or a custom path.
@@ -155,16 +156,8 @@ shows the thin-voice case — what honest mining looks like when the market bare
 - [`intelligence-collection-disciplines`](../intelligence-collection-disciplines/SKILL.md) (Component) — OSINT review-mining sources and bias tradecraft
 - [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) (Component) — the solution-free framing themes should land in
 - [`discovery-interview-prep`](../discovery-interview-prep/SKILL.md) (Interactive) — where the validation happens
-- [`opportunity-solution-tree`](../opportunity-solution-tree/SKILL.md) (Interactive) — structures the opportunity hypotheses
+- Opportunity solution tree (external optional reference, not installed here) — structures the opportunity hypotheses
 - [`battle-card-builder`](../battle-card-builder/SKILL.md) (Workflow) — consumes the weak points
 - Adapted from `market-intelligence/voice-of-customer-miner-prompt.md` in the
   `https://github.com/deanpeters/product-manager-prompts` repo.
-
-## 相关技能说明（2026-08-02）
-
-正文引用的以下技能**不在本技能库**（deanpeters 同库**可选参考**——为保持技能库克制未接入）：
-
-- `opportunity-solution-tree` —— 需要时按需接入（deanpeters 同库可选参考）
-
-**情况说明**：这些引用仅为参考方向（如「可用 X 做市场量化」），**不阻塞本技能独立使用**；实际需要时再按需接入对应技能。
 

@@ -23,7 +23,7 @@ metadata:
     - "交付物#3显式含编舞责任方"
     - "进度清单§3与交付物对齐（编舞责任方）"
 slug: prd-driven-ddd
-version: 4.5.4
+version: 4.5.5
 displayName: prd-driven-ddd
 ---
 
@@ -183,7 +183,7 @@ graph LR
 
 | 用户场景 | 涉及事件/命令 | 对应聚合 | 模型覆盖？ |
 |----------|--------------|----------|-----------|
-| 如「用户下单并支付」 | OrderPlaced / PaymentReceived | 订单聚合 | ✅/❌ |
+| 如「用户下单并支付」 | OrderPlaced / PaymentReceived | 订单聚合 | ✓/✗ |
 
 - **核对方法**：对每个核心用户场景，列出它触发的事件/命令 → 找到承载的聚合 → 检查模型是否覆盖（无遗漏、边界正确）
 - **发现偏差** → 回退到对应建模环节修正（非线性回溯——ForceInjection ddd-model-review 借鉴）

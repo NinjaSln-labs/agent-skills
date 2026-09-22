@@ -5,13 +5,13 @@ description: >-
   Markdown file in the repo. Use when the user wants a topic researched, docs or API facts
   gathered, or reading legwork delegated to a background agent.
 slug: delegated-research
-version: 1.0.0
+version: 1.0.1
 displayName: delegated-research
 ---
 
 # Delegated Research
 
-Spin up a **background agent** to do the delegated-research, so you keep working while it reads.
+Spin up a **background agent** to do the research, so you keep working while it reads.
 
 Its job:
 

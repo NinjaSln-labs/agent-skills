@@ -5,13 +5,13 @@ description: >-
   (default), an in-place branch, or a project copy; records a small experiment doc
   (.experiments/<slug>.md plus a generated index); supports handing off to another agent/session;
   and on close merges the validated change back into the project (full or partial) or discards it,
-  then cleans up the sandbox. Auto-detects VCS and the isolation strategy, records the base revision,
-  and reuses the handoff-lint env fingerprint. This skill is mounted but USER-INVOKED ONLY: the
-  agent must NOT auto-invoke it — the user runs it explicitly as /experiment-handoff. Use when the
-  user explicitly invokes /experiment-handoff to start, hand off, or close an experiment/spike. NOT
-  for: full-project handoff — use project-handoff; reading a full handoff — use project-intake.
+  then cleans up the sandbox. Auto-detects VCS and the isolation strategy, and records the base
+  revision. This skill is mounted but USER-INVOKED ONLY: the agent must NOT auto-invoke it — the
+  user runs it explicitly as /experiment-handoff. Use when the user explicitly invokes
+  /experiment-handoff to start, hand off, or close an experiment/spike. NOT for: the
+  project-wide handoff store or resuming prior work on a project.
 slug: experiment-handoff
-version: 1.0.2
+version: 1.0.4
 displayName: experiment-handoff
 disable-model-invocation: true
 ---
@@ -22,7 +22,7 @@ disable-model-invocation: true
 
 你是**实验性交接**的执行者。项目进行到中途要试功能/跑测试时：**隔离出一个沙箱**（worktree/branch/copy），写一份小实验文档交接给下一个 agent/session，实验有结论后**把验证过的改动合并回主项目或丢弃**，并清理沙箱。
 
-与 `project-handoff`（全项目状态交接）并列：本技能只管**单个实验**的隔离与回收。
+与 `project-handoff`（项目状态交接）并列：本技能只管**单个实验**的隔离与回收，**自足**——不依赖其它技能的脚本或文件。
 
 ## 何时使用（**已挂载 · 仅用户手动 `/experiment-handoff`**）
 
@@ -30,7 +30,7 @@ disable-model-invocation: true
 
 - **触发方式**：用户键入 `/experiment-handoff`（或明确点名该技能）；**仅手动**。
 - 三段手动：① 用户 `/invoke` 本技能 ② 用户手动把会话交给另一个 agent ③ 用户手动宣告实验结束。
-- **其余全自动**：探测 VCS、选隔离策略、建隔离、写文档/索引、记基线、算指纹、合并回主、清理。
+- **其余全自动**：探测 VCS、选隔离策略、建隔离、写文档/索引、记基线、合并回主、清理。
 
 ## 硬约束
 
@@ -65,7 +65,6 @@ worktree **各自独立依赖**（无 `node_modules`）——建后需 install�
 - Method: 方法
 - 隔离: <worktree|branch|copy> · 位置: <path> · 分支: <exp/slug 或 ->
 - 基线: <commit 短 hash 或 copy 快照 hash>
-- 环境指纹: 复用 .handoff/fp.sha（清单 .handoff/fp.txt）
 - Run: 命令
 - 结论: <反馈——合并依据>
 - Next Steps:
@@ -81,17 +80,17 @@ worktree **各自独立依赖**（无 `node_modules`）——建后需 install�
 【手动触发 1】开
 - [ ] 1. 探测：git 仓？worktree 可用？主树干净？（无 git → copy）
 - [ ] 2. 选隔离策略（见上表），建沙箱（worktree/branch/copy）
-- [ ] 3. 写 .experiments/<slug>.md（基线 + 指纹）+ 生成索引
+- [ ] 3. 写 .experiments/<slug>.md（含基线）+ 生成索引
 - [ ] 4. （worktree）cd 沙箱 && install 依赖
 
 【手动触发 2】续 / 交办
-- [ ] 5. 读文档 → `handoff-lint.sh fp check` 判环境是否变（一致→跳过复验；不一致→只复验变化维度）
+- [ ] 5. 读文档 → 若文档里的基线 commit 已前进，先确认是否需要重取基线 / 重新隔离
 - [ ] 6. 进沙箱继续实验，Evidence 追加
 
 【手动触发 3】收
 - [ ] 7. 填 结论/反馈 → 定合并计划（全量/部分/丢弃）
 - [ ] 8. 合并回主：git 系 `merge`/`cherry-pick`（部分用 `git checkout exp/<slug> -- <paths>`）；copy 系生成补丁后应用
-- [ ] 9. 合并后：跑测试 + `fp check` → 主项目 HANDOFF §2 留一行引用（不复制）
+- [ ] 9. 合并后：跑测试 → 按项目交接约定留一行引用（`project-handoff`；不复制）
 - [ ] 10. 清理沙箱 + 归档文档（状态 promoted/discarded）
 ```
 
@@ -104,7 +103,7 @@ worktree **各自独立依赖**（无 `node_modules`）——建后需 install�
 
 - **粒度**：全量 / 部分（只带验证过的文件）/ 丢弃——由 `结论` 决定。
 - **回滚**：合并前基线的 hash 是回滚锚点（`git reset --hard <base>` / `git revert`）；copy 系原副本仍在，可重来。
-- **落痕**：成功后主项目 `project-handoff` §2 快照留一行 **引用**（commit/补丁路径），不复制内容。
+- **落痕**：成功后按项目交接约定留一行 **引用**（commit/补丁路径；`project-handoff` 维护），不复制内容。
 
 ## 防膨胀
 
@@ -140,14 +139,15 @@ experiment.ps1 list  [write]
 - 收束不清理沙箱/分支（残留膨胀）
 - 实验文档写成大百科（超预算、不归档）
 - agent **自主调用**本技能（应等用户 `/experiment-handoff`）
+- **依赖其它技能的脚本/文件**（本技能须自足）
 
 ## 完成标准
 
 - [ ] 沙箱已建且主树未被污染（worktree/branch/copy 其一）
 - [ ] 由用户 `/experiment-handoff` 显式触发（非 agent 自主调用）
-- [ ] `.experiments/<slug>.md` 存在（含 Goal/Method/基线/指纹/结论/合并计划/合并结果/清理）
+- [ ] `.experiments/<slug>.md` 存在（含 Goal/Method/基线/结论/合并计划/合并结果/清理）
 - [ ] 索引 `.experiments/EXPERIMENTS.md` 已生成
-- [ ] 收束：按结论合并或丢弃；合并后有验证 + 主项目 HANDOFF §2 引用一行
+- [ ] 收束：按结论合并或丢弃；合并后有验证 + 按项目交接约定引用一行
 - [ ] 沙箱/分支已清理；文档已迁 `archive/`
 - [ ] 无敏感信息
 

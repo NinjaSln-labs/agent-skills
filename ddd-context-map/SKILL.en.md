@@ -1,6 +1,6 @@
 ---
 name: ddd-context-map
-description: "Map inter-context relationships and integration strategies: pattern selection, contract ownership, failure modes, and versioning strategy."
+description: "Map relationships and integration strategies between bounded contexts: pattern selection, contract ownership, failure modes, and versioning strategy. Use when mapping bounded-context relationships, integration patterns, or contract ownership."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Context Map
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

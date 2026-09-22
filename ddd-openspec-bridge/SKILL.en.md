@@ -1,6 +1,6 @@
 ---
 name: ddd-openspec-bridge
-description: "Map DDD tactical modeling artifacts to OpenSpec structured specifications, enabling smooth transition from domain modeling to engineering implementation."
+description: "Map DDD tactical modeling artifacts into OpenSpec structured specifications for a smooth handoff from domain modeling to engineering implementation. Use when bridging domain modeling outputs to OpenSpec specs."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-11"
 
 # DDD OpenSpec Bridge
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

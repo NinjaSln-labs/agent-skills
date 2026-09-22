@@ -6,13 +6,13 @@ source: self
 tags: "[ddd, implementation, openspec, sdd]"
 date_added: "2026-05-11"
 slug: ddd-openspec-bridge
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-openspec-bridge
 ---
 
 # DDD OpenSpec Bridge
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

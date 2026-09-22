@@ -7,11 +7,10 @@ description: >-
   visual regression), each with a gate, plus a run-all delivery gate and a DoD quality
   gate (deterministic assertions + probabilistic sample/threshold for model-driven
   behavior). Use when delivering or verifying a feature, before claiming work complete,
-  or when asked to run full self-tests / quality checks. NOT for: stage-level DoD
-  aggregation (use stage-gate) or single-shot verification (use
-  verification-before-completion).
+  or when asked to run full self-tests / quality checks. NOT for: aggregating DoD across
+  a delivery stage, or verifying one completion claim in isolation.
 slug: ddd-qa-chain
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-qa-chain
 ---
 

@@ -4,7 +4,7 @@ description: >-
   Research and draft a competitive battle card from public evidence — every claim labeled
   and sourced. Use when a rep needs a field-action card, not a research report.
 slug: battle-card-builder
-version: 1.0.0
+version: 1.0.1
 displayName: battle-card-builder
 ---
 
@@ -14,7 +14,7 @@ displayName: battle-card-builder
 
 Build a field-action competitive battle card from public evidence: **use or gather evidence → search
 plan (if gathering) → draft card with per-claim labels → appendix → next-step options.** A battle
-card is the artifact a rep opens mid-deal, not a delegated-research report — it must fit thirty seconds, every
+card is the artifact a rep opens mid-deal, not a research report — it must fit thirty seconds, every
 claim must survive being said out loud to a hostile audience, and every claim therefore carries a
 source URL, a date, and a Fact/Inference/Assumption label. Most battle cards in the wild are unlabeled
 inference; this skill exists because of what it costs a rep when one of those turns out wrong.

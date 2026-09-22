@@ -4,7 +4,7 @@ description: >-
   Facilitate workshop sessions in a one-step, multi-turn flow. Use when an interactive
   skill needs consistent pacing, options, and progress tracking.
 slug: workshop-facilitation
-version: 1.0.0
+version: 1.0.1
 displayName: workshop-facilitation
 ---
 
@@ -22,7 +22,7 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 
 **Arriving empty-handed? That works too.** When another skill references this protocol, that skill's Input section governs what to provide.
 
-**Example invocation:** `Facilitate a 45-minute retro on our failed beta product-launch using this protocol.`
+**Example invocation:** `Facilitate a 45-minute retro on our failed beta product launch using this protocol.`
 
 ## Key Concepts
 - **One-step-at-a-time:** Ask a single targeted question per turn.

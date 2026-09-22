@@ -8,10 +8,9 @@ description: >-
   'go-to-market,' 'beta launch,' 'early access,' 'waitlist,' 'product update,' 'how do I
   launch this,' 'launch checklist,' 'GTM plan,' or 'we're about to ship.' Use this
   whenever someone is preparing to release something publicly. For ongoing marketing after
-  launch, see marketing-ideas. For the offer being launched (bonuses, guarantees,
-  scarcity, naming), see offers.
+  launch, turn the launch outputs into fresh channel and content ideas to keep promoting.
 slug: product-launch
-version: 1.0.0
+version: 1.0.4
 displayName: product-launch
 ---
 
@@ -28,9 +27,9 @@ If `.agents/product-marketing.md` exists (or `.claude/product-marketing.md`, or 
 
 ## Core Philosophy
 
-The best companies don't just product-launch once—they product-launch again and again. Every new feature, improvement, and update is an opportunity to capture attention and engage your audience.
+The best companies don't just launch once—they launch again and again. Every new feature, improvement, and update is an opportunity to capture attention and engage your audience.
 
-A strong product-launch isn't about a single moment. It's about:
+A strong launch isn't about a single moment. It's about:
 - Getting your product into users' hands early
 - Learning from real feedback
 - Making a splash at every stage
@@ -40,7 +39,7 @@ A strong product-launch isn't about a single moment. It's about:
 
 ## The ORB Framework
 
-Structure your product-launch marketing across three channel types. Everything should ultimately lead back to owned channels.
+Structure your launch marketing across three channel types. Everything should ultimately lead back to owned channels.
 
 ### Owned Channels
 You own the channel (though not the audience). Direct access without algorithms or platform rules.
@@ -159,14 +158,14 @@ Shift from small-scale testing to controlled expansion.
 **Actions:**
 - Leak product details: screenshots, feature GIFs, demos
 - Gather quantitative usage data and qualitative feedback
-- Run user delegated-research with engaged users (incentivize with credits)
+- Run user research with engaged users (incentivize with credits)
 - Optionally run product/market fit survey to refine messaging
 
 **Expansion options:**
 - Option A: Throttle invites in batches (5-10% at a time)
 - Option B: Invite all users at once under "early access" framing
 
-**Goal:** Validate at scale and prepare for full product-launch.
+**Goal:** Validate at scale and prepare for full launch.
 
 ### Phase 5: Full Launch
 Open the floodgates.
@@ -179,7 +178,7 @@ Open the floodgates.
 **Launch touchpoints:**
 - Customer emails
 - In-app popups and product tours
-- Website banner linking to product-launch assets
+- Website banner linking to launch assets
 - "New" sticker in dashboard navigation
 - Blog post announcement
 - Social posts across platforms
@@ -205,21 +204,21 @@ Product Hunt can be powerful for reaching early adopters, but it's not magic—i
 
 ### How to Launch Successfully
 
-**Before product-launch day:**
+**Before launch day:**
 1. Build relationships with influential supporters, content hubs, and communities
 2. Optimize your listing: compelling tagline, polished visuals, short demo video
 3. Study successful launches to identify what worked
 4. Engage in relevant communities—provide value before pitching
 5. Prepare your team for all-day engagement
 
-**On product-launch day:**
+**On launch day:**
 1. Treat it as an all-day event
 2. Respond to every comment in real-time
 3. Answer questions and spark discussions
 4. Encourage your existing audience to engage
 5. Direct traffic back to your site to capture signups
 
-**After product-launch day:**
+**After launch day:**
 1. Follow up with everyone who engaged
 2. Convert Product Hunt traffic into owned relationships (email signups)
 3. Continue momentum with post-launch content
@@ -227,16 +226,16 @@ Product Hunt can be powerful for reaching early adopters, but it's not magic—i
 ### Case Studies
 
 **SavvyCal** (Scheduling tool):
-- Optimized landing page and onboarding before product-launch
+- Optimized landing page and onboarding before launch
 - Built relationships with productivity/SaaS influencers in advance
-- Responded to every comment on product-launch day
+- Responded to every comment on launch day
 - Result: #2 Product of the Month
 
 **Reform** (Form builder):
 - Studied successful launches and applied insights
 - Crafted clear tagline, polished visuals, demo video
-- Engaged in communities before product-launch (provided value first)
-- Treated product-launch as all-day engagement event
+- Engaged in communities before launch (provided value first)
+- Treated launch as all-day engagement event
 - Directed traffic to capture signups
 - Result: #1 Product of the Day
 
@@ -244,14 +243,14 @@ Product Hunt can be powerful for reaching early adopters, but it's not magic—i
 
 ## Post-Launch Product Marketing
 
-Your product-launch isn't over when the announcement goes live. Now comes adoption and retention work.
+Your launch isn't over when the announcement goes live. Now comes adoption and retention work.
 
 ### Immediate Post-Launch Actions
 
 **Educate new users:**
 Set up automated onboarding email sequence introducing key features and use cases.
 
-**Reinforce the product-launch:**
+**Reinforce the launch:**
 Include announcement in your weekly/biweekly/monthly roundup email to catch people who missed it.
 
 **Differentiate against competitors:**
@@ -264,13 +263,13 @@ Add dedicated sections about the new feature/product across your site.
 Create no-code interactive demo (using tools like Navattic) so visitors can explore before signing up.
 
 ### Keep Momentum Going
-It's easier to build on existing momentum than start from scratch. Every touchpoint reinforces the product-launch.
+It's easier to build on existing momentum than start from scratch. Every touchpoint reinforces the launch.
 
 ---
 
 ## Ongoing Launch Strategy
 
-Don't rely on a single product-launch event. Regular updates and feature rollouts sustain engagement.
+Don't rely on a single launch event. Regular updates and feature rollouts sustain engagement.
 
 ### How to Prioritize What to Announce
 
@@ -338,7 +337,7 @@ Even small changelog updates remind customers your product is evolving. This bui
 - [ ] Comparison pages published
 - [ ] Interactive demo created
 - [ ] Gather and act on feedback
-- [ ] Plan next product-launch moment
+- [ ] Plan next launch moment
 
 ---
 
@@ -347,7 +346,7 @@ Even small changelog updates remind customers your product is evolving. This bui
 1. What are you launching? (New product, major feature, minor update)
 2. What's your current audience size and engagement?
 3. What owned channels do you have? (Email list size, blog traffic, community)
-4. What's your timeline for product-launch?
+4. What's your timeline for launch?
 5. Have you launched before? What worked/didn't work?
 6. Are you considering Product Hunt? What's your preparation status?
 
@@ -355,9 +354,9 @@ Even small changelog updates remind customers your product is evolving. This bui
 
 ## Related Skills
 
-- **marketing-ideas**: For additional product-launch tactics (#22 Product Hunt, #23 Early Access Referrals)
-- **emails**: For product-launch and onboarding email sequences
-- **cro**: For optimizing product-launch landing pages
+- **Launch tactic ideation**: For additional launch tactics (more Product Hunt angles, early-access referral loops)
+- **emails**: For launch and onboarding email sequences
+- **cro**: For optimizing launch landing pages
 - **marketing-psychology**: For psychology behind waitlists and exclusivity
 - **programmatic-seo**: For comparison pages mentioned in post-launch
-- **sales-enablement**: For product-launch sales collateral and enablement materials
+- **sales-enablement**: For launch sales collateral and enablement materials

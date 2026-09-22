@@ -1,13 +1,13 @@
 ---
 name: ui-animation
 description: >-
-  > Encodes Emil Kowalski's design-engineering philosophy: UI polish, component design,
+  Encodes Emil Kowalski's design-engineering philosophy: UI polish, component design,
   animation decisions, and the invisible details that make software feel great. Use when
   building or reviewing interfaces, improving UI polish, auditing animation
   timing/easing/motion, checking animation accessibility (prefers-reduced-motion), or
   making components feel responsive and deliberate.
 slug: ui-animation
-version: 1.0.0
+version: 1.0.3
 displayName: ui-animation
 ---
 
@@ -69,32 +69,32 @@ Correct format: A single markdown table with | Before | After | Why | columns, o
 
 ## The Animation Decision Framework
 
-Before writing any ui-animation code, answer these questions in order:
+Before writing any animation code, answer these questions in order:
 
 ### 1. Should this animate at all?
 
-**Ask:** How often will users see this ui-animation?
+**Ask:** How often will users see this animation?
 
 | Frequency                                                   | Decision                     |
 | ----------------------------------------------------------- | ---------------------------- |
-| 100+ times/day (keyboard shortcuts, command palette toggle) | No ui-animation. Ever.          |
+| 100+ times/day (keyboard shortcuts, command palette toggle) | No animation. Ever.          |
 | Tens of times/day (hover effects, list navigation)          | Remove or drastically reduce |
-| Occasional (modals, drawers, toasts)                        | Standard ui-animation           |
+| Occasional (modals, drawers, toasts)                        | Standard animation           |
 | Rare/first-time (onboarding, feedback forms, celebrations)  | Can add delight              |
 
 **Never animate keyboard-initiated actions.** These actions are repeated hundreds of times daily. Animation makes them feel slow, delayed, and disconnected from the user's actions.
 
-Raycast has no open/close ui-animation. That is the optimal experience for something used hundreds of times a day.
+Raycast has no open/close animation. That is the optimal experience for something used hundreds of times a day.
 
 ### 2. What is the purpose?
 
-Every ui-animation must have a clear answer to "why does this animate?"
+Every animation must have a clear answer to "why does this animate?"
 
 Valid purposes:
 
 - **Spatial consistency**: toast enters and exits from the same direction, making swipe-to-dismiss feel intuitive
 - **State indication**: a morphing feedback button shows the state change
-- **Explanation**: a marketing ui-animation that shows how a feature works
+- **Explanation**: a marketing animation that shows how a feature works
 - **Feedback**: a button scales down on press, confirming the interface heard the user
 - **Preventing jarring changes**: elements appearing or disappearing without transition feel broken
 
@@ -144,11 +144,11 @@ Is the element entering or exiting?
 
 ### Perceived performance
 
-Speed in ui-animation is not just about feeling snappy — it directly affects how users perceive your app's performance:
+Speed in animation is not just about feeling snappy — it directly affects how users perceive your app's performance:
 
 - A **fast-spinning spinner** makes loading feel faster (same load time, different perception)
-- A **180ms select** ui-animation feels more responsive than a **400ms** one
-- **Instant tooltips** after the first one is open (skip delay + skip ui-animation) make the whole toolbar feel faster
+- A **180ms select** animation feels more responsive than a **400ms** one
+- **Instant tooltips** after the first one is open (skip delay + skip animation) make the whole toolbar feel faster
 
 The perception of speed matters as much as actual speed. Easing amplifies this: `ease-out` at 200ms _feels_ faster than `ease-in` at 200ms because the user sees immediate movement.
 
@@ -180,7 +180,7 @@ const springRotation = useSpring(mouseX * 0.1, {
 });
 ```
 
-This works because the ui-animation is **decorative** — it doesn't serve a function. If this were a functional graph in a banking app, no ui-animation would be better. Know when decoration helps and when it hinders.
+This works because the animation is **decorative** — it doesn't serve a function. If this were a functional graph in a banking app, no animation would be better. Know when decoration helps and when it hinders.
 
 ### Spring configuration
 
@@ -200,7 +200,7 @@ Keep bounce subtle (0.1-0.3) when used. Avoid bounce in most UI contexts. Use it
 
 ### Interruptibility advantage
 
-Springs maintain velocity when interrupted — CSS animations and keyframes restart from zero. This makes springs ideal for gestures users might change mid-motion. When you click an expanded item and quickly press Escape, a spring-based ui-animation smoothly reverses from its current position.
+Springs maintain velocity when interrupted — CSS animations and keyframes restart from zero. This makes springs ideal for gestures users might change mid-motion. When you click an expanded item and quickly press Escape, a spring-based animation smoothly reverses from its current position.
 
 ## Component Building Principles
 
@@ -254,7 +254,7 @@ Whether the user notices the difference individually does not matter. In the agg
 
 ### Tooltips: skip delay on subsequent hovers
 
-Tooltips should delay before appearing to prevent accidental activation. But once one tooltip is open, hovering over adjacent tooltips should open them instantly with no ui-animation. This feels faster without defeating the purpose of the initial delay.
+Tooltips should delay before appearing to prevent accidental activation. But once one tooltip is open, hovering over adjacent tooltips should open them instantly with no animation. This feels faster without defeating the purpose of the initial delay.
 
 ```css
 .tooltip {
@@ -268,7 +268,7 @@ Tooltips should delay before appearing to prevent accidental activation. But onc
   transform: scale(0.97);
 }
 
-/* Skip ui-animation on subsequent tooltips */
+/* Skip animation on subsequent tooltips */
 .tooltip[data-instant] {
   transition-duration: 0ms;
 }
@@ -400,7 +400,7 @@ Every element has an anchor point from which transforms execute. The default is 
 
 ## clip-path for Animation
 
-`clip-path` is not just for shapes. It is one of the most powerful ui-animation tools in CSS.
+`clip-path` is not just for shapes. It is one of the most powerful animation tools in CSS.
 
 ### The inset shape
 
@@ -512,7 +512,7 @@ Framer Motion's shorthand properties (`x`, `y`, `scale`) are NOT hardware-accele
 <motion.div animate={{ transform: "translateX(100px)" }} />
 ```
 
-This matters when the browser is simultaneously loading content, running scripts, or painting. At Vercel, the dashboard tab ui-animation used Shared Layout Animations and dropped frames during page loads. Switching to CSS animations (off main thread) fixed it.
+This matters when the browser is simultaneously loading content, running scripts, or painting. At Vercel, the dashboard tab animation used Shared Layout Animations and dropped frames during page loads. Switching to CSS animations (off main thread) fixed it.
 
 ### CSS animations beat JS under load
 
@@ -539,7 +539,7 @@ Animations can cause motion sickness. Reduced motion means fewer and gentler ani
 ```css
 @media (prefers-reduced-motion: reduce) {
   .element {
-    ui-animation: fade 0.2s ease;
+    animation: fade 0.2s ease;
     /* No transform-based motion */
   }
 }
@@ -564,7 +564,7 @@ Touch devices trigger hover on tap, causing false positives. Gate hover animatio
 
 ## The Sonner Principles (Building Loved Components)
 
-These principles come from building Sonner (13M+ weekly npm downloads) and apply to any component:
+These principles come from building Sonner (one of the most widely used React toast libraries; defer to the npm registry for current download figures) and apply to any component:
 
 1. **Developer experience is key.** No hooks, no context, no complex setup. Insert `<Toaster />` once, call `toast()` from anywhere. The less friction to adopt, the more people will use it.
 
@@ -580,13 +580,13 @@ These principles come from building Sonner (13M+ weekly npm downloads) and apply
 
 ### Cohesion matters
 
-Sonner's ui-animation feels satisfying partly because the whole experience is cohesive. The easing and duration fit the vibe of the library. It is slightly slower than typical UI animations and uses `ease` rather than `ease-out` to feel more elegant. The ui-animation style matches the toast design, the page design, the name — everything is in harmony.
+Sonner's animation feels satisfying partly because the whole experience is cohesive. The easing and duration fit the vibe of the library. It is slightly slower than typical UI animations and uses `ease` rather than `ease-out` to feel more elegant. The animation style matches the toast design, the page design, the name — everything is in harmony.
 
-When choosing ui-animation values, consider the personality of the component. A playful component can be bouncier. A professional dashboard should be crisp and fast. Match the motion to the mood.
+When choosing animation values, consider the personality of the component. A playful component can be bouncier. A professional dashboard should be crisp and fast. Match the motion to the mood.
 
 ### The opacity + height combination
 
-When items enter and exit a list (like Family's drawer), the opacity change must work well with the height ui-animation. This is often trial and error. There is no formula — you adjust until it feels right.
+When items enter and exit a list (like Family's drawer), the opacity change must work well with the height animation. This is often trial and error. There is no formula — you adjust until it feels right.
 
 ### Review your work the next day
 
@@ -616,7 +616,7 @@ When multiple elements enter together, stagger their appearance. Each element an
 .item {
   opacity: 0;
   transform: translateY(8px);
-  ui-animation: fadeIn 300ms ease-out forwards;
+  animation: fadeIn 300ms ease-out forwards;
 }
 
 .item:nth-child(1) {
@@ -646,7 +646,7 @@ Keep stagger delays short (30-80ms between items). Long delays make the interfac
 
 ### Slow motion testing
 
-Play animations at reduced speed to spot issues invisible at full speed. Temporarily increase duration to 2-5x normal, or use browser DevTools ui-animation inspector to slow playback.
+Play animations at reduced speed to spot issues invisible at full speed. Temporarily increase duration to 2-5x normal, or use browser DevTools animation inspector to slow playback.
 
 Things to look for in slow motion:
 
@@ -670,12 +670,12 @@ When reviewing UI code, check for:
 | Issue                                      | Fix                                                              |
 | ------------------------------------------ | ---------------------------------------------------------------- |
 | `transition: all`                          | Specify exact properties: `transition: transform 200ms ease-out` |
-| `scale(0)` entry ui-animation                 | Start from `scale(0.95)` with `opacity: 0`                       |
+| `scale(0)` entry animation                 | Start from `scale(0.95)` with `opacity: 0`                       |
 | `ease-in` on UI element                    | Switch to `ease-out` or custom curve                             |
 | `transform-origin: center` on popover      | Set to trigger location or use Base UI's `var(--transform-origin)` (modals are exempt — keep centered) |
-| Animation on keyboard action               | Remove ui-animation entirely                                        |
+| Animation on keyboard action               | Remove animation entirely                                        |
 | Duration > 300ms on UI element             | Reduce to 150-250ms                                              |
-| Hover ui-animation without media query        | Add `@media (hover: hover) and (pointer: fine)`                  |
+| Hover animation without media query        | Add `@media (hover: hover) and (pointer: fine)`                  |
 | Keyframes on rapidly-triggered element     | Use CSS transitions for interruptibility                         |
 | Framer Motion `x`/`y` props under load     | Use `transform: "translateX()"` for hardware acceleration        |
 | Same enter/exit transition speed           | Make exit faster than enter (e.g., enter 2s, exit 200ms)         |

@@ -1,17 +1,31 @@
 ---
 name: security-scan
 description: >-
-  Security scan: scan code for security vulnerabilities including OWASP Top 10, secrets,
-  and misconfigurations, with severity thresholds. Use when you need comprehensive
-  security analysis of a codebase.
+  Security scan: one comprehensive pass over a whole codebase — OWASP Top 10
+  detection (access control, crypto, injection, SSRF, logging), hardcoded
+  secrets, insecure configuration, with severity ranking and remediation
+  guidance. Use when you need a full security review before a release or PR,
+  want to triage which security problems matter most, or ask to "scan this
+  project for security issues". Detection is pattern-based: no SAST data-flow
+  engine or CVE advisory database is bundled, so dependency CVEs and taint
+  paths need external tooling. NOT for: a single-category deep dive (secrets
+  only, config/Docker/IaC only, dependency CVEs only — use the dedicated
+  scanner for that one category) or applying fixes without explicit approval.
+  USER-INVOKED ONLY: run only when the user asks for a security scan; never
+  auto-trigger from any code-writing task.
 slug: security-scan
-version: 1.0.0
+version: 1.0.2
 displayName: security-scan
+disable-model-invocation: true
 ---
 
 # Security Scan
 
 Comprehensive security vulnerability detection for codebases.
+
+**Invocation**: user-invoked only — run when the user explicitly asks for a security scan; never auto-trigger from ordinary coding tasks. Default output is a report; any file change (see `--fix`) requires the user's explicit approval first.
+
+**Detection basis**: this package ships pattern/regex-based detection and code review guidance only — no SAST data-flow engine, no scripted entropy tool, no bundled CVE advisory database. Where a finding would need such tooling, say so in the report and delegate to external tooling only if the user has it and approves.
 
 ## Quick Start
 
@@ -44,10 +58,10 @@ Comprehensive analysis of all security categories.
 **Checks performed:**
 - All OWASP Top 10 categories
 - Secrets and credential detection
-- Dependency vulnerabilities (if package files exist)
+- Dependency manifest review — versions read from the project's own lockfile/manifest; known-CVE matching needs external advisory tooling and is not claimed here
 - Configuration file review
 
-**Duration:** 2-5 minutes depending on codebase size
+**Duration:** scales with codebase size (minutes on typical repos)
 
 ### Quick Scan
 Fast check for critical and high-severity issues only.
@@ -61,7 +75,7 @@ Fast check for critical and high-severity issues only.
 - Exposed secrets
 - Known dangerous functions
 
-**Duration:** Under 1 minute
+**Duration:** a fraction of the full scan; scales with codebase size
 
 ### Focused Scan
 Target specific vulnerability category.
@@ -94,10 +108,18 @@ Target specific vulnerability category.
 ```
 [SEVERITY] CATEGORY: Brief description
   File: path/to/file.ext:line
-  Pattern: What was detected
+  Pattern: Rule name / code shape that matched — never the raw credential value
   Risk: Why this is dangerous
   Fix: How to remediate
 ```
+
+### Credential Masking (mandatory)
+
+Hard constraint (workspace rule: credentials never in plaintext): a real credential value found during a scan must **never** be echoed verbatim into terminal output, the report file, logs, or follow-up context. For any credential hit:
+
+- Show only: provider/type + `file:line` + a masked form — first 4 characters + `...` + last 4 characters (e.g. `AKIA...9f3c`, `sk_l...x20q`) — or a short SHA-256 hash prefix (first 8 hex).
+- Applies to `--details`, `--json`, and any report written to disk; JSON fields carry the masked string plus a `hash_prefix`, never the full value.
+- Examples in this skill (e.g. `sk_test_fake123`) are fabricated placeholders; do not replace them with real values in test output.
 
 ### Summary Report
 
@@ -130,10 +152,10 @@ Run `/security-scan --details` for full report.
 |---|----------|-------------------|
 | A01 | Broken Access Control | Authorization pattern analysis |
 | A02 | Cryptographic Failures | Weak crypto detection |
-| A03 | Injection | Pattern matching + data flow |
+| A03 | Injection | Static pattern matching (source-to-sink reading, no taint engine) |
 | A04 | Insecure Design | Security control gaps |
 | A05 | Security Misconfiguration | Config file analysis |
-| A06 | Vulnerable Components | Dependency scanning |
+| A06 | Vulnerable Components | Manifest staleness review (no advisory database) |
 | A07 | Auth Failures | Auth pattern review |
 | A08 | Data Integrity Failures | Deserialization checks |
 | A09 | Logging Failures | Audit log analysis |
@@ -170,21 +192,16 @@ See `references/patterns/` for language-specific patterns.
 
 ### Secrets Detection
 
-**High-Confidence Patterns:**
-```
-AWS Access Key:     AKIA[0-9A-Z]{16}
-AWS Secret Key:     [A-Za-z0-9/+=]{40}
-GitHub Token:       gh[pousr]_[A-Za-z0-9]{36,}
-Stripe Key:         sk_live_[A-Za-z0-9]{24,}
-Private Key:        -----BEGIN (RSA |EC )?PRIVATE KEY-----
-```
+Provider-specific token formats and generic regexes are **externalized** to
+`references/patterns/secret-formats.md` — a table carrying `lastUpdated`,
+`refreshInterval` (60 days; token formats are medium-stability) and a per-row
+confidence column, because provider prefixes drift over time and hardcoding
+them here would silently rot coverage.
 
-**Medium-Confidence Patterns:**
-```
-Generic API Key:    api[_-]?key.*[=:]\s*['"][a-zA-Z0-9]{16,}
-Password in Code:   password\s*[=:]\s*['"][^'"]+['"]
-Connection String:  (mysql|postgres|mongodb)://[^:]+:[^@]+@
-```
+How to use it:
+1. Load `references/patterns/secret-formats.md` and apply its high-confidence patterns first, then medium-confidence ones.
+2. If a provider you expect is missing from the table, treat that as a coverage gap and state it in the report — do not invent patterns in-scan.
+3. Every hit is reported with masked values only (see Credential Masking).
 
 ### Cryptographic Weaknesses
 
@@ -240,29 +257,29 @@ Infrastructure and configuration review:
 ### Phase 2: Static Analysis
 ```
 1. Pattern matching for known vulnerabilities
-2. Data flow analysis for injection paths
+2. Source-to-sink reading of suspicious call sites (heuristic; no automated data-flow engine ships with this skill)
 3. Configuration review
 ```
 
 ### Phase 3: Secrets Scanning
 ```
-1. High-confidence pattern matching
-2. Entropy analysis for potential secrets
+1. High-confidence pattern matching (formats from references/patterns/secret-formats.md)
+2. Entropy-style heuristics on candidate strings (visual/regex screening; no scripted entropy tool)
 3. Git history check (optional)
 ```
 
 ### Phase 4: Dependency Analysis
 ```
-1. Parse package manifests
-2. Check against vulnerability databases
-3. Identify outdated packages
+1. Read the project's own lockfile/manifest (package-lock.json, Cargo.lock, go.sum, poetry.lock, ...) for pinned versions — never assume versions from memory
+2. Flag stale pins and direct-manifest drift
+3. Known-CVE matching requires external advisory tooling: state the limitation in the report; delegate only if the user has such tooling and approves
 ```
 
 ### Phase 5: Reporting
 ```
 1. Deduplicate findings
 2. Assign severity scores
-3. Generate actionable report
+3. Generate actionable report (credential values masked per Credential Masking)
 4. Provide remediation guidance
 ```
 
@@ -318,6 +335,8 @@ const mockApiKey = "sk_test_fake123";
 
 ## Command Reference
 
+Flags below are conversational conventions the agent interprets — no bundled CLI parser exists in this package.
+
 | Command | Description |
 |---------|-------------|
 | `/security-scan` | Full security scan |
@@ -325,19 +344,20 @@ const mockApiKey = "sk_test_fake123";
 | `/security-scan --scope <path>` | Scan specific path |
 | `/security-scan --focus <cat>` | Single category |
 | `/security-scan --details` | Verbose output |
-| `/security-scan --json` | JSON output |
-| `/security-scan --fix` | Auto-fix where possible |
+| `/security-scan --json` | JSON output (masked credential fields) |
+| `/security-scan --fix` | Propose patches; apply only edits the user explicitly approved (report-first by default) |
 
 ## Related Skills
 
-- `/secrets-scan` - Deep secrets detection
-- `/dependency-scan` - Package vulnerability analysis
-- `/config-scan` - Configuration security review
-- `/review-code` - General code review (includes security)
+- [`secrets-scan`](../secrets-scan/SKILL.md) - Deep secrets detection
+- [`dependency-scan`](../dependency-scan/SKILL.md) - Package vulnerability analysis
+- [`config-scan`](../config-scan/SKILL.md) - Configuration security review
+- [`code-review`](../code-review/SKILL.md) - General code review (includes security)
 
 ## References
 
 - `references/owasp/` - OWASP Top 10 detection details
 - `references/patterns/` - Language-specific vulnerability patterns
+- `references/patterns/secret-formats.md` - Provider credential formats (refresh-managed table: lastUpdated + 60-day interval + confidence)
 - `references/remediation/` - Fix guidance by vulnerability type
 - `assets/severity-matrix.md` - Severity scoring criteria

@@ -4,7 +4,7 @@ description: >-
   Plan a strategic roadmap across prioritization, epic definition, stakeholder alignment,
   and sequencing. Use when turning strategy into a release plan that teams can execute.
 slug: roadmap-planning
-version: 1.0.0
+version: 1.0.1
 displayName: roadmap-planning
 ---
 
@@ -75,8 +75,8 @@ Roadmap planning is the process of:
 - Reframing existing roadmap (shift from feature-driven to outcome-driven)
 
 ### When NOT to Use This
-- For tactical sprint planning (use backlog instead)
-- When strategy is unclear (run product-strategy-session first)
+- For tactical sprint planning or day-to-day backlog grooming (stay at the strategic level here)
+- When strategy is unclear (run a product strategy session first)
 - When stakeholders expect date commitments (address expectations first)
 
 ---
@@ -119,7 +119,7 @@ This workflow orchestrates **5 phases** over **1-2 weeks**, using multiple compo
 
 **2. Review Customer Problems (Discovery Insights)**
 - **Source:** Discovery interviews, support tickets, NPS feedback, churn surveys
-- **Use:** Insights from `skills/discovery-process/SKILL.md` (if recently completed)
+- **Use:** Insights from any recently completed product discovery work, if applicable
 - **Questions:**
   - What are the top 3-5 customer pain points?
   - Which problems affect the most customers?
@@ -158,7 +158,7 @@ This workflow orchestrates **5 phases** over **1-2 weeks**, using multiple compo
 ### Activities
 
 **1. Define Epic Hypotheses**
-- **Use:** `skills/epic-hypothesis/SKILL.md` (component)
+- **Method:** Epic hypothesis writing (see format and examples below)
 - **For each initiative:** Write hypothesis statement
 - **Format:** "We believe that [building X] for [persona] will achieve [outcome] because [assumption]."
 - **Participants:** PM
@@ -218,7 +218,7 @@ Target: 5% → 20%
 ### Activities
 
 **1. Choose Prioritization Framework**
-- **Use:** `skills/prioritization-advisor/SKILL.md` (interactive)
+- **Method:** Facilitated framework selection — match your decision context to a framework (RICE, ICE, Value/Effort, etc.)
 - **Participants:** PM
 - **Duration:** 30 minutes
 - **Output:** Recommended framework (RICE, ICE, Value/Effort, etc.)
@@ -385,12 +385,12 @@ Week 1:
 │  └─ Review stakeholder requests
 │
 ├─ Day 3-4: Define Initiatives (Epics)
-│  ├─ skills/epic-hypothesis/SKILL.md (60 min per epic)
+│  ├─ Write epic hypotheses (60 min per epic)
 │  ├─ Estimate effort (90 min)
 │  └─ Map to business outcomes
 │
 ├─ Day 5: Prioritize Initiatives
-│  ├─ skills/prioritization-advisor/SKILL.md (30 min)
+│  ├─ Choose prioritization framework (30 min)
 │  ├─ Score epics (120 min)
 │  └─ Adjust for strategic fit
 │
@@ -475,36 +475,33 @@ Later: Mobile workflows (DAU lift)
 
 ## References
 
-### Related Skills (Orchestrated by This Workflow)
+### Related Capabilities (Embedded in This Workflow)
+
+This workflow is self-contained; the activities below live inside its phases, not in separate files.
 
 **Phase 2:**
-- `skills/epic-hypothesis/SKILL.md` (component)
+- Epic hypothesis writing (component activity, defined in Phase 2)
 
 **Phase 3:**
-- `skills/prioritization-advisor/SKILL.md` (interactive)
+- Prioritization framework selection (interactive activity, defined in Phase 3)
 
 **Phase 4:**
-- (Dependencies mapped manually, no specific skill)
+- (Dependencies mapped manually, no specific activity)
 
 **Phase 5:**
-- (Presentation created manually, no specific skill)
+- (Presentation created manually, no specific activity)
 
-**Optional/Related:**
-- `skills/product-strategy-session/SKILL.md` (workflow) — Run before roadmap planning to establish strategy
-- `skills/discovery-process/SKILL.md` (workflow) — Provides customer problem inputs for Phase 1
-- `skills/user-story-mapping-workshop/SKILL.md` (interactive) — For complex epics requiring release planning
+**Optional/Related upstream companion activities:**
+- A product strategy session — run before roadmap planning to establish strategy
+- A discovery process — provides customer problem inputs for Phase 1
+- A user story mapping workshop — for complex epics requiring release planning
 
 ### External Frameworks
 - Bruce McCarthy, *Product Roadmaps Relaunched* (2017) — Outcome-driven roadmaps
 - C. Todd Lombardo, *Product Roadmaps Relaunched* (2017) — Now/Next/Later framework
 - Intercom, "RICE Prioritization" (2016) — Prioritization framework
 
-### Dean's Work
-- [If Dean has roadmap planning resources, link here]
-
 ---
 
 **Skill type:** Workflow
-**Suggested filename:** `roadmap-planning.md`
-**Suggested placement:** `/skills/workflows/`
-**Dependencies:** Orchestrates `skills/epic-hypothesis/SKILL.md`, `skills/prioritization-advisor/SKILL.md`, plus manual activities
+**Dependencies:** Self-contained — epic hypothesis writing and prioritization framework selection are embedded in Phases 2–3, plus manual activities

@@ -5,7 +5,7 @@ description: >-
   metrics. Use when diagnosing a broken experience or aligning a team on the full customer
   flow.
 slug: customer-journey-map
-version: 1.0.0
+version: 1.0.3
 displayName: customer-journey-map
 ---
 
@@ -19,7 +19,7 @@ This is not a user flow diagram—it's a strategic artifact that combines custom
 ## Input
 
 **Works best with:** The customer (persona or segment) and the scenario or goal the journey covers.
-**Also useful:** Known stages, touchpoints, pain points, supporting delegated-research, and the business objective behind the map.
+**Also useful:** Known stages, touchpoints, pain points, supporting research, and the business objective behind the map.
 
 Anything supplied with the invocation itself — text after the skill name, a pasted context dump, or an appended `ARGUMENTS:` line — counts as answers already given. Use it and skip whatever it covers; don't re-ask.
 
@@ -81,7 +81,7 @@ Use `template.md` for the full fill-in structure.
 
 Before mapping, ensure you have:
 1. **Key stakeholders:** Marketing, sales, product, customer service representatives
-2. **Buyer personas:** Detailed personas with demographics, psychographics, goals, challenges (reference `skills/proto-persona/SKILL.md`)
+2. **Buyer personas:** Detailed personas with demographics, psychographics, goals, challenges (reference [`proto-persona`](../proto-persona/SKILL.md))
 3. **Defined stages:** Main stages of your buying process (typically: Awareness, Consideration, Decision, Service, Loyalty)
 4. **Touchpoint inventory:** All places customers interact with your brand (website, social, email, store, support, etc.)
 
@@ -138,7 +138,7 @@ What customers do at this stage:
 
 **Quality checks:**
 - **Observable:** You can see or measure this action
-- **Specific:** Not "delegated-research products" but "Google 'best roadmap software' and read comparison articles"
+- **Specific:** Not "research products" but "Google 'best roadmap software' and read comparison articles"
 
 ---
 
@@ -170,7 +170,7 @@ Emotions and thoughts customers have:
 ```
 
 **Quality checks:**
-- **Authentic:** Use customer quotes from delegated-research when possible
+- **Authentic:** Use customer quotes from research when possible
 - **Emotional:** Capture feelings, not just thoughts
 - **Specific:** Not "interested" but "curious but skeptical—worried about setup time"
 
@@ -303,7 +303,7 @@ Mini example excerpt:
 
 **Consequence:** Journey map reflects wishful thinking, not reality.
 
-**Fix:** Validate with customer delegated-research, analytics, and support tickets.
+**Fix:** Validate with customer research, analytics, and support tickets.
 
 ---
 
@@ -328,10 +328,10 @@ Mini example excerpt:
 ## References
 
 ### Related Skills
-- `skills/proto-persona/SKILL.md` — Defines the persona for the journey map
-- `skills/jobs-to-be-done/SKILL.md` — Informs customer actions and goals
-- `skills/problem-statement/SKILL.md` — Identifies pain points at each stage
-- `skills/user-story-mapping/SKILL.md` — Complementary (story mapping focuses on product usage, journey mapping covers all touchpoints)
+- [`proto-persona`](../proto-persona/SKILL.md) — Defines the persona for the journey map
+- [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md) — Informs customer actions and goals
+- [`problem-statement`](../problem-statement/SKILL.md) — Identifies pain points at each stage
+- User story mapping — Complementary (story mapping focuses on product usage, journey mapping covers all touchpoints)
 
 ### External Frameworks
 - NNGroup, *Customer Journey Mapping* (2016) — Foundational framework
@@ -349,4 +349,4 @@ Mini example excerpt:
 **Skill type:** Component
 **Suggested filename:** `customer-journey-map.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/proto-persona/SKILL.md`, `skills/jobs-to-be-done/SKILL.md`, `skills/problem-statement/SKILL.md`
+**Dependencies:** References [`proto-persona`](../proto-persona/SKILL.md), [`jobs-to-be-done`](../jobs-to-be-done/SKILL.md), [`problem-statement`](../problem-statement/SKILL.md)

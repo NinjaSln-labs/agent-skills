@@ -9,13 +9,13 @@ source: self
 tags: "[ddd, validation, review, feedback-loop]"
 date_added: "2026-05-08"
 slug: ddd-model-review
-version: 1.0.0
+version: 1.0.1
 displayName: ddd-model-review
 ---
 
 # DDD Model Review
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

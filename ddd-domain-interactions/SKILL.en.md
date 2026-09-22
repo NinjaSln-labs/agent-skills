@@ -1,6 +1,6 @@
 ---
 name: ddd-domain-interactions
-description: "Design collaboration mechanisms between building blocks: domain events, domain services, repository interfaces, and factories."
+description: "Design collaboration mechanisms between building blocks: domain events, domain services, repository interfaces, and factories. Use when designing domain services, repositories, domain events, or factories."
 lang: en
 risk: safe
 source: self
@@ -10,7 +10,9 @@ date_added: "2026-05-08"
 
 # DDD Domain Interactions
 
-> 🌐 中文版本: [Chinese](SKILL.md)
+> 中文版本: [Chinese](SKILL.md)
+>
+> 描述权威源＝同目录 `SKILL.md`（本件为正文英译，frontmatter 的 description 与主件逐字同步，勿单改）。
 
 ## When to Use
 

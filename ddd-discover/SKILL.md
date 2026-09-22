@@ -1,18 +1,26 @@
 ---
 name: ddd-discover
-description: "Collaborative domain discovery via event storming or domain storytelling, producing event streams, command/event candidates, hotspots, and ambiguity lists. Use when doing domain discovery (identifying events/commands/aggregates)."
+description: >-
+  Collaborative domain discovery via event storming, producing event streams,
+  command/event candidates, hotspots, ambiguity lists, and preliminary
+  context-boundary clues for downstream subdomain classification. Use when doing
+  domain discovery — identifying domain events and commands, aligning core business
+  flows and exception paths, or re-running discovery after bounded-context term
+  conflicts. NOT for: facilitating live EventStorming workshops (formats and
+  facilitation patterns are separate reference material), designing aggregate
+  boundaries, or partitioning/classifying subdomains — deliverables, not facilitation.
 risk: safe
 source: self
-tags: "[ddd, discovery, event-storming, domain-storytelling]"
+tags: "[ddd, discovery, event-storming]"
 date_added: "2026-05-08"
 slug: ddd-discover
-version: 1.0.0
+version: 1.0.2
 displayName: ddd-discover
 ---
 
 # DDD Discover
 
-> 🌐 English version: [English](SKILL.en.md)
+> English version: [English](SKILL.en.md)
 
 ## 使用时机
 

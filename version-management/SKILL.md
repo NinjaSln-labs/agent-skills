@@ -11,10 +11,10 @@ description: >-
   bumping a version number, writing a CHANGELOG or release notes, marking a release, planning a
   deprecation, or checking that version numbers agree across a project — including projects without
   version control.
-  NOT for: git branching / commit / PR flow (use
-  git-workflow), dependency pinning or vulnerability scanning (use dependency-scan).
+  NOT for: git branching / commit / PR flow, or dependency pinning and vulnerability
+  scanning.
 slug: version-management
-version: 1.2.0
+version: 1.2.1
 displayName: version-management
 ---
 
