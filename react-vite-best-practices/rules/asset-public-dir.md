@@ -14,11 +14,11 @@ Vite offers two ways to serve assets: the `public/` directory and JavaScript imp
 ## Incorrect
 
 ```tsx
-// ❌ Bad — importing files that should stay static in public/
+// ✗ Bad — importing files that should stay static in public/
 import robots from '../public/robots.txt?raw'
 import manifest from '../public/manifest.json'
 
-// ❌ Bad — putting everything in public/ to avoid imports
+// ✗ Bad — putting everything in public/ to avoid imports
 function Logo() {
   return <img src="/logo.png" alt="Logo" /> // No hash, no cache busting
 }
@@ -45,7 +45,7 @@ function App() {
 ## Correct
 
 ```tsx
-// ✅ Good — import assets that benefit from hashing and optimization
+// ✓ Good — import assets that benefit from hashing and optimization
 import logo from './assets/logo.png'        // → /assets/logo-a1b2c3d4.png
 import heroBanner from './assets/hero.png'   // → /assets/hero-e5f6g7h8.png
 import ArrowIcon from './assets/arrow.svg?react'
@@ -63,7 +63,7 @@ function App() {
 ```
 
 ```
-# ✅ Good — public/ only for files that MUST keep exact names
+# ✓ Good — public/ only for files that MUST keep exact names
 public/
 ├── favicon.ico          # Browsers look for exact path
 ├── robots.txt           # Crawlers expect /robots.txt
@@ -73,7 +73,7 @@ public/
 ```
 
 ```typescript
-// ✅ Good — reference public/ files by absolute path (no import needed)
+// ✓ Good — reference public/ files by absolute path (no import needed)
 function Head() {
   return (
     <Helmet>
@@ -85,7 +85,7 @@ function Head() {
 ```
 
 ```typescript
-// ✅ Good — dynamic imports for assets based on runtime values
+// ✓ Good — dynamic imports for assets based on runtime values
 function CountryFlag({ code }: { code: string }) {
   // Vite glob import — all matched files are hashed
   const flags = import.meta.glob('./assets/flags/*.svg', {

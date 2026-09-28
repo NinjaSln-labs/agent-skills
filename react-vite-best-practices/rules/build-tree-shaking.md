@@ -14,7 +14,7 @@ Configure your Vite build to effectively eliminate dead code through tree shakin
 ## Incorrect
 
 ```tsx
-// ❌ Bad: Barrel export that prevents tree shaking
+// ✗ Bad: Barrel export that prevents tree shaking
 // utils/index.ts
 export * from './strings';
 export * from './numbers';
@@ -32,7 +32,7 @@ function Component() {
 ```
 
 ```tsx
-// ❌ Bad: Importing entire libraries
+// ✗ Bad: Importing entire libraries
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -45,7 +45,7 @@ function processData(items: Item[]) {
 ```
 
 ```json
-// ❌ Bad: package.json missing sideEffects field
+// ✗ Bad: package.json missing sideEffects field
 {
   "name": "my-app",
   "version": "1.0.0",
@@ -63,7 +63,7 @@ function processData(items: Item[]) {
 ## Correct
 
 ```tsx
-// ✅ Good: Named exports for better tree shaking
+// ✓ Good: Named exports for better tree shaking
 // utils/index.ts
 export { formatString, capitalize, truncate } from './strings';
 export { formatNumber, clamp, round } from './numbers';
@@ -80,7 +80,7 @@ function Component() {
 ```
 
 ```tsx
-// ✅ Good: Import only what you need from tree-shakeable libraries
+// ✓ Good: Import only what you need from tree-shakeable libraries
 import uniqBy from 'lodash-es/uniqBy';
 import { format } from 'date-fns';
 
@@ -93,7 +93,7 @@ function processData(items: Item[]) {
 ```
 
 ```json
-// ✅ Good: package.json with proper sideEffects configuration
+// ✓ Good: package.json with proper sideEffects configuration
 {
   "name": "my-app",
   "version": "1.0.0",
@@ -108,7 +108,7 @@ function processData(items: Item[]) {
 ```
 
 ```tsx
-// ✅ Good: vite.config.ts - Optimize dependencies for tree shaking
+// ✓ Good: vite.config.ts - Optimize dependencies for tree shaking
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 

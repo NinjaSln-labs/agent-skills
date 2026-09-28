@@ -9,12 +9,12 @@ Apply moves in order. Stop when the class passes all detection checks.
 **When**: Multiple setters called together to perform one operation.
 
 ```typescript
-// Before ❌
+// Before ✗
 order.setStatus('CONFIRMED');
 order.setConfirmedAt(new Date());
 order.setConfirmedBy(userId);
 
-// After ✅
+// After ✓
 class Order {
   confirm(confirmedBy: UserId): void {
     if (this.status !== OrderStatus.PENDING) {
@@ -41,7 +41,7 @@ order.confirm(userId);
 **When**: A service method fetches an Aggregate and then does business logic on it.
 
 ```typescript
-// Before ❌ — logic lives in service
+// Before ✗ — logic lives in service
 class DiscountService {
   apply(orderId: string, pct: number): void {
     const order = this.repo.find(orderId);
@@ -52,7 +52,7 @@ class DiscountService {
   }
 }
 
-// After ✅ — logic inside Aggregate
+// After ✓ — logic inside Aggregate
 class Order {
   applyDiscount(discount: Discount): void {
     if (this.discountApplied) throw new Error('Discount already applied.');
@@ -78,14 +78,14 @@ class DiscountService {
 **When**: Primitives carry domain meaning or validation rules.
 
 ```typescript
-// Before ❌
+// Before ✗
 class Order {
   customerId: string;
   totalAmount: number;
   currency: string;
 }
 
-// After ✅
+// After ✓
 class CustomerId {
   constructor(private readonly value: string) {
     if (!value) throw new Error('CustomerId cannot be empty');

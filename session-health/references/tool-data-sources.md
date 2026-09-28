@@ -45,7 +45,7 @@ echo "会话 $LATEST：$TOTAL 条，compacted $COMPACTED（$(( COMPACTED * 100 /
 
 ### 上下文占用快照（sessions-index.json——注意结构为 `.entries[]`）
 
-> ⚠️ 旧版文档误用 `.[0] | {title, activeTokens, tokens}`——该结构已失效（顶层是 `{entries, originalPath, version}`；字段为 `activeTokens`/`usage`/`usagePerModel`，无 `title`/`tokens`）。
+> ⚠ 旧版文档误用 `.[0] | {title, activeTokens, tokens}`——该结构已失效（顶层是 `{entries, originalPath, version}`；字段为 `activeTokens`/`usage`/`usagePerModel`，无 `title`/`tokens`）。
 
 ```bash
 jq -c '.entries[] | {id, activeTokens, createTime, updateTime, status, summary}' \
@@ -119,12 +119,12 @@ sqlite3 -header "$DB" \
 
 | 信号 | 可用性 | 来源 |
 |------|--------|------|
-| 消息数 | ✅（仅 Agent 模式）| agent-transcripts/*.jsonl |
-| 压缩/概要化比例 | ❌ 无标记 | 不可量化 |
-| 上下文占用 | ❌ 无快照 → 估算降级 | 消息数 × 单条均值 / UI 占用条 |
-| 模型 | ⚠️ 多记 `default` | ai-code-tracking.db（需用户确认）|
-| 活跃度/时间跨度 | ✅ | ai_code_hashes.createdAt / 转录 mtime |
-| 会话恢复能力 | ⚠️ 弱（无命令式 resume）| 历史面板 + rules + git |
+| 消息数 | ✓（仅 Agent 模式）| agent-transcripts/*.jsonl |
+| 压缩/概要化比例 | ✗ 无标记 | 不可量化 |
+| 上下文占用 | ✗ 无快照 → 估算降级 | 消息数 × 单条均值 / UI 占用条 |
+| 模型 | ⚠ 多记 `default` | ai-code-tracking.db（需用户确认）|
+| 活跃度/时间跨度 | ✓ | ai_code_hashes.createdAt / 转录 mtime |
+| 会话恢复能力 | ⚠ 弱（无命令式 resume）| 历史面板 + rules + git |
 
 ---
 
@@ -132,13 +132,13 @@ sqlite3 -header "$DB" \
 
 | 信号 | Deep Code | Cursor |
 |------|-----------|--------|
-| 消息数 | ✅ JSONL 行数 | ✅ agent-transcripts（仅 Agent 模式；Chat 模式不可得）|
-| 压缩比例 | ✅ `compacted` 标记 | ❌ 无 → 跳过维度并标注 |
-| 上下文占用 | ✅ `activeTokens` 快照（≤上界）| ❌ 无 → 估算降级 + UI 确认 |
-| 经济（每轮输入费）| ✅ 可算（≤快照上界）| ❌ 无法量化 → 标注 |
-| 模型 | ✅ `usagePerModel` | ⚠️ `ai_code_hashes.model`（常为 default，需确认）|
-| 活跃度/时间跨度 | ✅ `createTime`/`updateTime` | ✅ `ai_code_hashes.createdAt` / 转录 mtime |
-| 恢复能力 | ✅ `/resume` + project-handoff | ⚠️ 历史面板 + rules + git |
+| 消息数 | ✓ JSONL 行数 | ✓ agent-transcripts（仅 Agent 模式；Chat 模式不可得）|
+| 压缩比例 | ✓ `compacted` 标记 | ✗ 无 → 跳过维度并标注 |
+| 上下文占用 | ✓ `activeTokens` 快照（≤上界）| ✗ 无 → 估算降级 + UI 确认 |
+| 经济（每轮输入费）| ✓ 可算（≤快照上界）| ✗ 无法量化 → 标注 |
+| 模型 | ✓ `usagePerModel` | ⚠ `ai_code_hashes.model`（常为 default，需确认）|
+| 活跃度/时间跨度 | ✓ `createTime`/`updateTime` | ✓ `ai_code_hashes.createdAt` / 转录 mtime |
+| 恢复能力 | ✓ `/resume` + project-handoff | ⚠ 历史面板 + rules + git |
 | 模型窗口（分母）| 查 `references/model-contexts.md`（共用）| 同左 |
 
 ---

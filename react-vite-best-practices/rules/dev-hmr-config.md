@@ -14,7 +14,7 @@ Configure Vite's Hot Module Replacement (HMR) for optimal development experience
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No HMR configuration
+// ✗ Bad: No HMR configuration
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -25,7 +25,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ❌ Bad: Module-level mutable state breaks HMR
+// ✗ Bad: Module-level mutable state breaks HMR
 let userCache = {};
 
 export function UserProvider({ children }) {
@@ -55,7 +55,7 @@ export function UserProvider({ children }) {
 ## Correct
 
 ```tsx
-// ✅ Good: Properly configured HMR
+// ✓ Good: Properly configured HMR
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -79,7 +79,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: Docker/WSL optimized HMR
+// ✓ Good: Docker/WSL optimized HMR
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -100,7 +100,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: HMR-compatible state management with Zustand
+// ✓ Good: HMR-compatible state management with Zustand
 import { create } from 'zustand';
 
 interface UserState {
@@ -116,7 +116,7 @@ export const useUserStore = create<UserState>((set) => ({
 ```
 
 ```tsx
-// ✅ Good: Custom HMR handling for special cases
+// ✓ Good: Custom HMR handling for special cases
 import axios from 'axios';
 
 export const apiClient = axios.create({
@@ -141,7 +141,7 @@ apiClient.interceptors.request.use((config) => {
 ```
 
 ```tsx
-// ✅ Good: HMR-compatible context with explicit accept
+// ✓ Good: HMR-compatible context with explicit accept
 import { createContext, useContext, useState, useCallback } from 'react';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);

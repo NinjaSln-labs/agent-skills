@@ -40,7 +40,7 @@ For each class under review:
 
 ### The Coordinator Service
 ```typescript
-// ❌ Logic lives outside the entity
+// ✗ Logic lives outside the entity
 class OrderService {
   confirm(orderId: string): void {
     const order = this.repo.find(orderId);
@@ -55,7 +55,7 @@ class OrderService {
 
 ### The Data Transfer Object Disguised as Entity
 ```typescript
-// ❌ Pure data bag
+// ✗ Pure data bag
 class Product {
   getName(): string { return this.name; }
   setName(v: string) { this.name = v; }
@@ -69,7 +69,7 @@ class Product {
 
 ### Primitive Obsession
 ```typescript
-// ❌ Primitives lose domain meaning and validation
+// ✗ Primitives lose domain meaning and validation
 class Order {
   customerId: string;   // Should be CustomerId VO
   totalAmount: number;  // Should be Money VO

@@ -143,7 +143,7 @@ Commit the `snapshots/` directory to git. All team members use the same baseline
 > **Match the Docker image version to your `@playwright/test` version.**
 > Check available tags: https://mcr.microsoft.com/v2/playwright/tags/list
 >
-> ⚠️ **Never run `--update-snapshots` in CI automatically.**
+> ⚠ **Never run `--update-snapshots` in CI automatically.**
 > Baselines are the source of truth. Silent auto-updates hide regressions.
 > Use the [update-snapshots workflow](../../.github/workflows/update-snapshots.yml)
 > for intentional updates.

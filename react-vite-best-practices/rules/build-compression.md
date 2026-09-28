@@ -14,7 +14,7 @@ Configure build-time compression to serve pre-compressed assets, reducing server
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No compression configured
+// ✗ Bad: No compression configured
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -28,7 +28,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ❌ Bad: Runtime compression adds latency
+// ✗ Bad: Runtime compression adds latency
 import express from 'express';
 import compression from 'compression';
 
@@ -48,7 +48,7 @@ app.use(express.static('dist'));
 ## Correct
 
 ```tsx
-// ✅ Good: Pre-compress assets during build
+// ✓ Good: Pre-compress assets during build
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import viteCompression from 'vite-plugin-compression';
@@ -77,7 +77,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: Advanced compression with maximum quality
+// ✓ Good: Advanced compression with maximum quality
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import viteCompression from 'vite-plugin-compression';
@@ -130,7 +130,7 @@ server {
 ```
 
 ```tsx
-// ✅ Good: Express server with pre-compressed file serving
+// ✓ Good: Express server with pre-compressed file serving
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
 

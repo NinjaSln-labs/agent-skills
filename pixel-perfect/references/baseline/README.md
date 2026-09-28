@@ -49,7 +49,7 @@ npx playwright test --update-snapshots
 npx playwright test tests/visual.spec.ts --update-snapshots
 ```
 
-> **⚠️ Never auto-update in CI.**
+> **⚠ Never auto-update in CI.**
 > If CI automatically updates snapshots on failure, regressions are silently hidden.
 > Use the [update-snapshots workflow](../../.github/workflows/update-snapshots.yml)
 > for intentional updates — it requires a reason and commits with attribution.

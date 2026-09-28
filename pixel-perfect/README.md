@@ -1,4 +1,4 @@
-# 🎯 pixel-perfect (Visual Regression)
+# pixel-perfect (Visual Regression)
 
 > A Claude Code skill for **automated visual regression testing** using Playwright's built-in screenshot comparison engine.
 
@@ -31,7 +31,6 @@ Built on `@playwright/test`'s native `toHaveScreenshot()` — no extra dependenc
 
 ```
 Baseline capture → Code change → Re-run → HTML diff report
-     ✅                 🛠️           ▶️          🔍
 ```
 
 ---
@@ -50,15 +49,15 @@ Claude activates this skill when you say things like:
 
 ## Features
 
-- ✅ Baseline management (capture, update, version in git)
-- ✅ Multi-viewport testing (Desktop / Tablet / Mobile)
-- ✅ HTML report with side-by-side diffs
-- ✅ Dynamic content masking (prices, dates, animations)
-- ✅ Configurable tolerance (`maxDiffPixelRatio`, `threshold`)
-- ✅ Production fixture — handles fonts, CSS/JS animations, lazy images
-- ✅ Cross-platform consistency via Docker (macOS ↔ Linux CI)
-- ✅ GitHub Actions workflows (PR checks + manual snapshot update)
-- ✅ `retries`, `maxFailures`, `updateSnapshots: 'missing'` configured
+- ✓ Baseline management (capture, update, version in git)
+- ✓ Multi-viewport testing (Desktop / Tablet / Mobile)
+- ✓ HTML report with side-by-side diffs
+- ✓ Dynamic content masking (prices, dates, animations)
+- ✓ Configurable tolerance (`maxDiffPixelRatio`, `threshold`)
+- ✓ Production fixture — handles fonts, CSS/JS animations, lazy images
+- ✓ Cross-platform consistency via Docker (macOS ↔ Linux CI)
+- ✓ GitHub Actions workflows (PR checks + manual snapshot update)
+- ✓ `retries`, `maxFailures`, `updateSnapshots: 'missing'` configured
 
 ---
 

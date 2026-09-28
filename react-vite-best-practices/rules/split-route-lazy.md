@@ -14,7 +14,7 @@ Loading all route components upfront delays initial page load. Users download co
 ## Incorrect
 
 ```typescript
-// ❌ Bad: All imports are eager - loaded immediately
+// ✗ Bad: All imports are eager - loaded immediately
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
@@ -46,7 +46,7 @@ function App() {
 ## Correct
 
 ```typescript
-// ✅ Good: Lazy load route components
+// ✓ Good: Lazy load route components
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
@@ -82,7 +82,7 @@ function App() {
 ```
 
 ```typescript
-// ✅ Good: Preload on hover for instant navigation
+// ✓ Good: Preload on hover for instant navigation
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 
 function NavLink() {

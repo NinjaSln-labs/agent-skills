@@ -22,13 +22,13 @@ SaaS competitor ever files.
 
 | Discipline | Running? | Why (which signal chains) | Key sources (free first) |
 |---|---|---|---|
-| OSINT | ✅ light | conference footprint + solutions-page language shifts | trade-show exhibitor lists, their site |
+| OSINT | ✓ light | conference footprint + solutions-page language shifts | trade-show exhibitor lists, their site |
 | FININT | ◻ not yet | private; re-opens on any raise or when partner firms (public) name them in filings | Crunchbase, partner 10-Ks |
-| GEOINT/DEMOINT | ✅ | terrain check: does the target segment exist at the size their move implies? establishment counts by NAICS + employee band | census County Business Patterns |
-| TECHINT | ✅ | API docs diffs (asset-class modeling) + patent classifications drifting from warehouse to general industrial | their docs, patents.google.com |
-| HUMINT | ✅ | domain-hiring chain: controls engineers/channel roles = staffing the bet; absence is also a signal | LinkedIn jobs, careers page |
-| SIGINT | ✅ | new subdomains, early-access forms, solutions-page diffs | crt.sh, Wayback |
-| MASINT | ✅ | the star here: customs component volumes, certification registry progress, facility permits | ImportYeti-class trade data, cert registry, local permit records |
+| GEOINT/DEMOINT | ✓ | terrain check: does the target segment exist at the size their move implies? establishment counts by NAICS + employee band | census County Business Patterns |
+| TECHINT | ✓ | API docs diffs (asset-class modeling) + patent classifications drifting from warehouse to general industrial | their docs, patents.google.com |
+| HUMINT | ✓ | domain-hiring chain: controls engineers/channel roles = staffing the bet; absence is also a signal | LinkedIn jobs, careers page |
+| SIGINT | ✓ | new subdomains, early-access forms, solutions-page diffs | crt.sh, Wayback |
+| MASINT | ✓ | the star here: customs component volumes, certification registry progress, facility permits | ImportYeti-class trade data, cert registry, local permit records |
 
 Six running — more than the SaaS plan's four, justified: a physical-product entry emits on more
 channels, and [DECISION] hinges on *timing*, which the physical channels date best.

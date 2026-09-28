@@ -14,7 +14,7 @@ Use prefetch and preload hints to load code chunks before they are needed, impro
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No prefetching - chunks load only when navigation occurs
+// ✗ Bad: No prefetching - chunks load only when navigation occurs
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 
@@ -53,7 +53,7 @@ function App() {
 ## Correct
 
 ```tsx
-// ✅ Good: Prefetch on hover/focus for instant-feeling navigation
+// ✓ Good: Prefetch on hover/focus for instant-feeling navigation
 import { lazy, Suspense, useCallback } from 'react';
 import { Routes, Route, Link, LinkProps } from 'react-router-dom';
 
@@ -116,7 +116,7 @@ function App() {
 ```
 
 ```tsx
-// ✅ Good: Prefetch based on viewport visibility
+// ✓ Good: Prefetch based on viewport visibility
 import { useEffect, useRef } from 'react';
 
 interface PrefetchOnVisibleProps {
@@ -156,7 +156,7 @@ export function PrefetchOnVisible({
 ```
 
 ```tsx
-// ✅ Good: Prefetch after idle time
+// ✓ Good: Prefetch after idle time
 import { useEffect, useRef } from 'react';
 
 export function usePrefetchAfterIdle(

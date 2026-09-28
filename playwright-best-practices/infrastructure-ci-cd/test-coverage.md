@@ -256,13 +256,13 @@ class CoverageReporter implements Reporter {
 
     // Generate summary
     const summary = this.generateSummary();
-    console.log("\n📊 Coverage Summary:");
+    console.log("\nCoverage Summary:");
     console.log(`   Files: ${summary.totalFiles}`);
     console.log(`   Lines: ${summary.lineCoverage.toFixed(1)}%`);
     console.log(`   Bytes: ${summary.byteCoverage.toFixed(1)}%`);
 
     if (summary.lineCoverage < 80) {
-      console.warn("⚠️  Coverage below 80% threshold!");
+      console.warn("⚠  Coverage below 80% threshold!");
     }
   }
 

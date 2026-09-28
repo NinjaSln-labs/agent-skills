@@ -89,12 +89,12 @@ ls <project>/.cursorrules <project>/.<tool>/rules ~/.<tool>/rules 2>/dev/null
 
 | 信号 | 可用性 | 来源 |
 |------|--------|------|
-| 消息数 | ✅/❌/⚠️ | <来源> |
-| 压缩比例 | ✅/❌ | <来源 / 不可量化> |
-| 上下文占用 | ✅/❌ | <来源 / 估算降级> |
-| 模型 | ✅/⚠️ | <来源> |
-| 活跃度/时间跨度 | ✅/❌ | <来源> |
-| 会话恢复能力 | ✅/⚠️ | <来源> |
+| 消息数 | ✓/✗/⚠ | <来源> |
+| 压缩比例 | ✓/✗ | <来源 / 不可量化> |
+| 上下文占用 | ✓/✗ | <来源 / 估算降级> |
+| 模型 | ✓/⚠ | <来源> |
+| 活跃度/时间跨度 | ✓/✗ | <来源> |
+| 会话恢复能力 | ✓/⚠ | <来源> |
 ````
 
 ---
@@ -118,12 +118,12 @@ ls <project>/.cursorrules <project>/.<tool>/rules ~/.<tool>/rules 2>/dev/null
 1. 存储目录：`~/.cursor/projects/<project>/`（`/` → `-` 命名）
 2. 会话格式：`agent-transcripts/<uuid>/<uuid>.jsonl`（JSONL，`{role, message}` + `{type: turn_ended}`）
 3. 信号探测结果：
-   - 消息数 ✅（仅 Agent 模式有转录；Chat 模式无本地文件）
-   - 压缩标记 ❌（无 `compacted` 类字段）
-   - token/占用 ❌（无快照字段）→ 估算降级
-   - 模型 ⚠️（`ai-code-tracking.db` 的 `ai_code_hashes.model` 多为 `default`，需用户确认实际模型）
-   - 活跃度 ✅（`ai_code_hashes.createdAt` / 转录 mtime）
-   - 恢复 ⚠️（历史面板 + `.cursor/rules`，无命令式 resume）
+   - 消息数 ✓（仅 Agent 模式有转录；Chat 模式无本地文件）
+   - 压缩标记 ✗（无 `compacted` 类字段）
+   - token/占用 ✗（无快照字段）→ 估算降级
+   - 模型 ⚠（`ai-code-tracking.db` 的 `ai_code_hashes.model` 多为 `default`，需用户确认实际模型）
+   - 活跃度 ✓（`ai_code_hashes.createdAt` / 转录 mtime）
+   - 恢复 ⚠（历史面板 + `.cursor/rules`，无命令式 resume）
 4. 按骨架生成适配节，置信度标「中」（结构可能随版本漂移）。
 
 > 该流程同样适用于其他工具（Windsurf / Codex / Claude Code 等）——照步骤探测即可。

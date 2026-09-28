@@ -189,8 +189,8 @@
 | 技能 | 能力 |
 |------|------|
 | skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护 + **pushy 质量（场景/关键词密度）**——自审只出报告）|
-| skill-eval | **skill 行为评估**（3-5 代表任务 × 有/无 skill N≥3 次 → pass-rate 对比表 + 失败案例反哺）|
-| skill-fit | **技能适配管家**（按项目画像对照 `catalog.yaml` 出「建议挂/建议摘/缺口」三清单；只读 v1；**仅用户 `/skill:skill-fit`**）|
+| skill-eval | **skill 动态评估**（行为 pass-rate：3-5 代表任务 × 有/无 skill N≥3 次 → 对比表；触发率 trigger-eval：~20 查询 ×3 跑、阈值 0.5）＋失败案例反哺 |
+| skill-fit | **技能需求管家 v2**（从本仓工件推**需求表**（词条×强度×证据串，条数按仓型档限）→ 覆盖四落点（已承载/库内有未挂/不适配/缺口）＋层级与预算提案；重入只报变化；全程只读；**仅用户 `/skill:skill-fit`**）|
 | product-doc-audit | 产品文档集审计（三层 + 就绪度评分 + 四层 go/no-go 最终验收）|
 
 #### P.2 安全（4）
@@ -216,9 +216,9 @@
 | project-handoff | **项目交接存储**（`.handoff/` 多维交接：status/summary/actions/pitfalls/decisions/commands/scope/exit + 机检 read-back；`next` 指针；JSONL 单源、单一写入口 CLI；机检门禁；P1–P3）|
 | decision-log | **决策日志（ADR）**（Nygard 模板 + proposed/accepted/superseded/rejected 状态机——记录/查询）|
 | experiment-handoff | 实验性交接（worktree/branch/copy 隔离 → 交接 → 反馈驱动合并回主；**已挂载、仅用户 `/invoke`（禁 agent 自主）**）|
-| task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）**（退役：真源保留、链接已摘）**|
+| task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）**（退役：真源保留、链接已摘——2026-09-25 裁定维持退役 t000093）**|
 | workshop-facilitation | 交互工作坊协议（deanpeters 交互技能配对——session 头/单问轮/进度标签）|
-| session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）**（退役：真源保留、链接已摘）**|
+| session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）**（退役：真源保留、链接已摘——2026-09-25 裁定维持退役 t000093）**|
 
 ---
 
@@ -233,7 +233,7 @@
 | ⑤ 上线 | 1 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
 | 贯穿层 | 16 | 审计 4 + 安全 4 + 规则 2 + 协作 6 |
-| **合计** | **88** ✅ | 全部唯一分类（已核对无重复/无遗漏）|
+| **合计** | **88** ✓ | 全部唯一分类（已核对无重复/无遗漏）|
 
 ---
 
@@ -280,7 +280,7 @@
 
 - **新项目启动**：按阶段取技能（①→⑥）——阶段间产物自然传递（研究→PRD→领域模型→tickets→实现→验收）
 - **质量门禁**：交付前跑 ddd-qa-chain 全链 + product-doc-audit（含项目最终验收）；阶段制项目走「阶段门禁链」（7.1：stage-spec → 执行 → stage-gate 跑 DoD + audit-item 核对）
-- **技能审计**：新接入技能 → 审计（description 合规）+ 本图更新（分类/计数/一图同步）
+- **技能审计**：新接入技能 → 审计（description 合规）+ 本图更新（分类/计数/一图同步）+ catalog 供给面标签（`primary` ＋领域标签，或 `generic: true`；漏标由 check-index 硬闸拦，规则 10）
 - **克制原则**：只接高价值技能（多源验证 + 实物克隆）；二级语义引用标注不接入
 
 ---
@@ -334,10 +334,10 @@
 
 | 子类 | 技能 | 关键性 |
 |------|------|--------|
-| 2.3 拆解立项 | to-tickets | ⭐⭐⭐ 需求→任务（垂直切片 ticket）|
-| 4.2 工程协作 | git-workflow | ⭐⭐ 提交一致性 |
-| ⑤ 上线 | product-launch | ⭐⭐⭐ 发布全流程 |
-| P.3 规则 | version-management | ⭐⭐⭐ 版本一致性底线（core-rules 已退役）|
+| 2.3 拆解立项 | to-tickets | ★★★ 需求→任务（垂直切片 ticket）|
+| 4.2 工程协作 | git-workflow | ★★ 提交一致性 |
+| ⑤ 上线 | product-launch | ★★★ 发布全流程 |
+| P.3 规则 | version-management | ★★★ 版本一致性底线（core-rules 已退役）|
 
 **说明**：薄弱子类均为单体高价值（无需扩展——多则冗余）；4.2 可考虑补 pre-commit 钩子类（mattpocock setup-pre-commit——已见未接——低优先）。
 
@@ -374,16 +374,16 @@
 | `positioning-workshop` | 1.0.3 | `prd-development` | 1.0.6 | `prd-driven-ddd` | 4.5.5 |
 | `press-release` | 1.0.3 | `problem-handling` | 1.0.2 |  |  |
 | `problem-statement` | 1.0.3 | `product-doc-audit` | 1.0.2 | `product-launch` | 1.0.4 |
-| `product-marketing` | 1.0.1 | `project-handoff` | 4.0.0 |  |  |
+| `product-marketing` | 1.0.1 | `project-handoff` | 4.2.1 |  |  |
 | `proto-persona` | 1.0.3 | `react-vite-best-practices` | 1.0.2 | `roadmap-planning` | 1.0.1 |
 | `secrets-scan` | 1.0.1 | `security-scan` | 1.0.2 | `session-health` | 1.0.3 |
-| `skill-description-audit` | 1.11.0 | `skill-eval` | 1.0.2 | `stage-gate` | 1.0.2 |
+| `skill-description-audit` | 1.11.0 | `skill-eval` | 1.1.0 | `stage-gate` | 1.0.2 |
 | `stage-spec` | 1.0.6 | `systematic-debugging` | 1.0.3 | `task-loop-progress` | 1.0.1 |
 | `test-data-generation` | 1.0.1 | `to-tickets` | 1.1.0 | `typescript-best-practices` | 1.0.1 |
 | `ui-animation` | 1.0.3 | `ui-typography` | 1.0.1 | `ui-ux-pro-max` | 1.0.4 |
 | `user-research` | 1.0.1 | `ux-heuristics` | 1.0.1 | `verification-before-completion` | 1.0.2 |
 | `visual-regression-tester` | 1.0.4 | `voice-of-customer-miner` | 1.0.3 | `web-design-guidelines` | 1.0.1 |
 | `workshop-facilitation` | 1.0.1 | `write-spec` | 1.0.2 | `writing-plans` | 1.0.2 |
-| `experiment-handoff` | 1.0.4 | `skill-fit` | 1.2.1 | `version-management` | 1.2.1 |
+| `experiment-handoff` | 1.0.4 | `skill-fit` | 2.1.3 | `version-management` | 1.2.1 |
 
 

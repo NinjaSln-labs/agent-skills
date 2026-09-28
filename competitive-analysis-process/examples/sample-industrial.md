@@ -63,10 +63,10 @@ wedge decision) and Meridian deferred to the tripwires. Skips recorded with reas
 
 | Output | Built | Owner / consumer | Fed by steps |
 |---|---|---|---|
-| Battle card: Northfield vs Helix Foresight | ✅ ([artifact](../../battle-card-builder/examples/sample-industrial.md)) | integrator-channel sellers | 2, 3+5 |
-| Threat assessment: Meridian entry, dated + tripwired | ✅ | leadership | 6 |
-| Positioning counter-move: "make the integrator the hero" | ✅ | PMM + partner program | 3+5 |
-| Executive comparison matrix | ✅ (Step 2's matrix) | exec staff | 2 |
+| Battle card: Northfield vs Helix Foresight | ✓ ([artifact](../../battle-card-builder/examples/sample-industrial.md)) | integrator-channel sellers | 2, 3+5 |
+| Threat assessment: Meridian entry, dated + tripwired | ✓ | leadership | 6 |
+| Positioning counter-move: "make the integrator the hero" | ✓ | PMM + partner program | 3+5 |
+| Executive comparison matrix | ✓ (Step 2's matrix) | exec staff | 2 |
 
 **Maintenance cadence installed:** quarterly `competitive-intel-watch`
 ([artifact](../../competitive-intel-watch/examples/sample-industrial.md)) — quarterly, not

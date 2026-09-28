@@ -149,8 +149,8 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | session-health | Session Health: assess the current AI coding tool session — context compaction/condensation… (deprecated) |
 | core-rules | (deprecated) — no longer maintained. |
 | skill-description-audit | Skill Description Audit. |
-| skill-eval | Behaviorally evaluate a skill: define 3-5 representative tasks, run each N>=3 times with and… |
-| skill-fit | Skill fit: a read-only audit that matches a project against the skill catalog. |
+| skill-eval | Behaviorally evaluate a skill in two modes: pass-rate (define 3-5 representative tasks, run… |
+| skill-fit | Skill fit (v2): derives a project's skill needs — tier T0–T4, evidence-backed requirement table… |
 | task-loop-progress | Generate config + adapter for the generic long-task progress loop (scaffold… (deprecated) |
 
 ## Deprecated

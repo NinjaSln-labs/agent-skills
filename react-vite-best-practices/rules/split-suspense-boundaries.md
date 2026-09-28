@@ -14,7 +14,7 @@ Without proper Suspense boundaries, a single lazy component can block the entire
 ## Incorrect
 
 ```typescript
-// ❌ Bad: Single Suspense at root - entire app shows loading state
+// ✗ Bad: Single Suspense at root - entire app shows loading state
 function App() {
   return (
     <Suspense fallback={<FullPageLoader />}>
@@ -36,7 +36,7 @@ function App() {
 ## Correct
 
 ```typescript
-// ✅ Good: Strategic Suspense boundaries per section
+// ✓ Good: Strategic Suspense boundaries per section
 function App() {
   return (
     <div className="app-layout">
@@ -63,7 +63,7 @@ function App() {
 ```
 
 ```typescript
-// ✅ Good: Nested Suspense for complex UIs
+// ✓ Good: Nested Suspense for complex UIs
 function Dashboard() {
   return (
     <div className="dashboard">
@@ -88,7 +88,7 @@ function Dashboard() {
 ```
 
 ```typescript
-// ✅ Good: Error Boundaries with Suspense
+// ✓ Good: Error Boundaries with Suspense
 import { ErrorBoundary } from 'react-error-boundary'
 
 function App() {
@@ -116,7 +116,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 ```
 
 ```typescript
-// ✅ Good: Skeleton components match actual content layout
+// ✓ Good: Skeleton components match actual content layout
 function ContentSkeleton() {
   return (
     <div className="animate-pulse">

@@ -425,14 +425,14 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   build: {
-    // ❌ Bad: Makes debugging production issues impossible
+    // ✗ Bad: Makes debugging production issues impossible
     sourcemap: false,
   },
 });
 ```
 
 ```tsx
-// ❌ Bad: Exposing full source maps in production
+// ✗ Bad: Exposing full source maps in production
 export default defineConfig({
   plugins: [react()],
   build: {
@@ -457,7 +457,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   build: {
-    // ✅ Good: 'hidden' for production, full maps for staging
+    // ✓ Good: 'hidden' for production, full maps for staging
     sourcemap: mode === 'production' ? 'hidden' : true,
     rollupOptions: {
       output: {
@@ -540,7 +540,7 @@ Configure your Vite build to effectively eliminate dead code through tree shakin
 ## Incorrect
 
 ```tsx
-// ❌ Bad: Barrel export that prevents tree shaking
+// ✗ Bad: Barrel export that prevents tree shaking
 // utils/index.ts
 export * from './strings';
 export * from './numbers';
@@ -558,7 +558,7 @@ function Component() {
 ```
 
 ```tsx
-// ❌ Bad: Importing entire libraries
+// ✗ Bad: Importing entire libraries
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -571,7 +571,7 @@ function processData(items: Item[]) {
 ```
 
 ```json
-// ❌ Bad: package.json missing sideEffects field
+// ✗ Bad: package.json missing sideEffects field
 {
   "name": "my-app",
   "version": "1.0.0",
@@ -589,7 +589,7 @@ function processData(items: Item[]) {
 ## Correct
 
 ```tsx
-// ✅ Good: Named exports for better tree shaking
+// ✓ Good: Named exports for better tree shaking
 // utils/index.ts
 export { formatString, capitalize, truncate } from './strings';
 export { formatNumber, clamp, round } from './numbers';
@@ -606,7 +606,7 @@ function Component() {
 ```
 
 ```tsx
-// ✅ Good: Import only what you need from tree-shakeable libraries
+// ✓ Good: Import only what you need from tree-shakeable libraries
 import uniqBy from 'lodash-es/uniqBy';
 import { format } from 'date-fns';
 
@@ -619,7 +619,7 @@ function processData(items: Item[]) {
 ```
 
 ```json
-// ✅ Good: package.json with proper sideEffects configuration
+// ✓ Good: package.json with proper sideEffects configuration
 {
   "name": "my-app",
   "version": "1.0.0",
@@ -634,7 +634,7 @@ function processData(items: Item[]) {
 ```
 
 ```tsx
-// ✅ Good: vite.config.ts - Optimize dependencies for tree shaking
+// ✓ Good: vite.config.ts - Optimize dependencies for tree shaking
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -676,7 +676,7 @@ Configure build-time compression to serve pre-compressed assets, reducing server
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No compression configured
+// ✗ Bad: No compression configured
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -690,7 +690,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ❌ Bad: Runtime compression adds latency
+// ✗ Bad: Runtime compression adds latency
 import express from 'express';
 import compression from 'compression';
 
@@ -710,7 +710,7 @@ app.use(express.static('dist'));
 ## Correct
 
 ```tsx
-// ✅ Good: Pre-compress assets during build
+// ✓ Good: Pre-compress assets during build
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import viteCompression from 'vite-plugin-compression';
@@ -739,7 +739,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: Advanced compression with maximum quality
+// ✓ Good: Advanced compression with maximum quality
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import viteCompression from 'vite-plugin-compression';
@@ -792,7 +792,7 @@ server {
 ```
 
 ```tsx
-// ✅ Good: Express server with pre-compressed file serving
+// ✓ Good: Express server with pre-compressed file serving
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
 
@@ -836,7 +836,7 @@ Configure content-based asset hashing to enable aggressive caching while ensurin
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No hash - files get cached indefinitely
+// ✗ Bad: No hash - files get cached indefinitely
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -855,7 +855,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ❌ Bad: Version-based hashing - all files invalidated on any change
+// ✗ Bad: Version-based hashing - all files invalidated on any change
 output: {
   entryFileNames: `assets/[name].${packageJson.version}.js`,
   chunkFileNames: `assets/[name].${packageJson.version}.js`,
@@ -872,7 +872,7 @@ output: {
 ## Correct
 
 ```tsx
-// ✅ Good: Content-based hashing with organized asset directories
+// ✓ Good: Content-based hashing with organized asset directories
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -905,7 +905,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: Server caching configuration
+// ✓ Good: Server caching configuration
 import express from 'express';
 import path from 'path';
 
@@ -979,7 +979,7 @@ Loading all route components upfront delays initial page load. Users download co
 ## Incorrect
 
 ```typescript
-// ❌ Bad: All imports are eager - loaded immediately
+// ✗ Bad: All imports are eager - loaded immediately
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
@@ -1011,7 +1011,7 @@ function App() {
 ## Correct
 
 ```typescript
-// ✅ Good: Lazy load route components
+// ✓ Good: Lazy load route components
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
@@ -1047,7 +1047,7 @@ function App() {
 ```
 
 ```typescript
-// ✅ Good: Preload on hover for instant navigation
+// ✓ Good: Preload on hover for instant navigation
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 
 function NavLink() {
@@ -1088,7 +1088,7 @@ Without proper Suspense boundaries, a single lazy component can block the entire
 ## Incorrect
 
 ```typescript
-// ❌ Bad: Single Suspense at root - entire app shows loading state
+// ✗ Bad: Single Suspense at root - entire app shows loading state
 function App() {
   return (
     <Suspense fallback={<FullPageLoader />}>
@@ -1110,7 +1110,7 @@ function App() {
 ## Correct
 
 ```typescript
-// ✅ Good: Strategic Suspense boundaries per section
+// ✓ Good: Strategic Suspense boundaries per section
 function App() {
   return (
     <div className="app-layout">
@@ -1137,7 +1137,7 @@ function App() {
 ```
 
 ```typescript
-// ✅ Good: Nested Suspense for complex UIs
+// ✓ Good: Nested Suspense for complex UIs
 function Dashboard() {
   return (
     <div className="dashboard">
@@ -1162,7 +1162,7 @@ function Dashboard() {
 ```
 
 ```typescript
-// ✅ Good: Error Boundaries with Suspense
+// ✓ Good: Error Boundaries with Suspense
 import { ErrorBoundary } from 'react-error-boundary'
 
 function App() {
@@ -1190,7 +1190,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 ```
 
 ```typescript
-// ✅ Good: Skeleton components match actual content layout
+// ✓ Good: Skeleton components match actual content layout
 function ContentSkeleton() {
   return (
     <div className="animate-pulse">
@@ -1223,7 +1223,7 @@ Heavy components like charts, editors, and complex forms should not be loaded un
 ## Incorrect
 
 ```typescript
-// ❌ Bad: All heavy libraries loaded upfront
+// ✗ Bad: All heavy libraries loaded upfront
 import { Chart } from 'chart.js'
 import ReactQuill from 'react-quill'
 import { PDFViewer } from '@react-pdf/renderer'
@@ -1250,7 +1250,7 @@ function Dashboard() {
 ## Correct
 
 ```typescript
-// ✅ Good: Lazy load heavy components
+// ✓ Good: Lazy load heavy components
 import { lazy, Suspense, useState } from 'react'
 
 const Chart = lazy(() => import('./components/Chart'))
@@ -1283,7 +1283,7 @@ function Dashboard() {
 ```
 
 ```typescript
-// ✅ Good: Conditional dynamic import for libraries
+// ✓ Good: Conditional dynamic import for libraries
 async function exportToPDF() {
   const { PDFDocument } = await import('pdf-lib')
   const pdfDoc = await PDFDocument.create()
@@ -1308,7 +1308,7 @@ function ExportButton() {
 ```
 
 ```typescript
-// ✅ Good: Preload on interaction intent
+// ✓ Good: Preload on interaction intent
 const HeavyModal = lazy(() => import('./HeavyModal'))
 
 function ModalTrigger() {
@@ -1339,7 +1339,7 @@ function ModalTrigger() {
 ```
 
 ```typescript
-// ✅ Good: Feature flag based loading
+// ✓ Good: Feature flag based loading
 function App({ user }) {
   const AdminPanel = user.isAdmin
     ? lazy(() => import('./AdminPanel'))
@@ -1388,7 +1388,7 @@ Use React.lazy for component-level code splitting to load non-critical UI compon
 ## Incorrect
 
 ```tsx
-// ❌ Bad: All components imported eagerly
+// ✗ Bad: All components imported eagerly
 import { useState } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -1427,7 +1427,7 @@ function Dashboard() {
 ## Correct
 
 ```tsx
-// ✅ Good: Component-level lazy loading
+// ✓ Good: Component-level lazy loading
 import { lazy, Suspense, useState } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -1484,7 +1484,7 @@ function Dashboard() {
 ```
 
 ```tsx
-// ✅ Good: Lazy component with preloading
+// ✓ Good: Lazy component with preloading
 import { lazy, ComponentType, LazyExoticComponent } from 'react';
 
 interface PreloadableComponent<T extends ComponentType<any>>
@@ -1516,7 +1516,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
 ```
 
 ```tsx
-// ✅ Good: Lazy loading below-the-fold content with Intersection Observer
+// ✓ Good: Lazy loading below-the-fold content with Intersection Observer
 import { lazy, Suspense } from 'react';
 import { useInView } from 'react-intersection-observer';
 
@@ -1576,7 +1576,7 @@ Use prefetch and preload hints to load code chunks before they are needed, impro
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No prefetching - chunks load only when navigation occurs
+// ✗ Bad: No prefetching - chunks load only when navigation occurs
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 
@@ -1615,7 +1615,7 @@ function App() {
 ## Correct
 
 ```tsx
-// ✅ Good: Prefetch on hover/focus for instant-feeling navigation
+// ✓ Good: Prefetch on hover/focus for instant-feeling navigation
 import { lazy, Suspense, useCallback } from 'react';
 import { Routes, Route, Link, LinkProps } from 'react-router-dom';
 
@@ -1678,7 +1678,7 @@ function App() {
 ```
 
 ```tsx
-// ✅ Good: Prefetch based on viewport visibility
+// ✓ Good: Prefetch based on viewport visibility
 import { useEffect, useRef } from 'react';
 
 interface PrefetchOnVisibleProps {
@@ -1718,7 +1718,7 @@ export function PrefetchOnVisible({
 ```
 
 ```tsx
-// ✅ Good: Prefetch after idle time
+// ✓ Good: Prefetch after idle time
 import { useEffect, useRef } from 'react';
 
 export function usePrefetchAfterIdle(
@@ -1783,7 +1783,7 @@ Vite pre-bundles dependencies to convert CommonJS/UMD to ESM and reduce the numb
 ## Incorrect
 
 ```typescript
-// ❌ Bad: No optimizeDeps configuration
+// ✗ Bad: No optimizeDeps configuration
 export default defineConfig({
   // Vite auto-detects but may miss some deps
 })
@@ -1798,7 +1798,7 @@ export default defineConfig({
 ## Correct
 
 ```typescript
-// ✅ Good: Explicitly include dependencies for pre-bundling
+// ✓ Good: Explicitly include dependencies for pre-bundling
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -1825,7 +1825,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Handle CommonJS dependencies
+// ✓ Good: Handle CommonJS dependencies
 export default defineConfig({
   optimizeDeps: {
     include: [
@@ -1843,7 +1843,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Warmup frequently used files (Vite 5+)
+// ✓ Good: Warmup frequently used files (Vite 5+)
 export default defineConfig({
   server: {
     warmup: {
@@ -1890,7 +1890,7 @@ Structure components to take full advantage of React Fast Refresh for instant up
 ## Incorrect
 
 ```tsx
-// ❌ Bad: Named exports can break Fast Refresh in some cases
+// ✗ Bad: Named exports can break Fast Refresh in some cases
 export const App = () => {
   return <div>App</div>;
 };
@@ -1902,7 +1902,7 @@ export const Sidebar = () => <aside>Sidebar</aside>;
 ```
 
 ```tsx
-// ❌ Bad: Module-level side effects break Fast Refresh
+// ✗ Bad: Module-level side effects break Fast Refresh
 import { fetchUser } from './api';
 
 const initialUser = await fetchUser('current');
@@ -1914,7 +1914,7 @@ export default function UserProfile() {
 ```
 
 ```tsx
-// ❌ Bad: Mixing components with non-component exports
+// ✗ Bad: Mixing components with non-component exports
 export default function Counter() {
   const [count, setCount] = useState(0);
   return (
@@ -1929,7 +1929,7 @@ export const formatCount = (n: number) => n.toLocaleString();
 ```
 
 ```tsx
-// ❌ Bad: Anonymous component - Fast Refresh can't identify it
+// ✗ Bad: Anonymous component - Fast Refresh can't identify it
 export default () => {
   return <div>Anonymous</div>;
 };
@@ -1944,7 +1944,7 @@ export default () => {
 ## Correct
 
 ```tsx
-// ✅ Good: Default export for main component, one per file
+// ✓ Good: Default export for main component, one per file
 export default function App() {
   return (
     <div>
@@ -1959,7 +1959,7 @@ export default function App() {
 ```
 
 ```tsx
-// ✅ Good: Separate file for constants
+// ✓ Good: Separate file for constants
 // constants/counter.ts
 export const MAX_COUNT = 100;
 export const MIN_COUNT = 0;
@@ -1988,7 +1988,7 @@ export default function Counter() {
 ```
 
 ```tsx
-// ✅ Good: Proper data fetching with hooks instead of module-level side effects
+// ✓ Good: Proper data fetching with hooks instead of module-level side effects
 import { useQuery } from '@tanstack/react-query';
 import { fetchUser } from '../api/users';
 
@@ -2012,7 +2012,7 @@ export default function UserProfile() {
 ```
 
 ```tsx
-// ✅ Good: Set displayName on HOCs for Fast Refresh and DevTools
+// ✓ Good: Set displayName on HOCs for Fast Refresh and DevTools
 export function withAuth<P extends object>(
   WrappedComponent: ComponentType<P>
 ) {
@@ -2059,7 +2059,7 @@ Configure Vite's Hot Module Replacement (HMR) for optimal development experience
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No HMR configuration
+// ✗ Bad: No HMR configuration
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -2070,7 +2070,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ❌ Bad: Module-level mutable state breaks HMR
+// ✗ Bad: Module-level mutable state breaks HMR
 let userCache = {};
 
 export function UserProvider({ children }) {
@@ -2100,7 +2100,7 @@ export function UserProvider({ children }) {
 ## Correct
 
 ```tsx
-// ✅ Good: Properly configured HMR
+// ✓ Good: Properly configured HMR
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -2124,7 +2124,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: Docker/WSL optimized HMR
+// ✓ Good: Docker/WSL optimized HMR
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -2145,7 +2145,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: HMR-compatible state management with Zustand
+// ✓ Good: HMR-compatible state management with Zustand
 import { create } from 'zustand';
 
 interface UserState {
@@ -2161,7 +2161,7 @@ export const useUserStore = create<UserState>((set) => ({
 ```
 
 ```tsx
-// ✅ Good: Custom HMR handling for special cases
+// ✓ Good: Custom HMR handling for special cases
 import axios from 'axios';
 
 export const apiClient = axios.create({
@@ -2186,7 +2186,7 @@ apiClient.interceptors.request.use((config) => {
 ```
 
 ```tsx
-// ✅ Good: HMR-compatible context with explicit accept
+// ✓ Good: HMR-compatible context with explicit accept
 import { createContext, useContext, useState, useCallback } from 'react';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -2239,7 +2239,7 @@ Unoptimized images are often the largest assets, significantly impacting page lo
 ## Incorrect
 
 ```typescript
-// ❌ Bad: Large images loaded eagerly with no optimization
+// ✗ Bad: Large images loaded eagerly with no optimization
 function Gallery() {
   return (
     <div>
@@ -2262,7 +2262,7 @@ function Gallery() {
 ## Correct
 
 ```typescript
-// ✅ Good: Optimized image loading
+// ✓ Good: Optimized image loading
 function Gallery() {
   return (
     <div>
@@ -2298,7 +2298,7 @@ function Gallery() {
 ```
 
 ```typescript
-// ✅ Good: Responsive images with format fallback
+// ✓ Good: Responsive images with format fallback
 function ResponsiveImage() {
   return (
     <picture>
@@ -2324,7 +2324,7 @@ function ResponsiveImage() {
 ```
 
 ```typescript
-// ✅ Good: Vite image optimization plugin
+// ✓ Good: Vite image optimization plugin
 // vite.config.ts
 import { defineConfig } from 'vite'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
@@ -2341,7 +2341,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Reusable Image component
+// ✓ Good: Reusable Image component
 interface ImageProps {
   src: string
   alt: string
@@ -2375,7 +2375,7 @@ export function Image({
 ```
 
 ```typescript
-// ✅ Good: Inline small images and use URL imports for backgrounds
+// ✓ Good: Inline small images and use URL imports for backgrounds
 // vite.config.ts
 export default defineConfig({
   build: {
@@ -2417,12 +2417,12 @@ SVGs can be used as images or as React components. Using them as components enab
 ## Incorrect
 
 ```typescript
-// ❌ Bad: Using SVG as image - limited styling options
+// ✗ Bad: Using SVG as image - limited styling options
 function Logo() {
   return <img src="/logo.svg" alt="Logo" className="w-8 h-8" />
 }
 
-// ❌ Bad: Inline SVG everywhere - duplicated code
+// ✗ Bad: Inline SVG everywhere - duplicated code
 function Icon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -2445,7 +2445,7 @@ npm install vite-plugin-svgr -D
 ```
 
 ```typescript
-// ✅ Good: vite.config.ts - Configure SVGR plugin
+// ✓ Good: vite.config.ts - Configure SVGR plugin
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
@@ -2472,7 +2472,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Import as React component for full styling control
+// ✓ Good: Import as React component for full styling control
 import Logo from './assets/logo.svg?react'
 import logoUrl from './assets/logo.svg'
 
@@ -2490,7 +2490,7 @@ function Header() {
 ```
 
 ```typescript
-// ✅ Good: TypeScript support
+// ✓ Good: TypeScript support
 // src/vite-env.d.ts
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
@@ -2508,7 +2508,7 @@ declare module '*.svg' {
 ```
 
 ```typescript
-// ✅ Good: Dynamic SVG colors via currentColor
+// ✓ Good: Dynamic SVG colors via currentColor
 import SearchIcon from './assets/search.svg?react'
 
 function SearchButton({ active }: { active: boolean }) {
@@ -2522,7 +2522,7 @@ function SearchButton({ active }: { active: boolean }) {
 ```
 
 ```typescript
-// ✅ Good: Icon component pattern with tree shaking
+// ✓ Good: Icon component pattern with tree shaking
 import type { SVGProps, FunctionComponent } from 'react'
 
 import HomeIcon from '@/assets/icons/home.svg?react'
@@ -2579,7 +2579,7 @@ Render-blocking external font requests add network round trips and cause layout 
 ## Incorrect
 
 ```tsx
-// ❌ Bad — render-blocking CDN font in index.html
+// ✗ Bad — render-blocking CDN font in index.html
 // index.html
 <head>
   <link
@@ -2590,7 +2590,7 @@ Render-blocking external font requests add network round trips and cause layout 
 ```
 
 ```tsx
-// ❌ Bad — no font-display, no preload, full character set
+// ✗ Bad — no font-display, no preload, full character set
 // styles/global.css
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700');
 
@@ -2615,7 +2615,7 @@ body {
 
 ```css
 /* src/styles/fonts.css */
-/* ✅ Good — self-hosted, subsetted, font-display: swap */
+/* ✓ Good — self-hosted, subsetted, font-display: swap */
 @font-face {
   font-family: 'Inter';
   src: url('/src/assets/fonts/Inter-Regular.woff2') format('woff2');
@@ -2645,7 +2645,7 @@ body {
 ```
 
 ```html
-<!-- ✅ Good — preload critical font in index.html -->
+<!-- ✓ Good — preload critical font in index.html -->
 <head>
   <link
     rel="preload"
@@ -2658,7 +2658,7 @@ body {
 ```
 
 ```typescript
-// ✅ Good — vite.config.ts handles font files
+// ✓ Good — vite.config.ts handles font files
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -2701,11 +2701,11 @@ Vite offers two ways to serve assets: the `public/` directory and JavaScript imp
 ## Incorrect
 
 ```tsx
-// ❌ Bad — importing files that should stay static in public/
+// ✗ Bad — importing files that should stay static in public/
 import robots from '../public/robots.txt?raw'
 import manifest from '../public/manifest.json'
 
-// ❌ Bad — putting everything in public/ to avoid imports
+// ✗ Bad — putting everything in public/ to avoid imports
 function Logo() {
   return <img src="/logo.png" alt="Logo" /> // No hash, no cache busting
 }
@@ -2732,7 +2732,7 @@ function App() {
 ## Correct
 
 ```tsx
-// ✅ Good — import assets that benefit from hashing and optimization
+// ✓ Good — import assets that benefit from hashing and optimization
 import logo from './assets/logo.png'        // → /assets/logo-a1b2c3d4.png
 import heroBanner from './assets/hero.png'   // → /assets/hero-e5f6g7h8.png
 import ArrowIcon from './assets/arrow.svg?react'
@@ -2750,7 +2750,7 @@ function App() {
 ```
 
 ```
-# ✅ Good — public/ only for files that MUST keep exact names
+# ✓ Good — public/ only for files that MUST keep exact names
 public/
 ├── favicon.ico          # Browsers look for exact path
 ├── robots.txt           # Crawlers expect /robots.txt
@@ -2760,7 +2760,7 @@ public/
 ```
 
 ```typescript
-// ✅ Good — reference public/ files by absolute path (no import needed)
+// ✓ Good — reference public/ files by absolute path (no import needed)
 function Head() {
   return (
     <Helmet>
@@ -2772,7 +2772,7 @@ function Head() {
 ```
 
 ```typescript
-// ✅ Good — dynamic imports for assets based on runtime values
+// ✓ Good — dynamic imports for assets based on runtime values
 function CountryFlag({ code }: { code: string }) {
   // Vite glob import — all matched files are hashed
   const flags = import.meta.glob('./assets/flags/*.svg', {
@@ -2806,20 +2806,20 @@ Vite only exposes environment variables prefixed with `VITE_` to client-side cod
 ## Incorrect
 
 ```env
-# ❌ Bad: .env
+# ✗ Bad: .env
 API_KEY=secret123
 DATABASE_URL=postgres://...
 APP_TITLE=My App
 ```
 
 ```typescript
-// ❌ Bad: Variables not exposed - returns undefined
+// ✗ Bad: Variables not exposed - returns undefined
 const apiKey = import.meta.env.API_KEY // undefined
 const title = import.meta.env.APP_TITLE // undefined
 ```
 
 ```env
-# ❌ Bad: Sensitive data with VITE_ prefix (exposed to browser!)
+# ✗ Bad: Sensitive data with VITE_ prefix (exposed to browser!)
 VITE_DATABASE_URL=postgres://...
 VITE_API_SECRET=secret123
 VITE_PRIVATE_KEY=...
@@ -2834,7 +2834,7 @@ VITE_PRIVATE_KEY=...
 ## Correct
 
 ```env
-# ✅ Good: .env
+# ✓ Good: .env
 # Client-side variables (exposed to browser)
 VITE_API_URL=https://api.example.com
 VITE_APP_TITLE=My App
@@ -2846,7 +2846,7 @@ API_SECRET=secret123
 ```
 
 ```typescript
-// ✅ Good: Access client-side variables
+// ✓ Good: Access client-side variables
 const apiUrl = import.meta.env.VITE_API_URL
 const appTitle = import.meta.env.VITE_APP_TITLE
 const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true'
@@ -2859,7 +2859,7 @@ const baseUrl = import.meta.env.BASE_URL
 ```
 
 ```typescript
-// ✅ Good: Type-safe environment variables
+// ✓ Good: Type-safe environment variables
 // src/vite-env.d.ts
 /// <reference types="vite/client" />
 
@@ -2875,7 +2875,7 @@ interface ImportMeta {
 ```
 
 ```env
-# ✅ Good: Environment-specific files
+# ✓ Good: Environment-specific files
 # .env.development
 VITE_API_URL=http://localhost:8000/api
 
@@ -2887,7 +2887,7 @@ VITE_API_URL=https://staging-api.example.com
 ```
 
 ```typescript
-// ✅ Good: Runtime configuration for values that change without rebuild
+// ✓ Good: Runtime configuration for values that change without rebuild
 // public/config.js
 window.APP_CONFIG = {
   apiUrl: 'https://api.example.com',
@@ -2920,14 +2920,14 @@ Vite supports multiple environment files that load based on the current mode. Us
 ## Incorrect
 
 ```typescript
-// ❌ Bad — hardcoded API URLs toggled by comments
+// ✗ Bad — hardcoded API URLs toggled by comments
 const API_URL = 'https://api.example.com'
 // const API_URL = 'http://localhost:8000'     // uncomment for dev
 // const API_URL = 'https://staging.example.com' // uncomment for staging
 ```
 
 ```env
-# ❌ Bad — single .env with everything
+# ✗ Bad — single .env with everything
 # .env
 VITE_API_URL=https://api.example.com
 VITE_SENTRY_DSN=https://abc@sentry.io/123
@@ -2966,7 +2966,7 @@ VITE_SENTRY_DSN=https://abc@sentry.io/456
 ```
 
 ```bash
-# ✅ Good — use --mode to target specific environment files
+# ✓ Good — use --mode to target specific environment files
 npx vite dev                    # loads .env + .env.development
 npx vite build                  # loads .env + .env.production
 npx vite build --mode staging   # loads .env + .env.staging
@@ -2981,7 +2981,7 @@ npx vite build --mode staging   # loads .env + .env.staging
 ```
 
 ```typescript
-// ✅ Good — type-safe config using the loaded environment
+// ✓ Good — type-safe config using the loaded environment
 // src/config.ts
 export const config = {
   appName: import.meta.env.VITE_APP_NAME,
@@ -3018,7 +3018,7 @@ Any environment variable with the `VITE_` prefix is statically replaced in the c
 ## Incorrect
 
 ```env
-# ❌ Bad — secrets with VITE_ prefix are EXPOSED in the browser bundle
+# ✗ Bad — secrets with VITE_ prefix are EXPOSED in the browser bundle
 VITE_DATABASE_URL=postgres://user:password@db.example.com:5432/mydb
 VITE_API_SECRET=sk_live_abc123def456
 VITE_STRIPE_SECRET_KEY=sk_live_789xyz
@@ -3027,14 +3027,14 @@ VITE_AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG
 ```
 
 ```typescript
-// ❌ Bad — calling external APIs directly with secrets from client
+// ✗ Bad — calling external APIs directly with secrets from client
 const response = await fetch('https://api.stripe.com/v1/charges', {
   headers: {
     Authorization: `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`,
   },
 })
 
-// ❌ Bad — database connection string in client code
+// ✗ Bad — database connection string in client code
 const db = connect(import.meta.env.VITE_DATABASE_URL)
 ```
 
@@ -3049,13 +3049,13 @@ const db = connect(import.meta.env.VITE_DATABASE_URL)
 
 ```env
 # .env
-# ✅ SAFE — VITE_ prefix only for truly public values
+# ✓ SAFE — VITE_ prefix only for truly public values
 VITE_API_URL=https://api.example.com
 VITE_APP_NAME=MyApp
 VITE_STRIPE_PUBLISHABLE_KEY=pk_live_abc123
 VITE_SENTRY_DSN=https://abc@sentry.io/123
 
-# ✅ SAFE — no VITE_ prefix means NOT exposed to the browser
+# ✓ SAFE — no VITE_ prefix means NOT exposed to the browser
 DB_PASSWORD=super-secret-password
 STRIPE_SECRET_KEY=sk_live_abc123def456
 JWT_SIGNING_KEY=super-secret-key-123
@@ -3064,7 +3064,7 @@ API_INTERNAL_TOKEN=tok_internal_xyz
 ```
 
 ```typescript
-// ✅ Good — call your own backend, which holds the secret keys
+// ✓ Good — call your own backend, which holds the secret keys
 // src/api/payments.ts
 export async function createCharge(amount: number) {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/charge`, {
@@ -3080,7 +3080,7 @@ export async function createCharge(amount: number) {
 ```
 
 ```typescript
-// ✅ Good — validate that no secrets leak through at build time
+// ✓ Good — validate that no secrets leak through at build time
 // src/config.ts
 if (import.meta.env.DEV) {
   const envKeys = Object.keys(import.meta.env)
@@ -3119,7 +3119,7 @@ Without bundle analysis, large dependencies go unnoticed and bundle size creeps 
 ## Incorrect
 
 ```typescript
-// ❌ Bad — guessing which dependencies are large
+// ✗ Bad — guessing which dependencies are large
 // "I think lodash is big, let me remove it"
 // "The bundle seems slow, maybe it's the icons?"
 
@@ -3151,7 +3151,7 @@ npm install -D rollup-plugin-visualizer
 ```
 
 ```typescript
-// ✅ Good — vite.config.ts with bundle visualizer
+// ✓ Good — vite.config.ts with bundle visualizer
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -3171,7 +3171,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good — only enable visualizer when analyzing (not every build)
+// ✓ Good — only enable visualizer when analyzing (not every build)
 import { defineConfig, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -3193,7 +3193,7 @@ export default defineConfig({
 ```
 
 ```json
-// ✅ Good — add an analyze script to package.json
+// ✓ Good — add an analyze script to package.json
 {
   "scripts": {
     "build": "vite build",

@@ -14,7 +14,7 @@ Structure components to take full advantage of React Fast Refresh for instant up
 ## Incorrect
 
 ```tsx
-// ❌ Bad: Named exports can break Fast Refresh in some cases
+// ✗ Bad: Named exports can break Fast Refresh in some cases
 export const App = () => {
   return <div>App</div>;
 };
@@ -26,7 +26,7 @@ export const Sidebar = () => <aside>Sidebar</aside>;
 ```
 
 ```tsx
-// ❌ Bad: Module-level side effects break Fast Refresh
+// ✗ Bad: Module-level side effects break Fast Refresh
 import { fetchUser } from './api';
 
 const initialUser = await fetchUser('current');
@@ -38,7 +38,7 @@ export default function UserProfile() {
 ```
 
 ```tsx
-// ❌ Bad: Mixing components with non-component exports
+// ✗ Bad: Mixing components with non-component exports
 export default function Counter() {
   const [count, setCount] = useState(0);
   return (
@@ -53,7 +53,7 @@ export const formatCount = (n: number) => n.toLocaleString();
 ```
 
 ```tsx
-// ❌ Bad: Anonymous component - Fast Refresh can't identify it
+// ✗ Bad: Anonymous component - Fast Refresh can't identify it
 export default () => {
   return <div>Anonymous</div>;
 };
@@ -68,7 +68,7 @@ export default () => {
 ## Correct
 
 ```tsx
-// ✅ Good: Default export for main component, one per file
+// ✓ Good: Default export for main component, one per file
 export default function App() {
   return (
     <div>
@@ -83,7 +83,7 @@ export default function App() {
 ```
 
 ```tsx
-// ✅ Good: Separate file for constants
+// ✓ Good: Separate file for constants
 // constants/counter.ts
 export const MAX_COUNT = 100;
 export const MIN_COUNT = 0;
@@ -112,7 +112,7 @@ export default function Counter() {
 ```
 
 ```tsx
-// ✅ Good: Proper data fetching with hooks instead of module-level side effects
+// ✓ Good: Proper data fetching with hooks instead of module-level side effects
 import { useQuery } from '@tanstack/react-query';
 import { fetchUser } from '../api/users';
 
@@ -136,7 +136,7 @@ export default function UserProfile() {
 ```
 
 ```tsx
-// ✅ Good: Set displayName on HOCs for Fast Refresh and DevTools
+// ✓ Good: Set displayName on HOCs for Fast Refresh and DevTools
 export function withAuth<P extends object>(
   WrappedComponent: ComponentType<P>
 ) {

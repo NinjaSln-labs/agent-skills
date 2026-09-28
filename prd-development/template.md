@@ -24,8 +24,8 @@
 
 > As you complete each section, tag every gap explicitly. Do not invent facts, data, approvals, or commitments.
 >
-> - **🔶 Assumption** — You filled this in based on inference, analogy, or incomplete data. It is plausible but unvalidated. Every assumption is a risk until confirmed. *(e.g., "🔶 Assumption: 60% of churned users leave due to onboarding friction — based on exit survey sample of 43 respondents, not full-cohort analysis.")*
-> - **🔵 Open Question** — You don't know this yet and need to find out. The answer requires discovery, a stakeholder conversation, or data you don't have. *(e.g., "🔵 Open Question: What is the current baseline for time-to-first-action? Analytics team has not confirmed.")*
+> - **Assumption** — You filled this in based on inference, analogy, or incomplete data. It is plausible but unvalidated. Every assumption is a risk until confirmed. *(e.g., "Assumption: 60% of churned users leave due to onboarding friction — based on exit survey sample of 43 respondents, not full-cohort analysis.")*
+> - **Open Question** — You don't know this yet and need to find out. The answer requires discovery, a stakeholder conversation, or data you don't have. *(e.g., "Open Question: What is the current baseline for time-to-first-action? Analytics team has not confirmed.")*
 >
 > Tag inline, right where the gap appears — not just in Section 10. Section 10 collects them, but each section should surface its own unknowns so reviewers see them in context.
 
@@ -126,7 +126,7 @@
 ##### **Before moving on — Section 1 → Section 2:**
 
 > Review what you just wrote. The executive summary names a persona, a problem, and an impact. Check:
-> - Does the **problem** you named have evidence behind it, or is it an 🔶 Assumption? If assumption, tag it now — Section 2 is where you'll either ground it in data or escalate it to an 🔵 Open Question.
+> - Does the **problem** you named have evidence behind it, or is it an Assumption? If assumption, tag it now — Section 2 is where you'll either ground it in data or escalate it to an Open Question.
 > - Does the **persona** you named match a real customer segment you can describe in detail? If not, Section 3 will expose the gap — be ready for it.
 > - Is the **impact** a measurable outcome or a vague aspiration? If vague, Section 6 will force you to name a metric and a target.
 
@@ -185,7 +185,7 @@
 
 > The problem statement names who has the problem. Check:
 > - Is the **"who"** specific enough to build a persona around, or is it a broad category like "small business owners"? Section 3 needs a concrete individual — role, goals, pain points, current behaviour.
-> - Does your **evidence** include at least one direct customer quote or data point? If all four evidence slots are empty or tagged 🔶 Assumption, consider running `discovery-interview-prep` before continuing.
+> - Does your **evidence** include at least one direct customer quote or data point? If all four evidence slots are empty or tagged Assumption, consider running `discovery-interview-prep` before continuing.
 > - Does the **business impact** connect to a metric your leadership actually tracks? If not, Section 4 (Strategic Context) will struggle to make the case.
 
 ***
@@ -246,7 +246,7 @@
 > The persona and JTBD define who you're building for. Check:
 > - Does the **persona's pain point** match the problem you stated in Section 2? If the persona's biggest frustration is something different from Section 2's problem, one of them is wrong.
 > - Is the persona **a real customer of your product**, or did you accidentally describe your own team, your PM audience, or a generic archetype? The persona is the person who uses or buys the product — not the person writing this PRD.
-> - Are the **jobs-to-be-done** grounded in observed behaviour or inferred? Tag any inferred JTBD as 🔶 Assumption.
+> - Are the **jobs-to-be-done** grounded in observed behaviour or inferred? Tag any inferred JTBD as Assumption.
 
 ***
 
@@ -304,7 +304,7 @@
 > Strategic context justifies the investment. Check:
 > - Does the **"why now?"** hold up under scrutiny, or is it just "we should have done this a while ago"? If the urgency is manufactured, stakeholders will sense it.
 > - Can you draw a straight line from **business goal → problem (Section 2) → persona (Section 3) → this initiative**? If any link is weak, the solution you're about to describe in Section 5 may not be the right one.
-> - If you included **TAM/SAM/SOM**, are the numbers sourced or estimated? Tag estimated figures as 🔶 Assumption.
+> - If you included **TAM/SAM/SOM**, are the numbers sourced or estimated? Tag estimated figures as Assumption.
 
 ***
 
@@ -414,7 +414,7 @@
 
 > Success metrics define how you'll know the solution worked. Check:
 > - Does the **primary metric** directly measure the problem from Section 2? If the problem is "users don't know what to do first" and the primary metric is "page views," there's a disconnect.
-> - Do you have a **current baseline** for every metric, or are baselines tagged 🔶 Assumption? Without a baseline, you cannot measure improvement — flag this for the analytics team now, not after launch.
+> - Do you have a **current baseline** for every metric, or are baselines tagged Assumption? Without a baseline, you cannot measure improvement — flag this for the analytics team now, not after launch.
 > - Is there at least one **guardrail metric**? Every initiative has side effects. If you can't name one thing that shouldn't get worse, you haven't thought about trade-offs.
 
 ***
@@ -589,7 +589,7 @@ As a [persona], I want [capability], so that [outcome].
 > Dependencies and risks surface what could block or derail you. Check:
 > - Have you accounted for **all four of Cagan's risks** — value (will customers want this?), usability (can they use it?), feasibility (can we build it?), and viability (does the business case hold)? Most PRDs overweight feasibility and underweight value risk.
 > - For each risk, is the **mitigation actionable** — with an owner and a trigger? "Monitor closely" is not a mitigation strategy.
-> - Do any of your 🔶 Assumptions from earlier sections appear here as risks? They should — an unvalidated assumption IS a risk. If they don't appear, either the assumption is low-stakes (fine) or you've lost track of it (not fine).
+> - Do any of your Assumptions from earlier sections appear here as risks? They should — an unvalidated assumption IS a risk. If they don't appear, either the assumption is low-stakes (fine) or you've lost track of it (not fine).
 
 ***
 
@@ -642,13 +642,13 @@ As a [persona], I want [capability], so that [outcome].
 
 ### Top Assumptions to Validate
 
-> Collect all 🔶 Assumption tags from throughout the document. List the ones that carry the highest risk if they turn out to be wrong.
+> Collect all Assumption tags from throughout the document. List the ones that carry the highest risk if they turn out to be wrong.
 
 | # | Assumption | Section | Risk if Wrong | Proposed Validation |
 |---|------------|---------|---------------|---------------------|
-| 1 | [Statement tagged 🔶 above] | [Section #] | [What breaks if this is false] | [How to test — interview, data pull, experiment] |
-| 2 | [Statement tagged 🔶 above] | [Section #] | [What breaks if this is false] | [How to test] |
-| 3 | [Statement tagged 🔶 above] | [Section #] | [What breaks if this is false] | [How to test] |
+| 1 | [Statement tagged above] | [Section #] | [What breaks if this is false] | [How to test — interview, data pull, experiment] |
+| 2 | [Statement tagged above] | [Section #] | [What breaks if this is false] | [How to test] |
+| 3 | [Statement tagged above] | [Section #] | [What breaks if this is false] | [How to test] |
 
 ### Recommended Next Step
 

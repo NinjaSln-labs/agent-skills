@@ -405,12 +405,12 @@ Use **worker-scoped fixtures** instead of globalSetup when:
 ### Common Parallel Pitfall
 
 ```typescript
-// ❌ BAD: Global setup creates ONE user, all workers fight over it
+// ✗ BAD: Global setup creates ONE user, all workers fight over it
 async function globalSetup() {
   await createUser({ email: "test@example.com" }); // Shared!
 }
 
-// ✅ GOOD: Each worker gets its own user via worker-scoped fixture
+// ✓ GOOD: Each worker gets its own user via worker-scoped fixture
 // Uses workerInfo.workerIndex to create unique data per worker
 ```
 

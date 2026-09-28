@@ -14,20 +14,20 @@ Vite only exposes environment variables prefixed with `VITE_` to client-side cod
 ## Incorrect
 
 ```env
-# ❌ Bad: .env
+# ✗ Bad: .env
 API_KEY=secret123
 DATABASE_URL=postgres://...
 APP_TITLE=My App
 ```
 
 ```typescript
-// ❌ Bad: Variables not exposed - returns undefined
+// ✗ Bad: Variables not exposed - returns undefined
 const apiKey = import.meta.env.API_KEY // undefined
 const title = import.meta.env.APP_TITLE // undefined
 ```
 
 ```env
-# ❌ Bad: Sensitive data with VITE_ prefix (exposed to browser!)
+# ✗ Bad: Sensitive data with VITE_ prefix (exposed to browser!)
 VITE_DATABASE_URL=postgres://...
 VITE_API_SECRET=secret123
 VITE_PRIVATE_KEY=...
@@ -42,7 +42,7 @@ VITE_PRIVATE_KEY=...
 ## Correct
 
 ```env
-# ✅ Good: .env
+# ✓ Good: .env
 # Client-side variables (exposed to browser)
 VITE_API_URL=https://api.example.com
 VITE_APP_TITLE=My App
@@ -54,7 +54,7 @@ API_SECRET=secret123
 ```
 
 ```typescript
-// ✅ Good: Access client-side variables
+// ✓ Good: Access client-side variables
 const apiUrl = import.meta.env.VITE_API_URL
 const appTitle = import.meta.env.VITE_APP_TITLE
 const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true'
@@ -67,7 +67,7 @@ const baseUrl = import.meta.env.BASE_URL
 ```
 
 ```typescript
-// ✅ Good: Type-safe environment variables
+// ✓ Good: Type-safe environment variables
 // src/vite-env.d.ts
 /// <reference types="vite/client" />
 
@@ -83,7 +83,7 @@ interface ImportMeta {
 ```
 
 ```env
-# ✅ Good: Environment-specific files
+# ✓ Good: Environment-specific files
 # .env.development
 VITE_API_URL=http://localhost:8000/api
 
@@ -95,7 +95,7 @@ VITE_API_URL=https://staging-api.example.com
 ```
 
 ```typescript
-// ✅ Good: Runtime configuration for values that change without rebuild
+// ✓ Good: Runtime configuration for values that change without rebuild
 // public/config.js
 window.APP_CONFIG = {
   apiUrl: 'https://api.example.com',

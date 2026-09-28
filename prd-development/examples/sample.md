@@ -39,7 +39,7 @@ Non-technical small business owners — solopreneurs and teams of 1–10 — who
 
 - **Metric**: Activation rate — % of users completing first action within 24 hours
 - **Current**: 40%
-- **Target**: 60% 🔶 **Assumption**: Target based on industry benchmark for comparable B2B SaaS onboarding improvements — not validated against our specific user base.
+- **Target**: 60% **Assumption**: Target based on industry benchmark for comparable B2B SaaS onboarding improvements — not validated against our specific user base.
 - **Timeline**: 30 days after launch
 
 **Secondary Metrics**
@@ -51,12 +51,12 @@ Non-technical small business owners — solopreneurs and teams of 1–10 — who
 **Guardrail Metrics**
 
 - Sign-up conversion rate: maintain at 10% — don't add friction to the signup flow
-- 🔵 **Open Question**: Should we also track session duration as a guardrail? If checklist completion inflates session time without delivering value, we could be measuring activity, not progress. Analytics team to confirm.
+- **Open Question**: Should we also track session duration as a guardrail? If checklist completion inflates session time without delivering value, we could be measuring activity, not progress. Analytics team to confirm.
 
 **Why this works:**
 - Primary metric is directly tied to the problem in Section 2 (activation failure)
-- Assumptions are tagged inline with 🔶 so reviewers see them in context
-- Open questions are tagged with 🔵 and include who needs to resolve them
+- Assumptions are tagged inline so reviewers see them in context
+- Open questions are tagged and include who needs to resolve them
 - Guardrail metric prevents the initiative from creating new problems
 
 ---
@@ -110,7 +110,7 @@ A PRD that skips evidence, personas, metrics, and acceptance criteria — the ki
 - No self-assessment — no honest accounting of what's known vs. guessed
 
 **Fix with the PRD template:**
-- **Section 2**: Write a problem statement with evidence from discovery interviews — tag any unvalidated claims as 🔶 Assumption
+- **Section 2**: Write a problem statement with evidence from discovery interviews — tag any unvalidated claims as Assumption
 - **Section 3**: Define a persona (not "users" — a specific person with goals, pain points, and current behaviour)
 - **Section 6**: Define success metrics with baselines and targets (activation rate 40% → 60%)
 - **Section 7**: Break down "onboarding flow" into user stories with testable acceptance criteria

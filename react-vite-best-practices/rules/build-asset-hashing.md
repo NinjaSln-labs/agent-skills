@@ -14,7 +14,7 @@ Configure content-based asset hashing to enable aggressive caching while ensurin
 ## Incorrect
 
 ```tsx
-// ❌ Bad: No hash - files get cached indefinitely
+// ✗ Bad: No hash - files get cached indefinitely
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -33,7 +33,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ❌ Bad: Version-based hashing - all files invalidated on any change
+// ✗ Bad: Version-based hashing - all files invalidated on any change
 output: {
   entryFileNames: `assets/[name].${packageJson.version}.js`,
   chunkFileNames: `assets/[name].${packageJson.version}.js`,
@@ -50,7 +50,7 @@ output: {
 ## Correct
 
 ```tsx
-// ✅ Good: Content-based hashing with organized asset directories
+// ✓ Good: Content-based hashing with organized asset directories
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -83,7 +83,7 @@ export default defineConfig({
 ```
 
 ```tsx
-// ✅ Good: Server caching configuration
+// ✓ Good: Server caching configuration
 import express from 'express';
 import path from 'path';
 

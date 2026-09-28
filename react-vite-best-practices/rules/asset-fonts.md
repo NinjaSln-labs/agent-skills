@@ -14,7 +14,7 @@ Render-blocking external font requests add network round trips and cause layout 
 ## Incorrect
 
 ```tsx
-// ❌ Bad — render-blocking CDN font in index.html
+// ✗ Bad — render-blocking CDN font in index.html
 // index.html
 <head>
   <link
@@ -25,7 +25,7 @@ Render-blocking external font requests add network round trips and cause layout 
 ```
 
 ```tsx
-// ❌ Bad — no font-display, no preload, full character set
+// ✗ Bad — no font-display, no preload, full character set
 // styles/global.css
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700');
 
@@ -50,7 +50,7 @@ body {
 
 ```css
 /* src/styles/fonts.css */
-/* ✅ Good — self-hosted, subsetted, font-display: swap */
+/* ✓ Good — self-hosted, subsetted, font-display: swap */
 @font-face {
   font-family: 'Inter';
   src: url('/src/assets/fonts/Inter-Regular.woff2') format('woff2');
@@ -80,7 +80,7 @@ body {
 ```
 
 ```html
-<!-- ✅ Good — preload critical font in index.html -->
+<!-- ✓ Good — preload critical font in index.html -->
 <head>
   <link
     rel="preload"
@@ -93,7 +93,7 @@ body {
 ```
 
 ```typescript
-// ✅ Good — vite.config.ts handles font files
+// ✓ Good — vite.config.ts handles font files
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 

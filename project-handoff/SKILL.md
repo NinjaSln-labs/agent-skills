@@ -8,7 +8,7 @@ description: >-
   sessions or tools, or resuming or continuing prior work on a project. Initializing a
   new project's store or migrating an old HANDOFF.md model is done only when the user
   explicitly asks. NOT for: ephemeral scratch notes, or work outside a project.
-version: 4.0.0
+version: 4.2.1
 slug: project-handoff
 displayName: project-handoff
 ---

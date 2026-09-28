@@ -636,14 +636,14 @@ A conflict-free PR that is merely behind (no `BEHIND` flag, `mergeable: MERGEABL
 When you have uncommitted local changes that need to be pushed, the order matters:
 
 ```bash
-# ✅ Correct — commit first, then sync, then push
+# ✓ Correct — commit first, then sync, then push
 git add <files>
 git commit -m "message"
 git fetch origin
 git rebase origin/<branch>
 git push
 
-# ❌ Wrong — rebase aborts with "please commit your changes or stash them"
+# ✗ Wrong — rebase aborts with "please commit your changes or stash them"
 git fetch origin
 git rebase origin/<branch>   # aborts with error if working tree is dirty
 git add <files>
@@ -1187,10 +1187,10 @@ threads — GitHub only couples the two when the "require conversation
 resolution" branch-protection rule is enabled, which most repos don't turn on.
 
 ```bash
-# ❌ Wrong — merge already executed by the time the gate output is visible
+# ✗ Wrong — merge already executed by the time the gate output is visible
 gh pr view 42 --json mergeStateStatus && gh pr merge 42 --merge
 
-# ✅ Right — run the gate queries, READ the output, then merge as a new command
+# ✓ Right — run the gate queries, READ the output, then merge as a new command
 gh pr view 42 --json reviewDecision,mergeStateStatus,mergeable,statusCheckRollup
 gh api graphql -f query='{repository(owner:"OWNER",name:"REPO"){pullRequest(number:42){reviewThreads(first:100){nodes{isResolved}}}}}' --jq '[.data.repository.pullRequest?.reviewThreads?.nodes[]?|select(.isResolved==false)]|length'
 # READ both: all threads resolved (count 0)? all checks green? Only then:

@@ -14,7 +14,7 @@ Unoptimized images are often the largest assets, significantly impacting page lo
 ## Incorrect
 
 ```typescript
-// ❌ Bad: Large images loaded eagerly with no optimization
+// ✗ Bad: Large images loaded eagerly with no optimization
 function Gallery() {
   return (
     <div>
@@ -37,7 +37,7 @@ function Gallery() {
 ## Correct
 
 ```typescript
-// ✅ Good: Optimized image loading
+// ✓ Good: Optimized image loading
 function Gallery() {
   return (
     <div>
@@ -73,7 +73,7 @@ function Gallery() {
 ```
 
 ```typescript
-// ✅ Good: Responsive images with format fallback
+// ✓ Good: Responsive images with format fallback
 function ResponsiveImage() {
   return (
     <picture>
@@ -99,7 +99,7 @@ function ResponsiveImage() {
 ```
 
 ```typescript
-// ✅ Good: Vite image optimization plugin
+// ✓ Good: Vite image optimization plugin
 // vite.config.ts
 import { defineConfig } from 'vite'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
@@ -116,7 +116,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Reusable Image component
+// ✓ Good: Reusable Image component
 interface ImageProps {
   src: string
   alt: string
@@ -150,7 +150,7 @@ export function Image({
 ```
 
 ```typescript
-// ✅ Good: Inline small images and use URL imports for backgrounds
+// ✓ Good: Inline small images and use URL imports for backgrounds
 // vite.config.ts
 export default defineConfig({
   build: {

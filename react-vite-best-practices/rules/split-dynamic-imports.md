@@ -14,7 +14,7 @@ Heavy components like charts, editors, and complex forms should not be loaded un
 ## Incorrect
 
 ```typescript
-// ❌ Bad: All heavy libraries loaded upfront
+// ✗ Bad: All heavy libraries loaded upfront
 import { Chart } from 'chart.js'
 import ReactQuill from 'react-quill'
 import { PDFViewer } from '@react-pdf/renderer'
@@ -41,7 +41,7 @@ function Dashboard() {
 ## Correct
 
 ```typescript
-// ✅ Good: Lazy load heavy components
+// ✓ Good: Lazy load heavy components
 import { lazy, Suspense, useState } from 'react'
 
 const Chart = lazy(() => import('./components/Chart'))
@@ -74,7 +74,7 @@ function Dashboard() {
 ```
 
 ```typescript
-// ✅ Good: Conditional dynamic import for libraries
+// ✓ Good: Conditional dynamic import for libraries
 async function exportToPDF() {
   const { PDFDocument } = await import('pdf-lib')
   const pdfDoc = await PDFDocument.create()
@@ -99,7 +99,7 @@ function ExportButton() {
 ```
 
 ```typescript
-// ✅ Good: Preload on interaction intent
+// ✓ Good: Preload on interaction intent
 const HeavyModal = lazy(() => import('./HeavyModal'))
 
 function ModalTrigger() {
@@ -130,7 +130,7 @@ function ModalTrigger() {
 ```
 
 ```typescript
-// ✅ Good: Feature flag based loading
+// ✓ Good: Feature flag based loading
 function App({ user }) {
   const AdminPanel = user.isAdmin
     ? lazy(() => import('./AdminPanel'))

@@ -149,8 +149,8 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）（已废弃） |
 | core-rules | 全局规则（密码安全/权限确认/长任务反馈/session 维护）（已废弃） |
 | skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护 + pushy 质量… |
-| skill-eval | skill 行为评估（3-5 代表任务 × 有/无 skill N≥3 次 → pass-rate 对比表 + 失败案例反哺） |
-| skill-fit | 技能适配管家（按项目画像对照 catalog.yaml 出「建议挂/建议摘/缺口」三清单；只读 v1… |
+| skill-eval | skill 动态评估（行为 pass-rate：3-5 代表任务 × 有/无 skill N≥3 次 → 对比表… |
+| skill-fit | 技能需求管家 v2（从本仓工件推需求表（词条×强度×证据串… |
 | task-loop-progress | 长任务进度 loop（config+adapter——轮询/汇报）（已废弃） |
 
 ## 已废弃（Deprecated）

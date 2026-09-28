@@ -14,12 +14,12 @@ SVGs can be used as images or as React components. Using them as components enab
 ## Incorrect
 
 ```typescript
-// ❌ Bad: Using SVG as image - limited styling options
+// ✗ Bad: Using SVG as image - limited styling options
 function Logo() {
   return <img src="/logo.svg" alt="Logo" className="w-8 h-8" />
 }
 
-// ❌ Bad: Inline SVG everywhere - duplicated code
+// ✗ Bad: Inline SVG everywhere - duplicated code
 function Icon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ npm install vite-plugin-svgr -D
 ```
 
 ```typescript
-// ✅ Good: vite.config.ts - Configure SVGR plugin
+// ✓ Good: vite.config.ts - Configure SVGR plugin
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
@@ -69,7 +69,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Import as React component for full styling control
+// ✓ Good: Import as React component for full styling control
 import Logo from './assets/logo.svg?react'
 import logoUrl from './assets/logo.svg'
 
@@ -87,7 +87,7 @@ function Header() {
 ```
 
 ```typescript
-// ✅ Good: TypeScript support
+// ✓ Good: TypeScript support
 // src/vite-env.d.ts
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
@@ -105,7 +105,7 @@ declare module '*.svg' {
 ```
 
 ```typescript
-// ✅ Good: Dynamic SVG colors via currentColor
+// ✓ Good: Dynamic SVG colors via currentColor
 import SearchIcon from './assets/search.svg?react'
 
 function SearchButton({ active }: { active: boolean }) {
@@ -119,7 +119,7 @@ function SearchButton({ active }: { active: boolean }) {
 ```
 
 ```typescript
-// ✅ Good: Icon component pattern with tree shaking
+// ✓ Good: Icon component pattern with tree shaking
 import type { SVGProps, FunctionComponent } from 'react'
 
 import HomeIcon from '@/assets/icons/home.svg?react'

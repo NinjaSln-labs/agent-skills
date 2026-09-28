@@ -21,14 +21,14 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   build: {
-    // ❌ Bad: Makes debugging production issues impossible
+    // ✗ Bad: Makes debugging production issues impossible
     sourcemap: false,
   },
 });
 ```
 
 ```tsx
-// ❌ Bad: Exposing full source maps in production
+// ✗ Bad: Exposing full source maps in production
 export default defineConfig({
   plugins: [react()],
   build: {
@@ -53,7 +53,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   build: {
-    // ✅ Good: 'hidden' for production, full maps for staging
+    // ✓ Good: 'hidden' for production, full maps for staging
     sourcemap: mode === 'production' ? 'hidden' : true,
     rollupOptions: {
       output: {

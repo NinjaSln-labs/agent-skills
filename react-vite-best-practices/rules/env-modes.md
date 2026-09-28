@@ -14,14 +14,14 @@ Vite supports multiple environment files that load based on the current mode. Us
 ## Incorrect
 
 ```typescript
-// ❌ Bad — hardcoded API URLs toggled by comments
+// ✗ Bad — hardcoded API URLs toggled by comments
 const API_URL = 'https://api.example.com'
 // const API_URL = 'http://localhost:8000'     // uncomment for dev
 // const API_URL = 'https://staging.example.com' // uncomment for staging
 ```
 
 ```env
-# ❌ Bad — single .env with everything
+# ✗ Bad — single .env with everything
 # .env
 VITE_API_URL=https://api.example.com
 VITE_SENTRY_DSN=https://abc@sentry.io/123
@@ -60,7 +60,7 @@ VITE_SENTRY_DSN=https://abc@sentry.io/456
 ```
 
 ```bash
-# ✅ Good — use --mode to target specific environment files
+# ✓ Good — use --mode to target specific environment files
 npx vite dev                    # loads .env + .env.development
 npx vite build                  # loads .env + .env.production
 npx vite build --mode staging   # loads .env + .env.staging
@@ -75,7 +75,7 @@ npx vite build --mode staging   # loads .env + .env.staging
 ```
 
 ```typescript
-// ✅ Good — type-safe config using the loaded environment
+// ✓ Good — type-safe config using the loaded environment
 // src/config.ts
 export const config = {
   appName: import.meta.env.VITE_APP_NAME,

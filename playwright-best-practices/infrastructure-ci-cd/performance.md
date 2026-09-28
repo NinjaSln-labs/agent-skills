@@ -135,7 +135,7 @@ Avoid logging in for every test. Use setup projects with storage state to authen
 Sharing a single page/context across tests with `beforeAll`/`afterAll` is **not recommended** for most suites: it breaks test isolation, causes state leak between tests, and makes failures harder to debug. Prefer a fresh `page` per test (Playwright default). Use shared page only when you explicitly need serial execution and accept no isolation.
 
 ```typescript
-// ⚠️ Serial only, no isolation: state from one test leaks into the next.
+// ⚠ Serial only, no isolation: state from one test leaks into the next.
 // Prefer test.describe.configure({ mode: 'serial' }) + fresh page per test, or beforeEach + page.goto().
 test.describe.configure({ mode: "serial" });
 test.describe("Dashboard", () => {

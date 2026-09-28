@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import glob
 import json
 import os
@@ -35,6 +36,9 @@ TYPE2SLOT = {"t": "actions", "p": "pitfalls", "c": "commands", "u": "unconfirmed
 KEY_ORDER = ["id", "created", "summary", "status", "blockedBy", "topic", "src", "detail", "closed", "outcome"]
 ALLOWED_KEYS = set(KEY_ORDER)
 SINGLES = ("status", "summary", "scope", "exit")
+# scope 建库即写注释头：空项目留空不再是 0 字节——0 字节＝「未执行 init」（t000018）
+SCOPE_HEADER = ("# 对账范围（P3）：未决项可能落在哪（一行一路径/glob；# 注释允许）\n"
+                "# 空项目可只留本注释——register-first：未登记 ≠ 未决源。\n")
 
 # ---------------- add 参数面：按**型**声明，一处生成两侧（v3.2.0 / t000089） ----------------
 # 旧形 `add --slot <槽>` 把五种异构记录的参数**并集**挂在同一子命令上：argparse 全接受、
@@ -95,6 +99,15 @@ def today() -> str:
 
 def norm(s: str) -> str:
     return re.sub(r"\s+", " ", str(s)).strip()
+
+
+def require_text(cmd: str, label: str, v) -> None:
+    """写入型字符串参数非空守卫（t000121 / p000048 / p000051）：空串与全空白＝删除语义，
+    静默写入即数据丢失。`None`＝未提供（放行）；`""`／全空白＝提供但为空（拒）。
+    报错文案与「条目不存在」区分开——两者是不同故障。"""
+    if v is not None and not str(v).strip():
+        die(f"{cmd}: {label} 为空——写入型参数不接受空串/全空白"
+            "（空串＝删除语义，疑似漏喂变量如 `$(cat 空文件)`）")
 
 
 def ordered(entry: dict) -> dict:
@@ -262,7 +275,7 @@ def cmd_init(st: Store, a) -> int:
     st.d.mkdir(parents=True, exist_ok=True)
     for s in SINGLES:
         if not (st.d / s).is_file():
-            (st.d / s).write_text("", encoding="utf-8")
+            (st.d / s).write_text(SCOPE_HEADER if s == "scope" else "", encoding="utf-8")
     for slot in ENTRY_SLOTS:
         (st.d / slot).mkdir(parents=True, exist_ok=True)
     st.decisions_dir().mkdir(parents=True, exist_ok=True)
@@ -472,8 +485,11 @@ def cmd_add(st: Store, kind: str, f: dict) -> int:
     """
     spec = ADD_KINDS[kind]
     slot, part_key = spec["slot"], spec["part"]
+    consumed = ({"title", "body", "status", "supersedes", "domain", "topic"} if slot == DOC_SLOT
+                else {"summary", "status", "blockedBy", "topic", "src", "detail", part_key})
+    for k in sorted(consumed):
+        require_text(f"add {kind}", f"--{k}", f.get(k))
     if slot == DOC_SLOT:
-        consumed = {"title", "body", "status", "supersedes", "domain", "topic"}
         if not f.get("title"):
             die("add decision: 需要 --title")
         did = st.allocate("d")
@@ -484,8 +500,8 @@ def cmd_add(st: Store, kind: str, f: dict) -> int:
                 text += f"{k}: {f[k]}\n"
         text += f"---\n# {f['title']}\n\n{f.get('body') or ''}\n"
         (st.decisions_dir() / f"{did}.md").write_text(text, encoding="utf-8")
+        new_id = did
     else:
-        consumed = {"summary", "status", "blockedBy", "topic", "src", "detail", part_key}
         if not f.get("summary"):
             die(f"add {kind}: 需要 --summary")
         e = {"id": st.allocate(ENTRY_SLOTS[slot]["type"]), "created": today(),
@@ -494,10 +510,11 @@ def cmd_add(st: Store, kind: str, f: dict) -> int:
             if f.get(k) is not None:
                 e[k] = f[k]
         append_jsonl(st.d / slot / f"{f.get(part_key) or '_global'}.jsonl", e)
+        new_id = e["id"]
     if drift := set(f) - consumed:
         die(f"内部不一致：add {kind} 声明了 {sorted(drift)} 却无人消费（补 ADD_KINDS 或消费分支）")
     st.write_index()
-    print(f"handoff add {kind}: ok（slot={slot}）")
+    print(f"handoff add {kind}: ok（slot={slot}） id={new_id}")
     return 0
 
 
@@ -558,6 +575,7 @@ def refill_pick(st: Store):
 
 
 def cmd_close(st: Store, a) -> int:
+    require_text("close", "--outcome", a.outcome)      # 空 outcome＝静默销账（p000051）
     r = _find_live(st, a.id)
     if not r:
         die(f"close: 未找到 live 条目 {a.id}")
@@ -617,6 +635,8 @@ def cmd_next(st: Store, a) -> int:
 
 def cmd_unconfirmed(st: Store, a) -> int:
     if a.action == "add":
+        for label, v in (("--ref", a.ref), ("--summary", a.summary), ("--detail", a.detail)):
+            require_text("unconfirmed add", label, v)
         summ = a.summary or a.ref
         if not summ:
             die("unconfirmed add: 需要 --ref 或 --summary（不可空）")
@@ -630,6 +650,7 @@ def cmd_unconfirmed(st: Store, a) -> int:
         print(f"handoff unconfirmed add: {e['id']}")
         return 0
     if a.action == "resolve":
+        require_text("unconfirmed resolve", "--outcome", a.outcome)
         r = _find_live(st, a.id)
         if not r or r.get("_slot") != "unconfirmed":
             die(f"unconfirmed resolve: 未找到候选 {a.id}")
@@ -655,7 +676,11 @@ def cmd_unconfirmed(st: Store, a) -> int:
 
 # ---------------- read / render ----------------
 def cmd_filter(st: Store, a) -> int:
-    rows = st.load_live()
+    rows = st.load_live() if not a.id else st.load_live() + st.load_closed()
+    if a.id:
+        rows = [r for r in rows if r.get("id") == a.id]
+        if not rows:
+            die(f"filter: 未找到条目 {a.id}（live 与 closed 均无）", 2)
     if a.topic:
         rows = [r for r in rows if r.get("topic") == a.topic]
     if a.domain:
@@ -726,6 +751,13 @@ def _frontmatter(path: Path) -> dict:
 
 
 def cmd_view(st: Store, a) -> int:
+    if a.id:
+        hit = [r for r in st.load_live() + st.load_closed() if r.get("id") == a.id]
+        if not hit:
+            die(f"view: 未找到条目 {a.id}（live 与 closed 均无）", 2)
+        for r in hit:
+            print(entry_display_line(r))
+        return 0
     text = _render(st)
     if not a.save and not a.out:
         sys.stdout.write(text)
@@ -937,7 +969,7 @@ def cmd_import(st: Store, a) -> int:
     st.d.mkdir(parents=True, exist_ok=True)
     for s in SINGLES:
         if not (st.d / s).is_file():
-            (st.d / s).write_text("", encoding="utf-8")
+            (st.d / s).write_text(SCOPE_HEADER if s == "scope" else "", encoding="utf-8")
     for slot in ENTRY_SLOTS:
         (st.d / slot).mkdir(parents=True, exist_ok=True)
     st.decisions_dir().mkdir(parents=True, exist_ok=True)
@@ -1093,6 +1125,8 @@ def cmd_edit(st: Store, a) -> int:
     upd = {k: getattr(a, k) for k in EDIT_KEYS if getattr(a, k, None) is not None}
     if not upd:
         die(f"edit: 未给任何可改字段（{'/'.join('--' + k for k in EDIT_KEYS)}）")
+    for k in sorted(upd):
+        require_text("edit", f"--{k}", upd[k])          # 空串＝清空字段（p000048：643→0）
     allowed = editable_fields(slot)
     if bad := set(upd) - allowed:
         die(f"edit: {slot} 条目不接受 {sorted(bad)}（该型可改＝{sorted(allowed)}）")
@@ -1164,8 +1198,41 @@ def _scope_resolves(st: Store, entry: str) -> bool:
 
 
 _SKIP_DIRS = {".handoff", ".git", "node_modules", ".venv", "__pycache__", ".scaffold"}
-_MARKERS = re.compile(r"^\s*-\s*\[ \]|<!--\s*open:", re.M)
 _LEGACY = ("HANDOFF.md", "HANDOFF-ARCHIVE")
+
+# 完备性扫描标记词表（t000098）：原只认 `- [ ]` / `<!-- open:`，漏掉「建议以表格／散文形态
+# 存在于报告里」这一整类（09-22 实测：21 条建议全在表格里，五份出处只捞到 1 份）。
+# 基表取自设计件 audits/2026-09-20-pending-item-loss-rootcause.md L183 的封闭词表；
+# 项目可在 `.handoff/scope-vocab` 追加词、在 `.handoff/scope-ignore` 登记 fnmatch 豁免。
+_MARKER_HEAD = ("建议", "待办", "未决", "待决", "残余", "下一步", "待定", "TBD", "遗留",
+                "未实施", "未闭环", "待裁", "待回填", "未办", "缺口", "待投入")
+_MARKER_TOKENS = ("TODO", "FIXME", "XXX")          # ASCII，按词边界匹配
+_MARKER_CJK = ("未做", "备而未用")                  # 句内出现即算（CJK 无 ASCII 词边界可依）
+
+
+def _conf_lines(p: Path) -> list[str]:
+    if not p.is_file():
+        return []
+    return [s for ln in p.read_text(encoding="utf-8", errors="replace").splitlines()
+            if (s := ln.split("#", 1)[0].strip())]
+
+
+def scope_markers(st: "Store") -> re.Pattern:
+    words = list(_MARKER_HEAD)                                  # 标题/表格内命中（防正文噪声）
+    extra = _conf_lines(st.d / "scope-vocab")                   # 项目追加词：全文命中（opt-in）
+    alt = "|".join(re.escape(w) for w in words)
+    toks = "|".join(re.escape(t) for t in _MARKER_TOKENS)
+    cjk = "|".join(re.escape(t) for t in (*_MARKER_CJK, *extra))
+    return re.compile(
+        r"^\s*-\s*\[ \]" r"|<!--\s*open:"
+        rf"|\b(?:{toks})\b"
+        rf"|^#{{1,6}}\s[^\n]*(?:{alt})"            # 标题含建议词
+        rf"|^\|[^\n]*\|[^\n]*(?:{alt})[^\n]*\|"    # 表格行含建议词（表格建议行）
+        rf"|(?:{cjk})", re.M)
+
+
+def scope_ignore(st: "Store") -> list[str]:
+    return _conf_lines(st.d / "scope-ignore")
 
 
 def _gitignore_patterns(root: Path) -> list[str]:
@@ -1204,10 +1271,16 @@ def _brace_expand(s: str) -> list[str]:
 
 
 def _scope_scan(st: Store) -> int:
-    """机械候选提议：命中标记 / 旧模型件 / 旧 HANDOFF 引用，且未登记。纯提议、非权威。"""
+    """机械候选提议：命中标记 / 旧模型件 / 旧 HANDOFF 引用，且未登记。纯提议、非权威。
+
+    标记词表＝基表（`scope_markers`，t000098 已扩到标题/表格形态）＋ `.handoff/scope-vocab`
+    项目追加词；`.handoff/scope-ignore` 的 fnmatch 模式**豁免**文件（压噪声，均属纯提议面）。
+    """
     root = st.root_dir
     reg = set(_scope_lines(st))
     ign = _gitignore_patterns(root)
+    ignores = scope_ignore(st)
+    marker = scope_markers(st)
     cands: set[str] = set()
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames
@@ -1217,11 +1290,13 @@ def _scope_scan(st: Store) -> int:
             rel = str(fp.relative_to(root))
             if _ignored(ign, rel) or not fn.lower().endswith((".md", ".markdown", ".txt")):
                 continue
+            if any(fnmatch.fnmatch(rel, p) for p in ignores):
+                continue
             try:
                 text = fp.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
-            if _MARKERS.search(text):
+            if marker.search(text):
                 cands.add(rel)
     # 旧模型件总提议（主迁移源，即便无标记）
     for leg in _LEGACY:
@@ -1369,9 +1444,9 @@ def main(argv=None) -> int:
     p.add_argument("--answers"); p.add_argument("--n", type=int, default=5); p.add_argument("--seed", type=int)
 
     p = sub.add_parser("filter")
-    p.add_argument("--topic"); p.add_argument("--domain"); p.add_argument("--status"); p.add_argument("--json", action="store_true")
+    p.add_argument("--id"); p.add_argument("--topic"); p.add_argument("--domain"); p.add_argument("--status"); p.add_argument("--json", action="store_true")
 
-    p = sub.add_parser("view"); p.add_argument("--save", action="store_true"); p.add_argument("--out")
+    p = sub.add_parser("view"); p.add_argument("--id"); p.add_argument("--save", action="store_true"); p.add_argument("--out")
 
     p = sub.add_parser("export"); p.add_argument("--out")
     p = sub.add_parser("import"); p.add_argument("file"); p.add_argument("--force", action="store_true")

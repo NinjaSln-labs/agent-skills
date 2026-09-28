@@ -14,7 +14,7 @@ Use React.lazy for component-level code splitting to load non-critical UI compon
 ## Incorrect
 
 ```tsx
-// ❌ Bad: All components imported eagerly
+// ✗ Bad: All components imported eagerly
 import { useState } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -53,7 +53,7 @@ function Dashboard() {
 ## Correct
 
 ```tsx
-// ✅ Good: Component-level lazy loading
+// ✓ Good: Component-level lazy loading
 import { lazy, Suspense, useState } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -110,7 +110,7 @@ function Dashboard() {
 ```
 
 ```tsx
-// ✅ Good: Lazy component with preloading
+// ✓ Good: Lazy component with preloading
 import { lazy, ComponentType, LazyExoticComponent } from 'react';
 
 interface PreloadableComponent<T extends ComponentType<any>>
@@ -142,7 +142,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
 ```
 
 ```tsx
-// ✅ Good: Lazy loading below-the-fold content with Intersection Observer
+// ✓ Good: Lazy loading below-the-fold content with Intersection Observer
 import { lazy, Suspense } from 'react';
 import { useInView } from 'react-intersection-observer';
 

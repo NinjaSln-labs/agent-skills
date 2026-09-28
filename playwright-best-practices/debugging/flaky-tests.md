@@ -140,11 +140,11 @@ npx playwright test tests/flaky.spec.ts --trace on
 **Problem: Element not ready when action executes**
 
 ```typescript
-// ❌ BAD: No wait for element state
+// ✗ BAD: No wait for element state
 await page.click("#submit");
 await page.fill("#username", "test"); // Element may not be ready
 
-// ✅ GOOD: Actions + assertions pattern (auto-waiting built-in)
+// ✓ GOOD: Actions + assertions pattern (auto-waiting built-in)
 await page.getByRole("button", { name: "Submit" }).click();
 await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 ```
@@ -152,10 +152,10 @@ await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 **Problem: Animations or transitions interfere**
 
 ```typescript
-// ❌ BAD: Click during animation
+// ✗ BAD: Click during animation
 await page.click(".menu-item");
 
-// ✅ GOOD: Wait for animation to complete
+// ✓ GOOD: Wait for animation to complete
 await page.getByRole("menuitem", { name: "Settings" }).click();
 await expect(page.getByRole("dialog")).toBeVisible();
 // Or disable animations entirely
@@ -165,10 +165,10 @@ await page.emulateMedia({ reducedMotion: "reduce" });
 **Problem: Brittle selectors**
 
 ```typescript
-// ❌ BAD: Fragile CSS chain
+// ✗ BAD: Fragile CSS chain
 await page.click("div.container > div:nth-child(2) > button.btn-primary");
 
-// ✅ GOOD: Semantic selectors
+// ✓ GOOD: Semantic selectors
 await page.getByRole("button", { name: "Continue" }).click();
 await page.getByTestId("checkout-button").click();
 await page.getByLabel("Email address").fill("test@example.com");
@@ -179,15 +179,15 @@ await page.getByLabel("Email address").fill("test@example.com");
 **Problem: Race between test and application**
 
 ```typescript
-// ❌ BAD: Arbitrary sleep
+// ✗ BAD: Arbitrary sleep
 await page.click("#load-data");
 await page.waitForTimeout(3000); // Hope data loads in 3s
 
-// ✅ GOOD: Wait for specific condition
+// ✓ GOOD: Wait for specific condition
 await page.click("#load-data");
 await expect(page.locator(".data-row")).toHaveCount(10, { timeout: 10000 });
 
-// ✅ BETTER: Wait for network response, then assert
+// ✓ BETTER: Wait for network response, then assert
 const responsePromise = page.waitForResponse(
   (r) =>
     r.url().includes("/api/data") &&
@@ -223,10 +223,10 @@ await Promise.all([
 **Problem: Tests share backend data**
 
 ```typescript
-// ❌ BAD: All workers use same user
+// ✗ BAD: All workers use same user
 const testUser = { email: "test@example.com", password: "pass123" };
 
-// ✅ GOOD: Unique data per worker
+// ✓ GOOD: Unique data per worker
 import { test as base } from "@playwright/test";
 
 export const test = base.extend<
@@ -248,12 +248,12 @@ export const test = base.extend<
 **Problem: Shared storageState across workers**
 
 ```typescript
-// ❌ BAD: All workers share same auth state
+// ✗ BAD: All workers share same auth state
 use: {
   storageState: '.auth/user.json',
 }
 
-// ✅ GOOD: Per-worker auth state
+// ✓ GOOD: Per-worker auth state
 export const test = base.extend<{}, { workerStorageState: string }>({
   workerStorageState: [
     async ({ browser }, use, workerInfo) => {
@@ -279,14 +279,14 @@ export const test = base.extend<{}, { workerStorageState: string }>({
 **Problem: Tests affect each other**
 
 ```typescript
-// ❌ BAD: Module-level state persists across tests
+// ✗ BAD: Module-level state persists across tests
 let sharedPage: Page;
 
 test.beforeAll(async ({ browser }) => {
   sharedPage = await browser.newPage(); // Shared across tests!
 });
 
-// ✅ GOOD: Use Playwright's default isolation (fresh context per test)
+// ✓ GOOD: Use Playwright's default isolation (fresh context per test)
 test("first test", async ({ page }) => {
   // Fresh page for this test
 });
@@ -299,7 +299,7 @@ test("second test", async ({ page }) => {
 **Problem: Fixture cleanup not happening**
 
 ```typescript
-// ✅ GOOD: Proper fixture with cleanup
+// ✓ GOOD: Proper fixture with cleanup
 export const test = base.extend<{ tempFile: string }>({
   tempFile: async ({}, use) => {
     const file = `/tmp/test-${Date.now()}.json`;
@@ -435,7 +435,7 @@ npx playwright test tests/new-feature.spec.ts --repeat-each=20 --workers=4
 ### Isolation Checklist
 
 ```typescript
-// ✅ Each test should be self-contained
+// ✓ Each test should be self-contained
 test.describe("User profile", () => {
   test("can update name", async ({ page, testUser }) => {
     // Uses unique testUser fixture
@@ -453,10 +453,10 @@ test.describe("User profile", () => {
 ### Defensive Assertions
 
 ```typescript
-// ❌ BAD: Single point of failure
+// ✗ BAD: Single point of failure
 await expect(page.locator(".items")).toHaveCount(5);
 
-// ✅ GOOD: Progressive assertions that help diagnose
+// ✓ GOOD: Progressive assertions that help diagnose
 await expect(page.locator(".items-container")).toBeVisible();
 await expect(page.locator(".loading")).not.toBeVisible();
 await expect(page.locator(".items")).toHaveCount(5);

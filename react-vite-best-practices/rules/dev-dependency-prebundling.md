@@ -14,7 +14,7 @@ Vite pre-bundles dependencies to convert CommonJS/UMD to ESM and reduce the numb
 ## Incorrect
 
 ```typescript
-// ❌ Bad: No optimizeDeps configuration
+// ✗ Bad: No optimizeDeps configuration
 export default defineConfig({
   // Vite auto-detects but may miss some deps
 })
@@ -29,7 +29,7 @@ export default defineConfig({
 ## Correct
 
 ```typescript
-// ✅ Good: Explicitly include dependencies for pre-bundling
+// ✓ Good: Explicitly include dependencies for pre-bundling
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -56,7 +56,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Handle CommonJS dependencies
+// ✓ Good: Handle CommonJS dependencies
 export default defineConfig({
   optimizeDeps: {
     include: [
@@ -74,7 +74,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good: Warmup frequently used files (Vite 5+)
+// ✓ Good: Warmup frequently used files (Vite 5+)
 export default defineConfig({
   server: {
     warmup: {

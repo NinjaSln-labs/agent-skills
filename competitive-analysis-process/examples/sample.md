@@ -70,10 +70,10 @@ is run one).
 
 | Output | Built | Owner / consumer | Fed by steps |
 |---|---|---|---|
-| Battle card: Fieldlight vs Wrenchline | ✅ ([artifact](../../battle-card-builder/examples/sample.md)) | sales | 2, 3, 5 |
-| Executive comparison matrix | ✅ (Step 2's matrix, lifted for the board deck) | exec staff | 2 |
-| Positioning counter-move | ✅ ("the FSM your techs won't fight") | PMM | 3, 5 |
-| Threat assessment brief | ✅ (DispatchCrow: act; Wrenchline: monitor; Vantiga: ignore-with-tripwire) | leadership | 6 |
+| Battle card: Fieldlight vs Wrenchline | ✓ ([artifact](../../battle-card-builder/examples/sample.md)) | sales | 2, 3, 5 |
+| Executive comparison matrix | ✓ (Step 2's matrix, lifted for the board deck) | exec staff | 2 |
+| Positioning counter-move | ✓ ("the FSM your techs won't fight") | PMM | 3, 5 |
+| Threat assessment brief | ✓ (DispatchCrow: act; Wrenchline: monitor; Vantiga: ignore-with-tripwire) | leadership | 6 |
 
 **Maintenance cadence installed:** monthly `competitive-intel-watch`; `pricing-packaging-tracker`
 monthly on the same set; quarterly direction re-read.

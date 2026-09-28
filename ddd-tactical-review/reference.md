@@ -83,7 +83,7 @@ price = price.add(new Money(20, 'USD'));  // new object, not mutation
 | **One Aggregate per transaction** | Cross-Aggregate coordination uses Domain Events |
 
 ```typescript
-// ✅ Small Aggregate with true invariant
+// ✓ Small Aggregate with true invariant
 class BacklogItem {
   private tasks: Task[] = [];
   private status: BacklogItemStatus;
@@ -133,13 +133,13 @@ class BacklogItem {
 
 | Criterion | Belongs in Entity/Aggregate | Belongs in Domain Service |
 |-----------|-----------------------------|--------------------------|
-| Involves only one Aggregate's state | ✅ | — |
-| Requires loading multiple Aggregates | — | ✅ |
-| Calculation needs context from many objects | — | ✅ |
-| Stateless business rule | ✅ (if single aggregate) | ✅ (if multi-aggregate) |
+| Involves only one Aggregate's state | ✓ | — |
+| Requires loading multiple Aggregates | — | ✓ |
+| Calculation needs context from many objects | — | ✓ |
+| Stateless business rule | ✓ (if single aggregate) | ✓ (if multi-aggregate) |
 
 ```typescript
-// ✅ Domain Service: authentication spans Tenant + User
+// ✓ Domain Service: authentication spans Tenant + User
 class AuthenticationService {
   authenticate(tenantId: TenantId, username: string, password: string): UserDescriptor | null {
     const tenant = this.tenantRepo.findById(tenantId);

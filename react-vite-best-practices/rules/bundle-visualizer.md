@@ -14,7 +14,7 @@ Without bundle analysis, large dependencies go unnoticed and bundle size creeps 
 ## Incorrect
 
 ```typescript
-// ❌ Bad — guessing which dependencies are large
+// ✗ Bad — guessing which dependencies are large
 // "I think lodash is big, let me remove it"
 // "The bundle seems slow, maybe it's the icons?"
 
@@ -46,7 +46,7 @@ npm install -D rollup-plugin-visualizer
 ```
 
 ```typescript
-// ✅ Good — vite.config.ts with bundle visualizer
+// ✓ Good — vite.config.ts with bundle visualizer
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -66,7 +66,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// ✅ Good — only enable visualizer when analyzing (not every build)
+// ✓ Good — only enable visualizer when analyzing (not every build)
 import { defineConfig, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -88,7 +88,7 @@ export default defineConfig({
 ```
 
 ```json
-// ✅ Good — add an analyze script to package.json
+// ✓ Good — add an analyze script to package.json
 {
   "scripts": {
     "build": "vite build",

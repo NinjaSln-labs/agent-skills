@@ -22,12 +22,12 @@ into FSM), and it shows the *collection side* of the fused conclusion that appea
 
 | Discipline | Running? | Why (which signal chains) | Key sources (free first) |
 |---|---|---|---|
-| OSINT | ✅ | review complaints clustering on their dispatch board = their roadmap pressure point | review sites, trades forums |
+| OSINT | ✓ | review complaints clustering on their dispatch board = their roadmap pressure point | review sites, trades forums |
 | FININT | ◻ not yet | private company; Crunchbase free tier only — thin until they raise again | Crunchbase |
 | GEOINT/DEMOINT | ◻ no | terrain already mapped in the June TAM pass; refresh annually | — |
-| TECHINT | ✅ | changelog + API docs diffs → beta capabilities before announcement | their changelog, API docs, app store notes |
-| HUMINT | ✅ | hiring surge/specialty chain → building a capability, not a feature | LinkedIn jobs, their careers page, blog |
-| SIGINT | ✅ | pricing-gate moves + new subdomains → monetization strategy and launch staging | pricing page snapshots, Wayback, crt.sh |
+| TECHINT | ✓ | changelog + API docs diffs → beta capabilities before announcement | their changelog, API docs, app store notes |
+| HUMINT | ✓ | hiring surge/specialty chain → building a capability, not a feature | LinkedIn jobs, their careers page, blog |
+| SIGINT | ✓ | pricing-gate moves + new subdomains → monetization strategy and launch staging | pricing page snapshots, Wayback, crt.sh |
 | MASINT | ◻ no | software target; ops-capacity signals folded into HUMINT job-post reading | — |
 
 Four disciplines, chosen because they feed [DECISION]; the table's empty rows are decisions too.
