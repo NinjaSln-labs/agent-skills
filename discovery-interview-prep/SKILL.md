@@ -5,7 +5,7 @@ description: >-
   method. Use when preparing interviews for problem validation, churn research, or new
   product ideas.
 slug: discovery-interview-prep
-version: 1.0.4
+version: 1.1.1
 displayName: discovery-interview-prep
 ---
 
@@ -59,6 +59,34 @@ An interactive process that:
 - User testing a prototype (use usability testing frameworks instead)
 - Quantitative research at scale (use surveys, analytics)
 - When you already know the problem (move to solution validation)
+- You have no way to reach any interviewee — not even sales/support proxies (Section "Failure Exits": recruitment-feeding produces a plan you cannot execute; a channel check comes first)
+- The output you actually need is a survey instrument or analytics plan — this skill produces a qualitative interview plan only
+
+## Failure Exits and Input Validation (observable)
+
+Do not guess past missing or contradictory input. Each row is an observable check:
+
+| Situation | Observable exit |
+|-----------|-----------------|
+| Q1 answer is not a learn-goal ("make the product better") | Re-ask once with the 4 options plus: "What question do you need answered about customers?" Do not proceed on a vibe. |
+| Q2 segment contradicts Q1 (e.g., churn investigation but segment = prospects) | Surface the mismatch in one sentence and ask which one to keep; do not silently reconcile. |
+| Constraints imply fewer than 3 interviews possible | State "patterns need 5+ interviews; with <3 treat every finding as a hypothesis" in the plan's Success Criteria. |
+| User skips a question twice | Take the default implied by their other answers, and label it in the plan: "Assumed: [X] — confirm before recruiting." |
+| No access channel at all (no customers, no proxy, no budget for outreach) | Stop before generating the plan; output the channel check as the next action instead of an unusable interview guide. |
+
+## FAQ
+
+**Q: Can I run this for interviews I already scheduled tomorrow?**
+A: Yes — answer the 4 questions fast (defaults are fine) and the plan is generated in one turn; skip Step 0 context gathering if you paste your goal and segment in the invocation.
+
+**Q: The plan suggests gift cards — is that required?**
+A: No. Incentives are the default for cold outreach; with existing customers a sincere ask plus a session summary often outperforms incentives.
+
+**Q: Can I mix methodologies (e.g., Mom Test + Switch interviews)?**
+A: Yes — say "1 & 2" at Q4. The plan merges question sets and flags which questions serve which goal.
+
+**Q: What do I do with the insights afterwards?**
+A: Synthesize after each interview (see Interview Logistics), then feed patterns into `problem-statement` to frame the finding, and `proto-persona` if the segment needs formalizing.
 
 ---
 
@@ -391,6 +419,13 @@ You'll know these interviews are successful if:
 **Fix:** Record (with consent) or take detailed notes. Synthesize immediately after each interview.
 
 ---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：通过追问研究目标、客户分层、访问约束与方法论，产出一份含访谈框架、问题清单与成功标准的访谈准备方案。
+- **何时用**：为问题验证、流失研究或新产品构想准备客户发现访谈时。
+- **核心步骤**：①收集背景与研究目标 ②逐项确认目标/分层/约束/方法 ③生成访谈计划（开场—核心问题—收尾） ④标注要避开的偏见 ⑤给出成功标准与后勤安排。
+- **国内可达性**：主流程离线可完成，无境外服务依赖；References 点名的书目（The Mom Test 等）仅作延伸阅读。
 
 ## References
 

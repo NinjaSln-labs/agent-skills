@@ -11,7 +11,7 @@ description: >-
   credentials-class skill; remediation such as rotation or history rewriting requires
   explicit user approval.
 slug: secrets-scan
-version: 1.0.1
+version: 1.1.1
 displayName: secrets-scan
 disable-model-invocation: true
 ---
@@ -75,89 +75,7 @@ Detects strings with high randomness that may be:
 
 ## Detection Patterns
 
-### Cloud Provider Keys
-
-```regex
-# AWS
-AKIA[0-9A-Z]{16}                           # Access Key ID
-[A-Za-z0-9/+=]{40}                         # Secret Access Key (context needed)
-
-# Azure
-[a-zA-Z0-9+/=]{88}                         # Storage Account Key
-
-# GCP
-AIza[0-9A-Za-z_-]{35}                      # API Key
-[0-9]+-[a-z0-9]{32}\.apps\.googleusercontent\.com  # OAuth Client
-```
-
-### Version Control Tokens
-
-```regex
-# GitHub
-gh[pousr]_[A-Za-z0-9]{36,}                 # Personal/OAuth/User/Repo/App
-github_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59} # Fine-grained PAT
-
-# GitLab
-glpat-[A-Za-z0-9-_]{20,}                   # Personal Access Token
-
-# Bitbucket
-[a-zA-Z0-9]{24}                            # App Password (context needed)
-```
-
-### Payment & Finance
-
-```regex
-# Stripe
-sk_live_[a-zA-Z0-9]{24,}                   # Secret Key
-rk_live_[a-zA-Z0-9]{24,}                   # Restricted Key
-pk_live_[a-zA-Z0-9]{24,}                   # Publishable Key
-
-# Square
-sq0[a-z]{3}-[A-Za-z0-9_-]{22,}            # Access Token
-
-# PayPal
-access_token\$[a-zA-Z0-9-_.]+             # OAuth Token
-```
-
-### Communication Services
-
-```regex
-# Slack
-xox[bpas]-[0-9]{10,}-[a-zA-Z0-9]{24,}     # Bot/User/App Token
-
-# Twilio
-SK[a-f0-9]{32}                             # API Key SID
-[a-f0-9]{32}                               # Auth Token (context)
-
-# SendGrid
-SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43}  # API Key
-```
-
-### Database Connection Strings
-
-```regex
-# PostgreSQL/MySQL
-(postgres|mysql|mariadb)://[^:]+:[^@]+@[^/]+/\w+
-
-# MongoDB
-mongodb(\+srv)?://[^:]+:[^@]+@
-
-# Redis
-redis://:[^@]+@
-```
-
-### Private Keys
-
-```regex
------BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----
------BEGIN PGP PRIVATE KEY BLOCK-----
-```
-
-### JWT & Session
-
-```regex
-eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+   # JWT
-```
+Full verbatim pattern tables for generic provider families — cloud provider keys (AWS/Azure/GCP), version control tokens (GitHub/GitLab/Bitbucket), payment & finance (Stripe/Square/PayPal), communication services (Slack/Twilio/SendGrid), database connection strings, private keys, and JWT — live in [references/secret-patterns-extra.md](references/secret-patterns-extra.md). The domestic provider table (Aliyun/Tencent/DingTalk/WeChat) stays below.
 
 ## Scan Options
 
@@ -370,6 +288,70 @@ npx husky add .husky/pre-commit "npx secrets-scan --staged"
 files=$(git diff --cached --name-only)
 /secrets-scan --files "$files"
 ```
+
+## Domestic & Additional Providers
+
+Extend coverage to platforms common in China-market codebases (same confidence rules as above):
+
+```regex
+# Alibaba Cloud (Aliyun)
+LTAI[a-zA-Z0-9]{12,30}                     # AccessKey ID
+
+# Tencent Cloud
+AKID[a-zA-Z0-9]{30,50}                     # SecretId (pair with SecretKey)
+
+# DingTalk
+ding[a-z0-9]{8,40}                         # AppKey/robot token (context needed)
+
+# WeChat / WeCom (context needed — check assignment shape)
+(corpid|corpsecret)\s*[:=]\s*['"][A-Za-z0-9_-]{10,}['"]
+```
+
+## Minimal Worked Example
+
+**Invocation:**
+
+```
+/secrets-scan --scope src/ --entropy
+```
+
+**Output excerpt (note the mandatory redaction — masked values only):**
+
+```
+SECRETS SCAN RESULTS
+====================
+
+High-Confidence Findings: 1
+
+[!] CRITICAL: AWS Access Key
+    File: src/config/aws.ts:15
+    Pattern: AKIA****MPLE
+    Action: Rotate immediately, check CloudTrail
+
+Files scanned: 87
+```
+
+**Exit codes (CI/hook wiring):** `0` = no findings; `1` = findings detected (gate fails — that is the report, not a crash); `2` = error during scan (fix the environment, then re-run).
+
+## Failure Exits
+
+No standalone binary ships with this skill — the scan is executed by the agent per this document, so each failure has a visible outcome in the report, never a silent pass:
+
+- **Scope path does not exist / not a repo:** report `Files scanned: 0` with the reason line `scope not found: <path>` and stop — do not report "no findings", which reads as a clean scan. Ask the user for the correct path.
+- **`--git-history` outside a git repository:** report `git history scan skipped: not a git repository` and continue with the working-tree scan; the summary notes history was not covered.
+- **Binary or unreadable files:** counted in the summary as skipped files; never decode-and-report their contents.
+- **Scan interrupted (timeout, user abort):** mark the report `PARTIAL — scan interrupted at <path>`; do not emit a summary that implies full coverage. Re-running the same command is safe (read-only).
+- **Exit `2` in a CI/hook run:** environment error (e.g. git missing). Fix the environment; a non-zero from findings (`1`) is the gate working as intended.
+
+## Wrong Way → Fix (FAQ)
+
+| Wrong way | Observable symptom | Fix |
+|-----------|--------------------|-----|
+| Pasting a full credential into a report, issue, or chat | Verbatim secret visible in output | Violates the Redaction Rule — report type + `file:line` + masked value only. If already exposed, rotate first, then clean the transcript. |
+| Rotating or rewriting git history without asking | Remediation executed unprompted | Approval gate: propose the action, state blast radius, wait for explicit user approval. |
+| Scanning dependency CVEs or IaC misconfigurations with this skill | Findings categories outside credentials | Out of scope — route to `/dependency-scan` or `/config-scan`. |
+| Trusting `.secrets-scan-ignore` to hide a real leak | Ignored finding never appears in reports | Ignore lists are for known false positives (fixtures, docs). If a real credential sits in an ignored path, the scan cannot see it — audit the ignore file when a leak is suspected. |
+| Treating `sk_test_` / example keys as leaks | CRITICAL finding on `AKIAIOSFODNN7EXAMPLE` | Apply the documented false-positive list before escalating; document new false positives in `.secrets-scan-ignore` with a reason comment. |
 
 ## Related Skills
 

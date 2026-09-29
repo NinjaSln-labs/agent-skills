@@ -9,7 +9,7 @@ description: >-
   accessibility, animation, or data visualization — including design system and
   stack-guideline steps.
 slug: ui-ux-pro-max
-version: 1.0.4
+version: 1.1.0
 displayName: ui-ux-pro-max
 ---
 
@@ -55,6 +55,60 @@ python "<skill-root>/scripts/search.py" "<query>" --domain <domain>
 If your runtime happens to expose a plugin/skill-root variable, you may substitute it for `<skill-root>` (e.g. `CLAUDE_PLUGIN_ROOT` in a Claude Code plugin install) — an optional convenience, never a requirement; the placeholder form above works everywhere.
 
 If `python` is not found, try `python3`, then `py -3`. Requires Python 3.x, no external dependencies (see README for install instructions if Python is missing).
+
+## Minimal Worked Examples
+
+**Example 1 — targeted domain search.** Prerequisite: Python 3.x available. Invocation:
+
+```bash
+python "<skill-root>/scripts/search.py" "saas dashboard dark" --domain color -n 2
+```
+
+Actual output excerpt (abridged):
+
+```
+## UI Pro Max Search Results
+**Domain:** color | **Query:** saas dashboard dark
+**Source:** colors.csv | **Found:** 2 results
+
+### Result 1
+- **Product Type:** Financial Dashboard
+- **Primary:** #0F172A
+- **Background:** #020617
+- **Notes:** Dark bg + green positive indicators
+```
+
+**Example 2 — design system generation.** Invocation:
+
+```bash
+python "<skill-root>/scripts/search.py" "beauty spa wellness service" --design-system -p "Serenity Spa"
+```
+
+Actual output excerpt (abridged):
+
+```
+TARGET: Serenity Spa - RECOMMENDED DESIGN SYSTEM
+--- PATTERN ---
+  Name: Hero-Centric + Social Proof
+--- STYLE ---
+  Name: Soft UI Evolution
+--- COLORS ---
+  Primary:    #EC4899   (--color-primary)
+  Background: #FDF2F8   (--color-background)
+```
+
+## Failure Exits and Environment Errors
+
+The script exits 0 whenever it runs to completion — including a 0-result search (`Found: 0 results` plus an explicit "no database match" note). Diagnose by symptom, not exit code:
+
+| Symptom you observe | Cause | Action |
+|---------------------|-------|--------|
+| `command not found: python` (or `can't open file ... search.py`) | Interpreter missing, or wrong `<skill-root>` path | Retry with `python3`, then `py -3`; if still missing, tell the user Python 3.x is required (no external dependencies otherwise). If the path is wrong, re-locate the directory containing this `SKILL.md` — do not guess install paths. |
+| `FileNotFoundError` / `KeyError` mentioning a `.csv` file | The skill's `data/` directory is missing or incomplete | Report to the user that the skill install is incomplete (the CSV data files under `<skill-root>/data/` must exist); do not fabricate database content to cover the gap. |
+| `Found: 0 results` | Query missed the database (keyword problem, not a system problem) | Retry once with broader/different keywords (see the 0-results section below); if still empty, fall back to the priority table and say so explicitly. |
+| Results look off-topic | Auto-detected domain misrouted overlapping terms | Re-run with an explicit `--domain`. |
+
+There is no network access and no cache: every call reads the local CSVs, so a repeated query after a fix returns the same result — if it failed once due to a path or data problem, it will keep failing until that problem is fixed.
 
 ## Workflow
 

@@ -11,7 +11,7 @@ description: >-
   DDD context mapping, or code outside the domain layer (DTOs, controllers, infrastructure
   adapters).
 slug: ddd-tactical-review
-version: 1.0.0
+version: 1.1.0
 displayName: ddd-tactical-review
 ---
 
@@ -97,3 +97,62 @@ Recommended refactoring:
 ```
 
 When refactoring, show a before/after diff for each class touched.
+
+## Minimal Worked Example
+
+**Input (user):** "Check my domain — is this anemic?" with a file containing:
+
+```java
+public class Order {
+    private OrderStatus status;
+    private BigDecimal total;
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus s) { this.status = s; }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal t) { this.total = t; }
+}
+public class OrderService {
+    public void complete(Order o) {
+        o.setStatus(OrderStatus.COMPLETED);
+        o.setTotal(o.getTotal().add(fee));
+    }
+}
+```
+
+**Output excerpt (Phase 1+2, validate intent — report, then ask before refactoring):**
+
+```
+## Anemia Diagnosis: Order
+
+Severity: Severe
+
+Issues:
+- No domain methods beyond getters/setters — pure data bag
+- OrderService.complete() mutates Order state — logic that belongs in the Aggregate
+- setStatus() allows arbitrary transitions; no invariant guard
+
+Recommended refactoring:
+- Move complete() into Order as an intent method with a business guard
+- Replace setStatus() setter chains with a single expressive method
+```
+
+Then ask: "Would you like me to apply these fixes?"
+
+## Wrong Way → Fix (FAQ)
+
+| Wrong way | Observable symptom | Fix |
+|-----------|--------------------|-----|
+| Refactoring immediately on a "review/check" request | Diffs appear without a diagnosis report or permission question | Phase 1+2 only; stop at the report and ask before Phase 3. |
+| Reviewing DTOs, controllers, or infrastructure adapters | "Anemic" findings on classes outside the domain layer | Out of scope — DTOs are deliberately data bags. State that the class is outside the domain layer and skip it; do not report it as anemia. |
+| Treating every primitive as a defect | A proposed Value Object for every `int`/`string` | Prefer VOs where invariants or vocabulary exist (`Money`, `Email`); report only primitives that carry domain meaning. |
+| Large Aggregate "to keep everything consistent" | One Aggregate spanning many child Entities | Default to root + Value Objects; add child Entities only for true invariants; cross-Aggregate rules go via Domain Events. |
+| Answering strategic questions (context mapping, service boundaries) with this skill | Advice about bounded contexts or microservice split | Out of scope. Say the question belongs to strategic DDD / architecture work and stop. |
+
+## Failure Exits and Boundaries (observable)
+
+This skill reads whatever code you point it at — there is no script and no exit code. Each dead end has a visible, sayable outcome:
+
+- **No repository / no code in context:** do not invent sample code and review it. Say "no domain code to review" and ask the user to point at the module or paste the classes.
+- **Wrong repo / framework code only (no domain layer found):** report "no domain-layer classes detected in the provided code" and name what would qualify (entities with state+behavior candidates). Do not grade DTO layers as anemia.
+- **Empty or trivial model (1–2 classes, no behavior):** run Phase 1 honestly; if severity is `None`, output the report with `Severity: None` and "no issues" — do not fabricate findings to seem useful.
+- **Not a review/refactor/modeling request:** out of scope (see description NOT for). Name the actual capability boundary in one sentence and stop.

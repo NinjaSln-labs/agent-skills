@@ -5,7 +5,7 @@ description: >-
   benefits, and differentiation. Use when your product messaging feels fuzzy, generic, or
   misaligned.
 slug: positioning-workshop
-version: 1.0.3
+version: 1.1.0
 displayName: positioning-workshop
 ---
 
@@ -406,6 +406,26 @@ Acme Workflows is a no-code automation platform for small business owners that r
 **Fix:** Read positioning statement to 5 target customers. If they don't say "Yes, that's me," revise.
 
 ---
+
+## When Answers Stay Vague (Failure Exits)
+
+The workshop tolerates messy input, but vague answers produce vague positioning (see Example 2). If an answer is too vague to adapt options from, re-ask **once** with a concrete clarifying question (e.g., "Businesses — which ones? Name the role and company size you serve best today."). If it stays vague after that re-ask:
+
+1. **Park the workshop** — don't fabricate a positioning statement from guesses.
+2. **List exactly which inputs are missing** and where to get them: customer research or testimonials (Question 2), competitor intel or win/loss notes (Question 5), current messaging (Step 0).
+3. **Offer the shortest path back**: paste any customer-facing material (website copy, sales deck, support tickets) and the workshop resumes from where it parked.
+
+Boundary in plain terms: this workshop helps you **make and record strategic choices** about who you serve and how you differ. It does not write taglines, ad copy, or website headlines, and it is not a brainstorming session — if what you want is copy, generate the positioning statement first, then brief copywriters on it.
+
+## FAQ (Wrong → Right)
+
+| Wrong | Right |
+|-------|-------|
+| Answering "businesses" / "everyone" as the target | Pick the *first* customer segment you serve best; expand later (Pitfall 1) |
+| Stating the need as a feature ("they need AI dashboards") | Ask "why do they need that?" until you reach the underlying problem (Pitfall 2) |
+| "We're better than competitors" as differentiation | Name the competitor and the measurable outcome gap ("setup: 2 hours → 10 minutes") |
+| Inventing answers when you have no customer research | Stop and gather evidence first — positioning without validation is Pitfall 5; the workshop can park and resume (above) |
+| Treating the workshop output as final copy | The statement is a strategic anchor; stress-test it with 5 customers before touching artifacts (Next Steps) |
 
 ## References
 

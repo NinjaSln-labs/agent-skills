@@ -5,7 +5,7 @@ description: >-
   with cited evidence. Use when entering or re-evaluating a market before sizing,
   positioning, or picking competitors to study.
 slug: market-landscape-scan
-version: 1.0.1
+version: 1.1.1
 displayName: market-landscape-scan
 ---
 
@@ -173,4 +173,35 @@ completely.
 - [`positioning-statement`](../positioning-statement/SKILL.md) (Component) — positions against this landscape
 - Adapted from `market-intelligence/market-landscape-scan-prompt.md` in the
   `https://github.com/deanpeters/product-manager-prompts` repo.
+
+## Failure Exits & Edge Cases
+
+- **No network / no retrievable sources:** stop before emitting the schema. Do not fill it from memory — an uncited player map violates the do-not-invent list. Exit: deliver Scope + search plan only, and tell the user the scan needs web access to proceed.
+- **Sources too thin after honest effort:** if fewer than 3 citable signals exist for a player, drop the player rather than pad it. A 6-player map with evidence beats a 12-player map with filler; say the map is source-limited.
+- **Upstream protocol missing:** if [`autonomous-investigation`](../autonomous-investigation/SKILL.md) is unavailable, proceed with the embedded contract in Key Concepts (3-question budget, Fact/Inference/Assumption labels, dead-zone test) — do not abandon those rules.
+- **Wrong scope:** if the user asks "how big is the market?", that is sizing (TAM/SAM/SOM), not this skill — offer Final Step option 2 instead of drifting the schema.
+
+## NOT for
+
+- Market sizing or revenue estimation (structure, not magnitude — use a TAM/SAM/SOM pass downstream).
+- Deep single-competitor profiles (that is `competitive-research-snapshot`, Final Step option 1).
+- Financial advice or investment recommendations — momentum signals are evidence-labeled observations, not calls.
+- Internal tooling decisions with no external market (no players, no substitutes — nothing to scan).
+
+## FAQ
+
+**Do I have to answer the 3 opening questions?** No — unanswered questions proceed as labeled assumptions. But a stated decision ("supports Q4 market entry") sharpens the So-What section, so answer if you can.
+
+**Why is the player map capped at 12?** Depth beats breadth: twelve strongest-signal entries are usable; twenty half-filled ones are noise (see Common Pitfalls).
+
+**Can I re-run quarterly with a changed boundary?** You can, but it is a new baseline, not a re-scan — comparability with the previous snapshot breaks (see Common Pitfalls).
+
+---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：按「检索计划→细分→玩家地图→动态→空白点→下一步选项」的工作流画出市场结构图——谁在哪玩、为何；只画结构，不估市场规模。
+- **何时用**：进入或重估一个市场之前，为后续 sizing、定位、竞对深研打底时。
+- **核心步骤**：定市场／决策／边界（至多 3 问）→ 出检索计划并过闸 → 买家视角细分＋玩家地图（含非消费替代品）→ 动态与空白点（过「死区检验」）→ 给下一步选项；事实／推断／假设全程分标。
+- **国内可达性边界**：主流程依赖网络检索（分析师报道、评测、社区、融资信号）——境外分析师报告与社区不可达时，用可访问的公开中文渠道替代并如实标注来源；检索完全不可用时按正文 Failure Exits 只交付 Scope＋检索计划，不凭记忆填玩家地图，不虚构公司、份额或增速。
 

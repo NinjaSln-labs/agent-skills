@@ -10,7 +10,7 @@ description: >-
   for: email copy, popup copy, or offer framing (bonuses/guarantees) — those belong to
   dedicated email/popup/offers skills when available.
 slug: marketing-copywriting
-version: 1.0.2
+version: 1.1.0
 displayName: marketing-copywriting
 ---
 
@@ -258,3 +258,64 @@ For headlines and CTAs, provide 2-3 options:
 - **emails**: For email copywriting
 - **popups**: For popup and modal copy
 - **ab-testing**: To test copy variations
+
+---
+
+## How to Invoke (explicit)
+
+There are no flags or arguments — this skill is invoked conversationally. Any of these utterances trigger it, and the most reliable forms name the page or the task:
+
+- "Write copy for my [pricing page / homepage / landing page]"
+- "Improve this copy: <paste the copy>" or "Rewrite my hero section"
+- "Give me 3 headline options for <page>"
+- "Help me describe my product on the feature page"
+
+Vague phrasing like "this copy is weak" also triggers it — the skill will first ask which page and what the primary action is (see Before Writing, #1) before touching a word.
+
+## Worked Example (shortest path)
+
+**Precondition:** none strictly required; if `.agents/product-marketing.md` exists it is read first and unanswered questions are skipped.
+
+**User says:** "Write copy for my pricing page — we're a scheduling SaaS for clinics."
+
+**What happens:** asks the one missing must-know (primary action: "start a trial") → drafts per the Page Structure Framework → returns section-by-section copy with annotations and headline/CTA alternatives.
+
+**Output excerpt (what you get back):**
+
+> **Headline:** Simple per-clinic pricing that scales with your schedule
+> **Subheadline:** Every plan includes unlimited appointments and calendar sync. Upgrade when your team grows — not before.
+> **Primary CTA:** Start My Free Trial
+>
+> *Annotation: headline leads with the buyer's unit ("per-clinic") to defuse seat-count anxiety; CTA names what they get (a trial), not the action ("Sign Up").*
+
+## Out-of-Scope Requests: helpful exits (not dead ends)
+
+When the request lands in the NOT-for zone, do this — each exit is observable:
+
+| Request is actually… | Do this |
+|----------------------|---------|
+| Email copy (sequences, newsletters) | Say "this is email copy — out of my scope", point to the `emails` skill if available, **and** still hand over what transfers: audience framing, benefit lines, and tone pulled from the context doc. |
+| Popup / modal copy | Same pattern: name `popups` as the owner, provide the headline + CTA candidates that would live inside the popup. |
+| Offer framing (bonuses, guarantees, discounts) | Decline the framing itself, but deliver the benefit statements the offer will attach to. |
+| Page strategy/structure is the real problem (copy can't fix it) | Say so explicitly ("the issue is page structure, not wording") and route to `cro` if available, or propose the section restructure before writing copy. |
+| Polishing existing copy only | Route to `copy-editing` if available; otherwise run the Quick Quality Check and mark it as an edit pass, not fresh copy. |
+
+Never answer a out-of-scope request with only "use another skill" — the transferable pieces above are always provided.
+
+## FAQ (wrong → fix)
+
+| Wrong move | Fix |
+|------------|-----|
+| Writing copy before asking for the ONE primary action | Stop; ask Page Purpose #1 first. Copy without a target action can't be evaluated. |
+| Ignoring `.agents/product-marketing.md` when it exists | Read it first; re-asking questions it answers is a defect. Only ask what's missing or task-specific. |
+| Fabricating stats or testimonials to sound specific | Specific ≠ invented. Use the user's proof points; if none exist, write the claim without a number and flag "[add proof]". |
+| Choosing clever over clear | Default to clarity (first principle). Offer the clever option only as an explicit Alternative with the tradeoff named. |
+| Delivering one headline with no options | Always return 2-3 headline/CTA alternatives with rationale (Output Format). |
+| Writing email/popup copy "just this once" | Use the out-of-scope exits above — scope discipline is what keeps the skill's quality bar. |
+
+## NOT For (each observable)
+
+- Email copy of any kind → output must instead contain the out-of-scope exit from the table above.
+- Popup, modal, and offer framing (bonuses/guarantees) → same.
+- SEO-only content (blog posts, articles) → this skill optimizes for conversion on product pages, not search content.
+- Writing or modifying files: deliverables are returned as copy in the response, unless the user explicitly asks to write them into files.

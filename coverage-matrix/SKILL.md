@@ -11,10 +11,10 @@ description: >-
   test, event without assertion) into the project's audit-item ledger.
   USER-INVOKED ONLY: it writes a tracked artifact and opens audit items; run
   only on the user's explicit request. Use when at a stage end or after
-  adding invariants/events, or on the Chinese trigger ("更新覆盖矩阵"). NOT for: runtime enforcement — the matrix is a
+  adding invariants/events. NOT for: runtime enforcement — the matrix is a
   human-checked artifact, never a test gate.
 slug: coverage-matrix
-version: 1.0.2
+version: 1.1.1
 displayName: coverage-matrix
 disable-model-invocation: true
 compatibility: Requires the staged-delivery (spec-kit) project layout; the concrete paths below are this family's default layout example, probe a new repo before applying
@@ -61,23 +61,8 @@ compatibility: Requires the staged-delivery (spec-kit) project layout; the concr
 
 ## 矩阵结构（三向表）
 
-### 表 1：不变量 ↔ L1 测试
-
-| 不变量 | 语义 | 覆盖测试（文件::用例） | 判定 |
-|--------|------|------------------------|------|
-| Inv 1 | … | tests/unit/conversationState.test.ts::「…」 | ✓ / ✗ 缺口 |
-
-### 表 2：事件 ↔ 测试
-
-| 事件 id | 语义 | 断言测试 | 判定 |
-|---------|------|----------|------|
-| session.pending_set | … | … | ✓ / ✗ 无断言 |
-
-### 表 3：DoD ↔ 门禁
-
-| DoD 断言（spec 原文） | 门禁方法（stage-gate 执行方式） | 判定 |
-|----------------------|--------------------------------|------|
-| L1 全量绿（新增 N 条） | `npx vitest run` | 断言可执行 ✓ |
+三向缺一不可：不变量↔L1 测试 / 事件↔测试 / DoD↔门禁，判定列无空值
+（三张检查点表全样见 [references/checkpoint-tables.md](references/checkpoint-tables.md)）。
 
 ## 缺口判定
 
@@ -85,6 +70,59 @@ compatibility: Requires the staged-delivery (spec-kit) project layout; the concr
 - 事件注册表有事件但测试无断言（不限于 tlog 打点——需语义断言）→ **缺口**
 - DoD 断言无法映射到门禁方法 → **spec 缺陷**（回 stage-spec，不算矩阵缺口）
 - 缺口一律入 audit-item（open），供 stage-gate 审计状态断言枚举
+
+## 最短真实示例（前置 → 调用 → 产出摘录）
+
+**前置**：仓库按 staged-delivery 布局——`tests/unit/` 有测试、`src/domain/timeline.ts` 有
+`TIMELINE_EVENT_SPECS`、`docs/design/stage-specs/S2.md` 有 DoD 节；用户在阶段末发起。
+
+**调用句**（用户对 agent 说）：
+
+```text
+「更新覆盖矩阵。」
+```
+
+**产出摘录**（`docs/tests/coverage-matrix.md` 应长这样——节选表 1 与表 2 各一行）：
+
+```markdown
+# 覆盖矩阵
+- 生成日期：2026-09-29 · 数据源版本：测试 46 条 / 事件 12 个
+
+## 表 1：不变量 ↔ L1 测试
+| 不变量 | 语义 | 覆盖测试 | 判定 |
+|--------|------|---------|------|
+| Inv 3 | 会话不可从 active 回 pending | tests/unit/conversationState.test.ts::「拒绝回退」 | ✓ |
+
+## 表 2：事件 ↔ 测试
+| 事件 id | 断言测试 | 判定 |
+|---------|---------|------|
+| session.pending_set | tests/unit/timeline.test.ts::「pending 打点」 | ✓ |
+| ticket.transferred | —（无任何语义断言） | ✗ 缺口 → audit-item #21 (open)
+```
+
+反例对照：矩阵只有 ✓ 没有判定依据、缺口不入账、无生成日期 → 不合格（见验收硬项）。
+
+## 失败出口与边界处置（可观察）
+
+| 情形 | 可观察出口 |
+|------|-----------|
+| 布局探测失败（步 0 找不到等价源） | 停止并在回复中说明「本技能仅适用 staged-delivery 布局，差异点：<列出>」；不写半成品矩阵 |
+| 事件注册表存在但无 `TIMELINE_EVENT_SPECS` 符号 | 问用户该仓的事件注册表在哪；**不**扫全库猜符号 |
+| `tests/unit/` 为空 / 无测试 | 矩阵照常产出（全部行判 ✗ 缺口），头部标注「测试 0 条」；缺清一色入账 |
+| stage-spec DoD 文件缺失（S1 期） | 表 3 标「无 DoD 源（S1 前正常）」；不算缺口 |
+| `docs/tests/` 目录不存在 | 创建后写入；头部记生成日期 + 数据源版本 |
+| audit-item 写入口不可用 | 报错原文呈现给用户并停；缺口先留在矩阵内标 ✗，**不**丢账 |
+
+## 错法 → 改法
+
+| 错法 | 改法 |
+|------|------|
+| 手写矩阵不扫源 | 必须从测试文件/注册表/DoD 提取——手写必然过期（反模式 1） |
+| 只更新表 1 不做事件/DoD 向 | 三向缺一不可，表 2/3 空着等于没跑完 |
+| 缺口发现了口头提一句不入账 | 一律 audit-item 入账（open，来源=覆盖矩阵），门禁才能枚举 |
+| 把矩阵 ✓ 当测试通过 | 矩阵是静态文档，执行归 `ddd-qa-chain`——覆盖 ≠ 通过 |
+| 布局不同的仓库硬套默认路径 | 先按步 0 映射等价源并记录映射；映射不了就停（compatibility 字段同口径） |
+| 模型在阶段中自行动刷新矩阵 | USER-INVOKED ONLY（disable-model-invocation）：写 tracked 件 + 开审计项，只在用户显式要求（如「更新覆盖矩阵」）时运行 |
 
 ## 验收
 

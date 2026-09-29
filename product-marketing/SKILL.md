@@ -9,7 +9,7 @@ description: >-
   'ideal customer profile.' Use at the start of any new project before other marketing
   skills.
 slug: product-marketing
-version: 1.0.1
+version: 1.1.0
 displayName: product-marketing
 ---
 
@@ -261,3 +261,75 @@ After gathering information, create `.agents/product-marketing.md` with this str
 - **Ask for examples**: "Can you give me an example?" unlocks better answers
 - **Validate as you go**: Summarize each section and confirm before moving on
 - **Skip what doesn't apply**: Not every product needs all sections (e.g., Personas for B2C)
+
+---
+
+## Inputs and Outputs
+
+**Input:** none required to start — the skill gathers everything by reading the repo and asking. Optional inputs that speed it up: an existing `.agents/product-marketing.md`, a README, landing-page copy, or customer quotes the user pastes in.
+
+**Output:** exactly one file, `.agents/product-marketing.md`, in the structure of Step 3, with `Document version`, `Last updated` (ISO date), and a `Changelog` section. No other files are created or modified.
+
+---
+
+## Worked Example (shortest path)
+
+**Precondition:** a repo with a README, no `.agents/product-marketing.md` yet.
+
+**User says:** "Set up my product marketing context."
+
+**What happens:**
+1. No existing context found → offers auto-draft (option 1) and the user accepts.
+2. Reads README / landing copy / package.json, drafts all 12 sections.
+3. Asks: "What needs correcting? What's missing?" — user fixes the one-liner and ICP.
+4. Saves and reports the excerpt below.
+
+**Output excerpt (what the saved file looks like):**
+
+```markdown
+# Product Marketing Context
+
+**Document version:** v1
+**Last updated:** 2026-09-29
+
+## Product Overview
+**One-liner:** SavvyCal is scheduling that respects both sides of the meeting.
+**Product category:** scheduling software
+**Business model:** SaaS, per-seat monthly subscription
+...
+## Changelog
+- v1 (2026-09-29) — Initial context.
+```
+
+**Update example — user says:** "We pivoted from an email tool to a deliverability platform; update the context." → Only ICP, Differentiation, Competitive Landscape are re-gathered, version bumps to v3, one changelog line is prepended; untouched sections stay as-is.
+
+---
+
+## Failure Exits (observable, do these — not just "note a degradation")
+
+| Situation | Observable exit |
+|-----------|-----------------|
+| No repo / empty directory, and user can't answer section questions | Say: "No codebase and no answers provided — I can only produce a skeleton." Save the skeleton with every section left as `**TBD**`, version it `v1`, and list the TBD sections back to the user. Do **not** invent product facts. |
+| `.agents/` cannot be written (permission error on save) | Report the exact path and the error message, then offer: save to `.claude/product-marketing.md` instead, or have the user fix permissions (`mkdir -p .agents` / adjust write access) and retry. Do not silently drop the save. |
+| A legacy copy exists (`product-marketing-context.md` or `.claude/product-marketing.md`) and differs from `.agents/product-marketing.md` | Show both versions and ask which is canonical before merging; never overwrite without an explicit choice. |
+| Repo scan finds no marketing signals (no README, no copy) | Say which sources were checked and came up empty, then switch to conversational gathering instead of fabricating positions. |
+| User contradicts a previously saved section | Treat the user as authoritative: update the section, bump the version, and record the contradiction in the changelog line (e.g. "ICP corrected — prior draft was inferred from README, user says otherwise"). |
+
+---
+
+## NOT For
+
+- Writing the actual marketing copy (pages, emails, ads) — that is `marketing-copywriting` and related skills, which **read** this document.
+- One-off competitive research or market sizing with no intent to maintain positioning context.
+- Internal/non-product docs (engineering design docs, user manuals).
+
+## Common Mistakes → Fixes
+
+| Wrong approach | Observable symptom | Fix |
+|----------------|--------------------|-----|
+| Dumping all 12 sections of questions at once | One giant question list the user can't answer | Walk section by section (Step 2); ask, confirm, move on. |
+| Polishing the customer's words into marketing speak | Changelog/quotes contain paraphrases, no verbatim quotes | Keep `"exact words"` in quotes; polish downstream copy instead. |
+| Editing the file by hand later without version/changelog | `Document version` unchanged after real content changes | Every substantive save bumps version + prepends one changelog line (typo-only fixes excepted). |
+| Rewriting/reordering old changelog entries | History no longer shows how positioning evolved | Only prepend; never touch past entries. |
+| Letting the model invent competitors, metrics, or testimonials | Proof Points contains numbers the user never gave | Ask for the fact or mark `**TBD**`; never fabricate. |
+| Filling every section for a tiny B2C product | Personas table full of invented stakeholders | Skip sections that don't apply and say so. |

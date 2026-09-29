@@ -4,7 +4,7 @@ description: >-
   Write a user-centered problem statement with who is blocked, what they are trying to do,
   why it matters, and how it feels. Use when framing discovery, prioritization, or a PRD.
 slug: problem-statement
-version: 1.0.3
+version: 1.1.0
 displayName: problem-statement
 ---
 
@@ -253,6 +253,29 @@ Mini example excerpt:
 - Adapted from `prompts/framing-the-problem-statement.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
 
 ---
+
+## Failure Exits & Edge Cases
+
+- **No user research at all:** stop before drafting. Exit: "run discovery interviews first" (see When NOT to Use). Do not fabricate quotes or emotions — that is Pitfall 5 in its worst form.
+- **Input too scattered to draft:** do not force a narrative from noise. Reply: "Please reorganize — I need (1) who is blocked, (2) what they try to do, (3) what stops them." Then re-check.
+- **Internal/operational problem framed as user problem:** if the "user" is the company itself (revenue, churn, costs), say so explicitly and redirect — this skill is for user-facing problems only.
+- **Missing files:** `template.md` or `examples/` referenced but absent → use the inline templates in Steps 2–4 of this document.
+
+## FAQ
+
+**One user or a segment?** One specific persona per statement. If two personas share the statement, write two statements — "I am" fails quality check when it's plural.
+
+**Where does the "Because" come from?** From root-cause analysis on real evidence (interviews, logs, support tickets) — never from the room's best guess. If you can't cite a source, mark it `[assumed]`.
+
+**Can I reuse this directly in a PRD?** As the problem-framing section, yes. The PRD still owns requirements and solution definition (see When NOT to Use).
+
+**Is "makes me feel" mandatory?** Yes — it's the empathy check, but only with real emotions from research, not marketing adjectives.
+
+## 快速参考（中文速览）
+
+- **五段叙事**：**I am**（具体到能想象其人）→ **Trying to**（想要的结果，不是任务）→ **But**（真实障碍）→ **Because**（根因，连续追问 why）→ **Which makes me feel**（访谈里的真实情绪）。
+- **最短用法**：一句话给出"谁被卡住＋想做什么"即可开始；信息混乱时会被要求重新组织这三件事。
+- **完成标准**：最终问题陈述一句话、可判定是否解决、当事人听完说"对，就是这样"。
 
 **Skill type:** Component
 **Suggested filename:** `problem-statement.md`

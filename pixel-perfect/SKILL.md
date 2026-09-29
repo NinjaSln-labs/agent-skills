@@ -10,7 +10,7 @@ description: >-
   accessibility. Prefer a hosted solution when the user needs managed visual baselines with PR review
   and approval workflows (Chromatic-style service).
 slug: pixel-perfect
-version: 1.0.3
+version: 1.1.0
 displayName: pixel-perfect
 ---
 
@@ -331,3 +331,24 @@ npx playwright test tests/visual.spec.ts # specific file
 npx playwright test --update-snapshots # update changed baselines
 npx playwright test --update-snapshots=missing # only add new baselines
 ```
+
+## Troubleshooting (错法 → 改法)
+
+| Symptom | Wrong move | Right move |
+|---------|-----------|------------|
+| Diff shows only tiny text anti-aliasing noise | Loosening `maxDiffPixelRatio` to `0.1` (masks real regressions) | Raise `threshold` to `0.1` only, or capture baselines in Docker (Workflow B) |
+| Tests pass locally, fail in CI | Re-running CI until green | Fonts/OS mismatch — recapture baselines in the Playwright Docker image (Workflow B Step 2) |
+| New page section has no baseline diff | Adding a mask to hide it | Run `npx playwright test --update-snapshots=missing` to add the missing baseline |
+| Snapshot diffs on every run (timestamps, prices) | Updating baselines each time | Black out the volatile region with `mask` (Key Options) |
+| `--update-snapshots` run in CI | Accepting the corrupted baselines | Never auto-update in CI — use `update-snapshots.yml` locally with a reason (Workflow C) |
+| Tests crash with no report | Increasing retries | Check Chromium IPC: workflows use `--ipc=host` in Docker; locally check Node v18+ |
+
+## FAQ
+
+**Do I need a hosted visual-testing service?** No — this skill is free and local via Playwright's native `toHaveScreenshot`. Prefer a hosted service (Chromatic-style) only when you need managed baselines with PR approval workflows.
+
+**Why Docker for baseline capture?** Font rendering differs across OSes; baselines captured on macOS can false-fail Linux CI. The Docker image matches CI rendering.
+
+**Where do the "common problems" live?** In the Troubleshooting table above and the ⚠ notes inside Workflows B/C/F — no separate page needed.
+
+**Chinese-language environments:** Playwright and `toHaveScreenshot` work as documented in China; the Docker registry and GitHub Actions may need mirrors, but local workflows (A–E) have no such dependency.

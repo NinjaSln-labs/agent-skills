@@ -10,7 +10,7 @@ description: >-
   a PR, work-in-progress changes, asks to "review since X", asks to review for code smells,
   or at a stage completion (stage-end review).
 slug: code-review
-version: 1.0.2
+version: 1.1.0
 displayName: code-review
 ---
 
@@ -100,7 +100,7 @@ End with a one-line summary: total findings per axis, and the worst issue _withi
 - **Spec 轴**：以 stage-spec DoD 为 spec 来源（`docs/design/stage-specs/S{N}.md`）——逐条核对代码是否实现（DoD 未实现 = Spec fail）。
 - **Standards 轴**：同普通模式（仓库规范 + smell 基线）。
 - **产出 = 状态化报告**：每条 finding 标注状态——`open`（待修）/ `fixed`（本次已修，含 commit+回归测试证据）/ `recorded`（裁决不修，含理由）——落盘 `docs/audits/stage-review-S{N}-YYYY-MM-DD.md`。
-- **下游**：open 项 → `audit-item` 入账（`.scratch/neonforge-v1/audit-items/`）；阶段收口 → `stage-gate` 跑 DoD（含审计状态核对）。
+- **下游**：open 项 → `audit-item` 入账（入本仓约定的审计台账位置）；阶段收口 → `stage-gate` 跑 DoD（含审计状态核对）。
 
 与普通模式的差异：普通模式输出双轴报告即可；阶段模式要求**状态化清单**（每条 finding 带状态 + 证据），可直接被 audit-item 消费、被 stage-gate 枚举。
 
@@ -112,3 +112,52 @@ A change can pass one axis and fail the other:
 - Code that does exactly what the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
 
 Reporting them separately stops one axis from masking the other.
+
+## Minimal worked example
+
+Precondition: HEAD has commits since `v1.2.0`, `CODING_STANDARDS.md` exists, a commit message references `#42`.
+
+User says: **"review the changes since v1.2.0"**
+
+What happens:
+
+1. `git rev-parse v1.2.0` resolves; `git diff v1.2.0...HEAD` is non-empty; `git log v1.2.0..HEAD --oneline` shows 3 commits.
+2. Spec source: `#42` found in a commit message, fetched per `docs/agents/issue-tracker.md`.
+3. Both sub-agents run in parallel; the aggregated report looks like:
+
+```markdown
+## Standards
+- src/utils/date.ts:12 — Mysterious Name: `fn2` doesn't reveal intent → rename (judgement call)
+- src/api/orders.ts:48 — bare `except:` violates CODING_STANDARDS.md §3 (hard violation)
+
+## Spec
+- #42 asked for CSV export; not present in the diff (missing requirement)
+- Diff adds a `/health` endpoint not mentioned in #42 (scope creep)
+
+Summary: Standards 2 findings (worst: bare except), Spec 2 findings (worst: CSV export missing).
+```
+
+## Failure exits
+
+| Situation | Observable signal | Exit action |
+|-----------|-------------------|-------------|
+| Fixed point doesn't resolve | `git rev-parse <fixed-point>` exits non-zero ("unknown revision") | Tell the user which ref failed and ask for a corrected one. Do **not** spawn sub-agents. |
+| Empty diff | `git diff <fixed-point>...HEAD` prints nothing | Report "no changes since `<fixed-point>`" and stop. |
+| No spec found after the step-2 lookups | none of the four lookups matched | Ask the user where the spec is; if there is none, run Standards only and write "Spec skipped: no spec available" in the report. |
+| Repo documents no standards | no `CODING_STANDARDS.md` / `CONTRIBUTING.md` / similar | Proceed with the smell baseline only and note "no documented repo standards found" at the top of the Standards section. |
+
+## Wrong way → right way (FAQ)
+
+| Wrong | Right |
+|-------|-------|
+| Running a review without the user asking for one | Run only on request ("review since X", a PR review, stage-end review); otherwise propose it |
+| Merging both axis reports into one ranked list | Keep `## Standards` and `## Spec` separate; end with one summary line per axis |
+| Telling the sub-agent "see step 3 of the skill" | Paste the smell baseline in full into the sub-agent prompt — sub-agents cannot see this skill |
+| Reporting a baseline smell as a hard violation | Label smells as judgement calls; a documented repo standard overrides the baseline |
+| Reviewing the whole repo instead of the change | Review only `git diff <fixed-point>...HEAD`; uncommitted worktree edits are out of scope unless the user asks to include them |
+
+## NOT for
+
+- Not a vulnerability/CVE sweep — that's `security-scan`.
+- Not for secrets or credential detection — that's `secrets-scan`.
+- Not for writing or auto-fixing code; the report is the deliverable (fixes happen after, with the user's go-ahead).

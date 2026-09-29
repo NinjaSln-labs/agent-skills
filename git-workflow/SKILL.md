@@ -11,11 +11,57 @@ description: >-
   a GitHub release. NOT for: diagnosing BLOCKED project-workflow PR states; no skill
   name implied.
 slug: git-workflow
-version: 1.0.1
+version: 1.1.1
 displayName: git-workflow
 ---
 
 # Git Workflow Skill
+
+## When to Use / How to Invoke
+
+Invoke explicitly by name when any of these is true (do not self-trigger on ordinary git chatter):
+
+- "merge is blocked on failing checks / unresolved review threads" → load `references/pull-request-workflow.md`.
+- "hook won't install / fails in a worktree" → load `references/git-hooks-setup.md`.
+- writing commit / branch / tag conventions → `references/commit-conventions.md`.
+- creating a GitHub release → `references/release-rules.md`.
+
+Invocation form: `use git-workflow: <what you need, e.g. "merge PR #42 after CI passes">`. If invoked without arguments, ask which of the trigger scenarios above applies before loading references.
+
+**NOT for (observable boundaries):**
+
+- Not a git repository (no `.git/` where `pwd` points) → stop; this skill has nothing to act on.
+- Diagnosing BLOCKED project-workflow PR states → that is a workflow-state issue, not a git operation; no skill name implied.
+- No network / GitHub unreachable: all local operations (branches, commits, rebase, hooks, `verify-git-workflow.sh`) still work; defer PR/release steps and say which command failed on connectivity.
+- Wrong repo (the repo you are in is not the one the user named) → verify with `git remote -v` before any write operation; abort on mismatch.
+
+## Quick-Start Example
+
+Precondition: you are in a feature-branch repo with a PR waiting on CI.
+
+Invocation:
+
+```text
+use git-workflow: PR #42 is green, merge it per the merge gate
+```
+
+What happens / typical output excerpt:
+
+```text
+Loaded references/pull-request-workflow.md.
+Merge gate: threads resolved ✓ · CI green ✓ · rebased onto main ✓ · signed ✓
+→ git fetch origin && git rebase origin/main
+→ git push --force-with-lease origin feature/TICKET-42
+→ git merge --ff-only main   (or via platform merge button)
+```
+
+Local-only check (no PR needed):
+
+```bash
+./scripts/verify-git-workflow.sh /path/to/repository
+```
+
+Output excerpt: `✅ All branch names follow conventions` / `⚠️  Non-standard branch names found: ...`. Exit code 0 when the checks ran (warnings are counted and reported, not fatal); exit 1 when the path is not a git repository (`❌ Not a git repository`).
 
 ## Critical Rules (Non-Negotiable)
 
@@ -92,6 +138,40 @@ Before merging: threads resolved, CI green (incl. annotations), rebased, signed.
 ```bash
 ./scripts/verify-git-workflow.sh /path/to/repository
 ```
+
+- Argument: repository path (default `.`). No flags.
+- Exit 0: checks ran (fix reported ⚠️ warnings before opening/merging a PR).
+- Exit 1: target is not a git repository — check `pwd` and the path argument.
+
+## Failure Exits
+
+| Symptom (observable) | Way out |
+|----------------------|---------|
+| `❌ Not a git repository` from the verify script (exit 1) | Wrong path or wrong directory; run `pwd` + `git remote -v`, rerun with the correct repo path |
+| `fatal: not a git repository` from any git command | Same as above — never `git init` to make the error go away |
+| Hook install prints nothing / `echo "No hooks"` fired (see Hook Detection) | No hook framework configured; pick one from `references/git-hooks-setup.md` first, then install |
+| Push rejected (non-fast-forward) | Do **not** plain `--force`; commit local work, `git fetch`, `git rebase`, then `git push --force-with-lease` |
+| Rebase aborts with dirty tree | Rule 7: `git add → git commit` (or `git stash`) first, then rebase |
+| `gh release create` fails on existing tag | Releases are immutable — bump the version, never reuse the tag (see Critical Release Rules) |
+| Network timeout on `git fetch` / `gh` | Finish all local steps, then retry the remote step once connectivity is back; state which step is pending |
+
+## 中文速览（Quick Guide）
+
+- **做什么**：覆盖分支策略、Conventional Commits、PR 创建/评审/合并、git hooks 安装排障与 GitHub 发布规则的实操指引，按触发场景加载对应 references。
+- **何时用**：合并被失败检查或未解评审线程卡住、hook 在 worktree 装不上、写提交/分支/标签规范，或建 GitHub release 时。
+- **核心步骤**：①`git remote -v` 确认在正确仓库 ②按触发场景选参考文件 ③本地操作（分支/提交/rebase/钩子） ④PR 合并走 CI 验证 ⑤发布遵循不可变 tag 规则。
+- **国内可达性**：本地 git 操作全部离线可用；`gh`/GitHub PR/release 步骤依赖 GitHub，网络不通时先完成本地步骤并注明待远端的一步（正文 Failure Exits 已给此出口）。
+
+## FAQ / Wrong Way → Fix
+
+| Wrong way | Fix |
+|-----------|-----|
+| `git push --force` because "it's my branch" | `--force-with-lease` only; plain force can eat teammates' commits |
+| Squashing by default for a "clean history" | Don't squash unless asked — it destroys atomic commits, signatures, bisectability (Rule 3) |
+| Saying "tested and working" without pasting output | Paste the command output or say it's unverified (Rule 4) |
+| Editing skills under `~/.claude/skills/` or `**/.bare/**` | Always edit the repo worktree; verify with `pwd` (Rule 5) |
+| Self-triggering this skill for any git question | Only for the named trigger scenarios; otherwise answer inline without loading references |
+| Merging with unresolved review threads because CI is green | Threads-resolved is a hard gate — resolve or get explicit waiver first (Rule 2) |
 
 ---
 

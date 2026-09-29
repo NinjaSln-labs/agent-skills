@@ -6,7 +6,7 @@ description: >-
   non-goals, defining success metrics and acceptance criteria, or breaking a big ask into
   a phased spec.
 slug: write-spec
-version: 1.0.2
+version: 1.1.0
 displayName: write-spec
 ---
 
@@ -16,11 +16,75 @@ displayName: write-spec
 
 Write a feature specification or product requirements document (PRD).
 
+**Related skills:** pair with `problem-statement` when the user problem is still vague, `prd-development`/`prd-driven-ddd` when the spec feeds a DDD-driven build, and `roadmap-planning` when phasing spans multiple releases.
+
 ## Usage
 
 ```
 /write-spec $ARGUMENTS
 ```
+
+## When NOT to Use This
+
+- The ask is an engineering implementation plan (task breakdown, sequencing) → use a planning skill; this skill produces the *what and why*, not the *how*.
+- The ask is a bug report or incident write-up → that is post-hoc documentation, not a feature spec.
+- The feature is already specced and you only need tickets broken out → feed the existing spec to a ticketing step instead of regenerating a PRD.
+- You cannot articulate any user problem yet — write a problem statement first; a PRD built on a phantom problem is worse than no PRD.
+
+## Failure Exits and Edge Handling (observable)
+
+| Situation | Observable exit |
+|-----------|-----------------|
+| `$ARGUMENTS` is empty and the user gives no goal | Ask one question: "What problem should this spec solve?" Do **not** generate a placeholder PRD. |
+| User gives only a solution ("add a dropdown") | Restate the underlying user problem in one sentence and confirm before writing Goals. |
+| Conflicting constraints stated (e.g., "ship in 1 week" + "rewrite auth") | Surface the conflict explicitly in **Open Questions** tagged to the decision owner; do not silently pick a side. |
+| Connected-tool sections reference tools that are not connected | Skip them and proceed from user-provided info only (per Workflow step 3); do not fabricate ticket or research references. |
+| Scope too big for one spec | Stop expanding; propose phasing and spec only phase 1 (per Tips). |
+
+## Minimal Worked Example
+
+**Preconditions:** user invokes with a feature idea and answers a couple of context questions.
+
+**Invocation:**
+
+```
+/write-spec Users want to export their data as CSV; enterprise admins keep asking
+```
+
+**Excerpt of the produced PRD (what "done" looks like):**
+
+```markdown
+# Spec: CSV Data Export
+
+## Problem Statement
+Enterprise admins need data out of the product for reporting, but today must
+request manual extracts — a 2-day turnaround per request. (Evidence: 14 support
+tickets in Q3.)
+
+## Goals
+- Reduce admin time-to-data from 2 days to under 5 minutes
+
+## Non-Goals
+- Scheduled/recurring exports — separate initiative, needs scheduler infra
+- XLSX or JSON formats — CSV covers 90% of requests; formats are a fast follow
+
+## Requirements
+### Must-Have (P0)
+- Admin can export the members list as CSV — Given an admin on the members page,
+  When they click "Export CSV", Then a download starts within 10 seconds
+...
+```
+
+## Common Mistakes → Fixes
+
+| Mistake | Symptom | Fix |
+|---------|---------|-----|
+| Goals are outputs, not outcomes | "Build an export wizard" | Restate as measurable change: "reduce time-to-data to under 5 minutes" |
+| Non-goals missing | Spec grows every review | Add 3-5 explicit non-goals with one-line rationale each |
+| Every requirement is P0 | "If everything is P0, nothing is P0" | Challenge each: "Would we really not ship without this?" |
+| Acceptance criteria say "user-friendly" | Untestable | Rewrite in Given/When/Then with observable behavior |
+| User story prescribes UI | "I want a dropdown" | Rewrite around the need: "I want to filter members by status" |
+| Open questions answerable from context | Noise for stakeholders | Only list genuinely open questions with a named owner |
 
 ## Workflow
 

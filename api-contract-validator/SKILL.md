@@ -8,7 +8,7 @@ description: >-
   when detecting GraphQL schema breaking changes; or when reviewing
   consumer-driven contract tests.
 slug: api-contract-validator
-version: 1.0.1
+version: 1.1.1
 displayName: api-contract-validator
 ---
 
@@ -57,961 +57,74 @@ tests/
   playwright.config.ts
 ```
 
+## When to Use / How to Invoke
+
+Invoke explicitly when one of these holds (do not self-trigger on ordinary API work):
+
+- An API response must be checked against its OpenAPI/Swagger spec or JSON Schema.
+- A change may remove fields, change types, or break backward compatibility.
+- Contract validation must be wired into CI, or an existing contract test is failing.
+- GraphQL schema breaking changes must be detected, or consumer-driven contract tests (e.g. Pact) need review.
+
+Invocation form: `use api-contract-validator: <task, e.g. "check v2 of the orders API against specs/openapi.yaml for breaking changes">`. No bundled scripts ship with this skill — the code samples in the references are patterns you adapt into the target repo's test suite. Default assumption when unspecified: TypeScript + AJV for JS/TS projects, REST Assured for Java projects (see the reference sections).
+
+**NOT for (observable boundaries):**
+
+- No spec / schema exists at all → write the OpenAPI spec first (schema-first, Core Principle 4); there is nothing to validate against.
+- No access to the API or a staging instance → contract tests cannot run; do not point them at production (Anti-Pattern 4).
+- Load / performance testing → different discipline; this skill validates structure, not throughput.
+- Business-correctness of response *values* → schema validation checks structure and types, not whether the data is semantically right.
+
+## Example (precondition → invocation → output excerpt)
+
+Precondition: `specs/openapi.yaml` is committed; the repo has a TS test runner (e.g. Playwright/Vitest); AJV installed.
+
+Invocation:
+
+```text
+use api-contract-validator: verify GET /users/{id} responses still match the spec after the v2 refactor
+```
+
+What happens / typical output excerpt:
+
+```text
+Loaded references/openapi-response-validation.md.
+→ fetch GET /users/42 (staging) → 200
+→ AJV validate against components/schemas/User
+✅ structure matches (id, email, createdAt)
+❌ FAIL: GET /users/999 → 404 body missing required field `code` (error.schema.json)
+→ Breaking-change check vs specs@v1: `legacyId` removed from User → BREAKING
+```
+
+Completion criteria (checkable): every documented status code for the endpoint has a passing test, AJV reports zero errors, and the backward-compat diff (e.g. `openapi-diff`) shows no subtractive change — or each one carries an explicit version bump.
+
 ## Configuration
 
-```typescript
-// tests/contracts/fixtures/schema-loader.ts
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
-
-export interface OpenAPISpec {
-  openapi: string;
-  info: { title: string; version: string };
-  paths: Record<string, Record<string, PathOperation>>;
-  components: { schemas: Record<string, JSONSchema> };
-}
-
-export interface PathOperation {
-  operationId: string;
-  summary?: string;
-  parameters?: ParameterObject[];
-  requestBody?: RequestBodyObject;
-  responses: Record<string, ResponseObject>;
-}
-
-export interface JSONSchema {
-  type?: string;
-  properties?: Record<string, JSONSchema>;
-  required?: string[];
-  items?: JSONSchema;
-  enum?: unknown[];
-  format?: string;
-  minimum?: number;
-  maximum?: number;
-  minLength?: number;
-  maxLength?: number;
-  pattern?: string;
-  additionalProperties?: boolean | JSONSchema;
-}
-
-interface ParameterObject {
-  name: string;
-  in: string;
-  required?: boolean;
-  schema: JSONSchema;
-}
-
-interface RequestBodyObject {
-  required?: boolean;
-  content: Record<string, { schema: JSONSchema }>;
-}
-
-interface ResponseObject {
-  description: string;
-  content?: Record<string, { schema: JSONSchema }>;
-  headers?: Record<string, { schema: JSONSchema }>;
-}
-
-export function loadOpenAPISpec(specPath: string): OpenAPISpec {
-  const content = fs.readFileSync(specPath, 'utf-8');
-  if (specPath.endsWith('.yaml') || specPath.endsWith('.yml')) {
-    return yaml.load(content) as OpenAPISpec;
-  }
-  return JSON.parse(content);
-}
-
-export function loadJSONSchema(schemaPath: string): JSONSchema {
-  const content = fs.readFileSync(schemaPath, 'utf-8');
-  return JSON.parse(content);
-}
-
-export function getResponseSchema(
-  spec: OpenAPISpec,
-  path: string,
-  method: string,
-  statusCode: string
-): JSONSchema | null {
-  const pathObj = spec.paths[path];
-  if (!pathObj) return null;
-
-  const operation = pathObj[method.toLowerCase()];
-  if (!operation) return null;
-
-  const response = operation.responses[statusCode] || operation.responses['default'];
-  if (!response?.content) return null;
-
-  const jsonContent = response.content['application/json'];
-  return jsonContent?.schema || null;
-}
-```
-
-```typescript
-// tests/contracts/fixtures/contract-helpers.ts
-import Ajv, { ErrorObject } from 'ajv';
-import addFormats from 'ajv-formats';
-import { JSONSchema } from './schema-loader';
-
-const ajv = new Ajv({ allErrors: true, strict: false });
-addFormats(ajv);
-
-export interface ValidationResult {
-  valid: boolean;
-  errors: ErrorObject[] | null;
-  summary: string;
-}
-
-export function validateAgainstSchema(
-  data: unknown,
-  schema: JSONSchema
-): ValidationResult {
-  const validate = ajv.compile(schema);
-  const valid = validate(data) as boolean;
-
-  return {
-    valid,
-    errors: validate.errors || null,
-    summary: valid
-      ? 'Response matches schema'
-      : `Schema violations: ${(validate.errors || [])
-          .map((e) => `${e.instancePath} ${e.message}`)
-          .join('; ')}`,
-  };
-}
-
-export function checkBackwardCompatibility(
-  oldSchema: JSONSchema,
-  newSchema: JSONSchema
-): { compatible: boolean; breakingChanges: string[] } {
-  const breakingChanges: string[] = [];
-
-  // Check for removed required fields
-  const oldRequired = new Set(oldSchema.required || []);
-  const newRequired = new Set(newSchema.required || []);
-  const oldProperties = oldSchema.properties || {};
-  const newProperties = newSchema.properties || {};
-
-  // Removed properties that were in old schema
-  for (const prop of Object.keys(oldProperties)) {
-    if (!(prop in newProperties)) {
-      breakingChanges.push(`Removed property: "${prop}"`);
-    }
-  }
-
-  // Type changes on existing properties
-  for (const [prop, oldPropSchema] of Object.entries(oldProperties)) {
-    if (prop in newProperties) {
-      const newPropSchema = newProperties[prop];
-      if (oldPropSchema.type !== newPropSchema.type) {
-        breakingChanges.push(
-          `Type changed for "${prop}": ${oldPropSchema.type} -> ${newPropSchema.type}`
-        );
-      }
-    }
-  }
-
-  // New required fields (breaking for existing consumers)
-  for (const field of newRequired) {
-    if (!oldRequired.has(field)) {
-      breakingChanges.push(`New required field added: "${field}"`);
-    }
-  }
-
-  // Enum value removal
-  for (const [prop, oldPropSchema] of Object.entries(oldProperties)) {
-    if (prop in newProperties && oldPropSchema.enum && newProperties[prop].enum) {
-      const removedValues = oldPropSchema.enum.filter(
-        (v) => !newProperties[prop].enum!.includes(v)
-      );
-      if (removedValues.length > 0) {
-        breakingChanges.push(
-          `Enum values removed from "${prop}": ${removedValues.join(', ')}`
-        );
-      }
-    }
-  }
-
-  return {
-    compatible: breakingChanges.length === 0,
-    breakingChanges,
-  };
-}
-```
+Full content (verbatim, including all code samples): [references/configuration.md](references/configuration.md).
 
 ## OpenAPI Response Validation
 
-```typescript
-// tests/contracts/openapi/validate-responses.spec.ts
-import { test, expect } from '@playwright/test';
-import { loadOpenAPISpec, getResponseSchema } from '../fixtures/schema-loader';
-import { validateAgainstSchema } from '../fixtures/contract-helpers';
-import * as path from 'path';
-
-const spec = loadOpenAPISpec(path.resolve(__dirname, '../specs/openapi.yaml'));
-
-test.describe('OpenAPI Response Validation', () => {
-  test('GET /api/users returns response matching spec', async ({ request }) => {
-    const response = await request.get('/api/users');
-    const status = response.status().toString();
-    const body = await response.json();
-
-    const schema = getResponseSchema(spec, '/api/users', 'get', status);
-    expect(schema, `No schema found for GET /api/users ${status}`).not.toBeNull();
-
-    const result = validateAgainstSchema(body, schema!);
-    expect(result.valid, result.summary).toBe(true);
-  });
-
-  test('GET /api/users/:id returns response matching spec', async ({ request }) => {
-    const response = await request.get('/api/users/1');
-    const status = response.status().toString();
-    const body = await response.json();
-
-    const schema = getResponseSchema(spec, '/api/users/{id}', 'get', status);
-    expect(schema).not.toBeNull();
-
-    const result = validateAgainstSchema(body, schema!);
-    expect(result.valid, result.summary).toBe(true);
-  });
-
-  test('POST /api/users error response matches error schema', async ({ request }) => {
-    // Send invalid data to trigger validation error
-    const response = await request.post('/api/users', {
-      data: { invalid: 'payload' },
-    });
-    const status = response.status().toString();
-    const body = await response.json();
-
-    const schema = getResponseSchema(spec, '/api/users', 'post', status);
-    if (schema) {
-      const result = validateAgainstSchema(body, schema);
-      expect(result.valid, result.summary).toBe(true);
-    }
-
-    // Verify standard error format
-    expect(body).toHaveProperty('error');
-    expect(typeof body.error).toBe('object');
-    if (body.error) {
-      expect(body.error).toHaveProperty('message');
-      expect(typeof body.error.message).toBe('string');
-    }
-  });
-
-  test('response content-type matches spec', async ({ request }) => {
-    const response = await request.get('/api/users');
-    const contentType = response.headers()['content-type'];
-
-    expect(contentType).toContain('application/json');
-  });
-
-  test('pagination response structure matches spec', async ({ request }) => {
-    const response = await request.get('/api/users?page=1&limit=10');
-    const body = await response.json();
-
-    // Standard pagination contract
-    expect(body).toHaveProperty('data');
-    expect(Array.isArray(body.data)).toBe(true);
-    expect(body).toHaveProperty('pagination');
-    expect(body.pagination).toHaveProperty('page');
-    expect(body.pagination).toHaveProperty('limit');
-    expect(body.pagination).toHaveProperty('total');
-    expect(body.pagination).toHaveProperty('totalPages');
-
-    expect(typeof body.pagination.page).toBe('number');
-    expect(typeof body.pagination.limit).toBe('number');
-    expect(typeof body.pagination.total).toBe('number');
-    expect(typeof body.pagination.totalPages).toBe('number');
-  });
-
-  test('validate all documented endpoints return conforming responses', async ({ request }) => {
-    const violations: string[] = [];
-
-    for (const [pathTemplate, pathObj] of Object.entries(spec.paths)) {
-      for (const [method, operation] of Object.entries(pathObj)) {
-        if (['get'].includes(method)) {
-          // Replace path parameters with test values
-          const resolvedPath = pathTemplate.replace(/{(\w+)}/g, '1');
-
-          try {
-            const response = await request.get(resolvedPath);
-            const status = response.status().toString();
-            const body = await response.json().catch(() => null);
-
-            if (body) {
-              const schema = getResponseSchema(spec, pathTemplate, method, status);
-              if (schema) {
-                const result = validateAgainstSchema(body, schema);
-                if (!result.valid) {
-                  violations.push(
-                    `${method.toUpperCase()} ${pathTemplate} (${status}): ${result.summary}`
-                  );
-                }
-              }
-            }
-          } catch (error) {
-            // Skip unreachable endpoints
-          }
-        }
-      }
-    }
-
-    expect(
-      violations,
-      `Contract violations found:\n${violations.join('\n')}`
-    ).toHaveLength(0);
-  });
-});
-```
+Full content (verbatim, including all code samples): [references/openapi-response-validation.md](references/openapi-response-validation.md).
 
 ## JSON Schema Validation
 
-```typescript
-// tests/contracts/json-schema/schema-validation.spec.ts
-import { test, expect } from '@playwright/test';
-import { loadJSONSchema } from '../fixtures/schema-loader';
-import { validateAgainstSchema } from '../fixtures/contract-helpers';
-import * as path from 'path';
-
-const userSchema = loadJSONSchema(
-  path.resolve(__dirname, '../specs/schemas/user.schema.json')
-);
-
-const errorSchema = loadJSONSchema(
-  path.resolve(__dirname, '../specs/schemas/error.schema.json')
-);
-
-test.describe('JSON Schema Validation', () => {
-  test('user object conforms to user schema', async ({ request }) => {
-    const response = await request.get('/api/users/1');
-    expect(response.status()).toBe(200);
-
-    const user = await response.json();
-    const result = validateAgainstSchema(user, userSchema);
-    expect(result.valid, result.summary).toBe(true);
-  });
-
-  test('user list items all conform to user schema', async ({ request }) => {
-    const response = await request.get('/api/users');
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
-    const users = body.data || body;
-
-    for (let i = 0; i < users.length; i++) {
-      const result = validateAgainstSchema(users[i], userSchema);
-      expect(result.valid, `User at index ${i}: ${result.summary}`).toBe(true);
-    }
-  });
-
-  test('error responses conform to error schema', async ({ request }) => {
-    const response = await request.get('/api/users/nonexistent-id');
-
-    if (response.status() >= 400) {
-      const error = await response.json();
-      const result = validateAgainstSchema(error, errorSchema);
-      expect(result.valid, result.summary).toBe(true);
-    }
-  });
-
-  test('required fields are always present', async ({ request }) => {
-    const response = await request.get('/api/users/1');
-    const user = await response.json();
-
-    const requiredFields = userSchema.required || [];
-    for (const field of requiredFields) {
-      expect(
-        user,
-        `Required field "${field}" is missing from user response`
-      ).toHaveProperty(field);
-    }
-  });
-
-  test('field types match schema definitions', async ({ request }) => {
-    const response = await request.get('/api/users/1');
-    const user = await response.json();
-    const properties = userSchema.properties || {};
-
-    for (const [field, fieldSchema] of Object.entries(properties)) {
-      if (user[field] !== undefined && user[field] !== null) {
-        switch (fieldSchema.type) {
-          case 'string':
-            expect(typeof user[field], `${field} should be string`).toBe('string');
-            break;
-          case 'number':
-          case 'integer':
-            expect(typeof user[field], `${field} should be number`).toBe('number');
-            break;
-          case 'boolean':
-            expect(typeof user[field], `${field} should be boolean`).toBe('boolean');
-            break;
-          case 'array':
-            expect(Array.isArray(user[field]), `${field} should be array`).toBe(true);
-            break;
-          case 'object':
-            expect(typeof user[field], `${field} should be object`).toBe('object');
-            break;
-        }
-      }
-    }
-  });
-
-  test('string format constraints are enforced', async ({ request }) => {
-    const response = await request.get('/api/users/1');
-    const user = await response.json();
-    const properties = userSchema.properties || {};
-
-    for (const [field, fieldSchema] of Object.entries(properties)) {
-      if (user[field] && fieldSchema.type === 'string') {
-        if (fieldSchema.format === 'email') {
-          expect(user[field]).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-        }
-        if (fieldSchema.format === 'date-time') {
-          expect(new Date(user[field]).toISOString()).toBeTruthy();
-        }
-        if (fieldSchema.format === 'uri') {
-          expect(() => new URL(user[field])).not.toThrow();
-        }
-        if (fieldSchema.minLength) {
-          expect(user[field].length).toBeGreaterThanOrEqual(fieldSchema.minLength);
-        }
-        if (fieldSchema.maxLength) {
-          expect(user[field].length).toBeLessThanOrEqual(fieldSchema.maxLength);
-        }
-      }
-    }
-  });
-});
-```
+Full content (verbatim, including all code samples): [references/json-schema-validation.md](references/json-schema-validation.md).
 
 ## Backward Compatibility Testing
 
-```typescript
-// tests/contracts/openapi/backward-compat.spec.ts
-import { test, expect } from '@playwright/test';
-import { loadOpenAPISpec } from '../fixtures/schema-loader';
-import { checkBackwardCompatibility } from '../fixtures/contract-helpers';
-import * as path from 'path';
-
-test.describe('Backward Compatibility', () => {
-  test('current schema is backward compatible with previous version', () => {
-    const previousSpec = loadOpenAPISpec(
-      path.resolve(__dirname, '../specs/openapi-v1.yaml')
-    );
-    const currentSpec = loadOpenAPISpec(
-      path.resolve(__dirname, '../specs/openapi.yaml')
-    );
-
-    const schemasToCheck = ['User', 'Document', 'Error'];
-
-    for (const schemaName of schemasToCheck) {
-      const oldSchema = previousSpec.components.schemas[schemaName];
-      const newSchema = currentSpec.components.schemas[schemaName];
-
-      if (oldSchema && newSchema) {
-        const result = checkBackwardCompatibility(oldSchema, newSchema);
-        expect(
-          result.compatible,
-          `Breaking changes in ${schemaName}:\n${result.breakingChanges.join('\n')}`
-        ).toBe(true);
-      }
-    }
-  });
-
-  test('API version header is present and correct', async ({ request }) => {
-    const response = await request.get('/api/users');
-    const apiVersion = response.headers()['api-version'] ||
-      response.headers()['x-api-version'];
-
-    expect(apiVersion).toBeDefined();
-    expect(apiVersion).toMatch(/^\d+\.\d+\.\d+$/);
-  });
-
-  test('deprecated fields still present but marked', async ({ request }) => {
-    const response = await request.get('/api/users/1');
-    const body = await response.json();
-
-    // If deprecated fields exist, they should still be present for backward compat
-    const spec = loadOpenAPISpec(path.resolve(__dirname, '../specs/openapi.yaml'));
-    const userSchema = spec.components.schemas['User'];
-
-    if (userSchema?.properties) {
-      for (const [field, fieldSchema] of Object.entries(userSchema.properties)) {
-        if ((fieldSchema as Record<string, unknown>).deprecated) {
-          // Deprecated fields should still be in the response
-          expect(
-            body,
-            `Deprecated field "${field}" removed before deprecation period ended`
-          ).toHaveProperty(field);
-        }
-      }
-    }
-  });
-
-  test('new required fields are not added without version bump', async ({ request }) => {
-    const v1Response = await request.get('/api/v1/users/1');
-    const v2Response = await request.get('/api/v2/users/1');
-
-    if (v1Response.status() === 200 && v2Response.status() === 200) {
-      const v1Body = await v1Response.json();
-      const v2Body = await v2Response.json();
-
-      const v1Fields = new Set(Object.keys(v1Body));
-      const v2Fields = new Set(Object.keys(v2Body));
-
-      // All v1 fields must still exist in v2
-      for (const field of v1Fields) {
-        expect(
-          v2Fields.has(field),
-          `Field "${field}" from v1 is missing in v2`
-        ).toBe(true);
-      }
-    }
-  });
-});
-```
+Full content (verbatim, including all code samples): [references/backward-compatibility-testing.md](references/backward-compatibility-testing.md).
 
 ## Java REST Assured Contract Validation
 
-```java
-// src/test/java/contracts/ApiContractTest.java
-package contracts;
-
-import io.restassured.RestAssured;
-import io.restassured.module.jsv.JsonSchemaValidator;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
-
-public class ApiContractTest {
-
-    @BeforeAll
-    static void setup() {
-        RestAssured.baseURI = System.getProperty("api.baseUrl", "http://<app-host>:<port>");
-    }
-
-    @Test
-    @DisplayName("GET /api/users response matches JSON Schema")
-    void getUsersResponseMatchesSchema() {
-        given()
-            .header("Accept", "application/json")
-        .when()
-            .get("/api/users")
-        .then()
-            .statusCode(200)
-            .contentType("application/json")
-            .body(JsonSchemaValidator.matchesJsonSchemaInClasspath(
-                "schemas/users-list-response.json"
-            ));
-    }
-
-    @Test
-    @DisplayName("GET /api/users/:id response matches User schema")
-    void getUserByIdMatchesSchema() {
-        given()
-            .header("Accept", "application/json")
-            .pathParam("id", 1)
-        .when()
-            .get("/api/users/{id}")
-        .then()
-            .statusCode(200)
-            .contentType("application/json")
-            .body(JsonSchemaValidator.matchesJsonSchemaInClasspath(
-                "schemas/user.schema.json"
-            ))
-            .body("id", notNullValue())
-            .body("email", matchesPattern("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))
-            .body("createdAt", matchesPattern(
-                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}"
-            ));
-    }
-
-    @Test
-    @DisplayName("Error responses follow standard error contract")
-    void errorResponseFollowsContract() {
-        given()
-            .header("Accept", "application/json")
-        .when()
-            .get("/api/users/nonexistent")
-        .then()
-            .statusCode(anyOf(is(404), is(400)))
-            .contentType("application/json")
-            .body("error", notNullValue())
-            .body("error.message", not(emptyOrNullString()))
-            .body("error.code", notNullValue());
-    }
-
-    @Test
-    @DisplayName("Pagination contract is consistent across endpoints")
-    void paginationContractConsistency() {
-        String[] paginatedEndpoints = {
-            "/api/users",
-            "/api/documents",
-            "/api/reports"
-        };
-
-        for (String endpoint : paginatedEndpoints) {
-            Response response = given()
-                .queryParam("page", 1)
-                .queryParam("limit", 10)
-            .when()
-                .get(endpoint);
-
-            if (response.statusCode() == 200) {
-                response.then()
-                    .body("data", instanceOf(java.util.List.class))
-                    .body("pagination.page", equalTo(1))
-                    .body("pagination.limit", equalTo(10))
-                    .body("pagination.total", instanceOf(Integer.class))
-                    .body("pagination.totalPages", instanceOf(Integer.class));
-            }
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"application/json", "application/xml"})
-    @DisplayName("Content negotiation returns correct content type")
-    void contentNegotiation(String acceptHeader) {
-        Response response = given()
-            .header("Accept", acceptHeader)
-        .when()
-            .get("/api/users");
-
-        String contentType = response.getContentType();
-
-        if (response.statusCode() == 200) {
-            // If the API supports the requested format, it should return it
-            assertThat(contentType, containsString(acceptHeader));
-        } else if (response.statusCode() == 406) {
-            // 406 Not Acceptable is the correct response for unsupported types
-            assertThat(response.statusCode(), equalTo(406));
-        }
-    }
-
-    @Test
-    @DisplayName("Required response headers are present")
-    void requiredHeadersPresent() {
-        given()
-            .header("Accept", "application/json")
-        .when()
-            .get("/api/users")
-        .then()
-            .statusCode(200)
-            .header("Content-Type", containsString("application/json"))
-            .header("X-Request-Id", notNullValue())
-            .header("Cache-Control", notNullValue());
-    }
-
-    @Test
-    @DisplayName("POST request validates required fields from schema")
-    void postRequestValidation() {
-        // Missing required fields should return 400 with specific validation errors
-        given()
-            .header("Content-Type", "application/json")
-            .body("{\"invalid\": \"data\"}")
-        .when()
-            .post("/api/users")
-        .then()
-            .statusCode(anyOf(is(400), is(422)))
-            .body("error.message", not(emptyOrNullString()));
-    }
-
-    @Test
-    @DisplayName("Response field types match schema definitions")
-    void responseFieldTypes() {
-        given()
-            .header("Accept", "application/json")
-            .pathParam("id", 1)
-        .when()
-            .get("/api/users/{id}")
-        .then()
-            .statusCode(200)
-            .body("id", anyOf(instanceOf(Integer.class), instanceOf(String.class)))
-            .body("name", instanceOf(String.class))
-            .body("email", instanceOf(String.class))
-            .body("active", instanceOf(Boolean.class))
-            .body("createdAt", instanceOf(String.class));
-    }
-
-    @Test
-    @DisplayName("Null handling follows schema nullable definitions")
-    void nullHandling() {
-        Response response = given()
-            .header("Accept", "application/json")
-            .pathParam("id", 1)
-        .when()
-            .get("/api/users/{id}");
-
-        if (response.statusCode() == 200) {
-            // Non-nullable required fields should never be null
-            response.then()
-                .body("id", notNullValue())
-                .body("email", notNullValue())
-                .body("name", notNullValue());
-        }
-    }
-}
-```
+Full content (verbatim, including all code samples): [references/java-rest-assured-contract-validation.md](references/java-rest-assured-contract-validation.md).
 
 ## GraphQL Schema Validation
 
-```typescript
-// tests/contracts/graphql/schema-validation.spec.ts
-import { test, expect } from '@playwright/test';
-
-test.describe('GraphQL Schema Validation', () => {
-  test('introspection returns expected types', async ({ request }) => {
-    const response = await request.post('/graphql', {
-      data: {
-        query: `
-          {
-            __schema {
-              types {
-                name
-                kind
-              }
-              queryType { name }
-              mutationType { name }
-            }
-          }
-        `,
-      },
-    });
-
-    expect(response.status()).toBe(200);
-    const body = await response.json();
-    const typeNames = body.data.__schema.types.map(
-      (t: { name: string }) => t.name
-    );
-
-    // Verify expected types exist
-    expect(typeNames).toContain('User');
-    expect(typeNames).toContain('Document');
-    expect(typeNames).toContain('Query');
-    expect(typeNames).toContain('Mutation');
-  });
-
-  test('query returns data matching declared return type', async ({ request }) => {
-    const response = await request.post('/graphql', {
-      data: {
-        query: `
-          query GetUser($id: ID!) {
-            user(id: $id) {
-              id
-              name
-              email
-              createdAt
-            }
-          }
-        `,
-        variables: { id: '1' },
-      },
-    });
-
-    expect(response.status()).toBe(200);
-    const body = await response.json();
-
-    expect(body.errors).toBeUndefined();
-    expect(body.data.user).toBeDefined();
-    expect(typeof body.data.user.id).toBe('string');
-    expect(typeof body.data.user.name).toBe('string');
-    expect(typeof body.data.user.email).toBe('string');
-  });
-
-  test('non-nullable fields never return null', async ({ request }) => {
-    const response = await request.post('/graphql', {
-      data: {
-        query: `
-          {
-            __type(name: "User") {
-              fields {
-                name
-                type {
-                  kind
-                  name
-                  ofType {
-                    kind
-                    name
-                  }
-                }
-              }
-            }
-          }
-        `,
-      },
-    });
-
-    const body = await response.json();
-    const fields = body.data.__type?.fields || [];
-
-    const nonNullableFields = fields
-      .filter((f: Record<string, unknown>) => {
-        const fieldType = f.type as { kind: string };
-        return fieldType.kind === 'NON_NULL';
-      })
-      .map((f: Record<string, unknown>) => f.name as string);
-
-    // Fetch actual data and verify non-nullable fields are not null
-    const dataResponse = await request.post('/graphql', {
-      data: {
-        query: `{ users { ${nonNullableFields.join(' ')} } }`,
-      },
-    });
-
-    const dataBody = await dataResponse.json();
-    if (dataBody.data?.users) {
-      for (const user of dataBody.data.users) {
-        for (const field of nonNullableFields) {
-          expect(
-            user[field],
-            `Non-nullable field "${field}" is null`
-          ).not.toBeNull();
-        }
-      }
-    }
-  });
-
-  test('deprecated fields trigger warnings but still work', async ({ request }) => {
-    const schemaResponse = await request.post('/graphql', {
-      data: {
-        query: `
-          {
-            __type(name: "User") {
-              fields(includeDeprecated: true) {
-                name
-                isDeprecated
-                deprecationReason
-              }
-            }
-          }
-        `,
-      },
-    });
-
-    const body = await schemaResponse.json();
-    const deprecatedFields = body.data.__type?.fields?.filter(
-      (f: Record<string, boolean>) => f.isDeprecated
-    ) || [];
-
-    for (const field of deprecatedFields) {
-      expect(
-        field.deprecationReason,
-        `Deprecated field "${field.name}" should have a deprecation reason`
-      ).toBeTruthy();
-
-      // Verify deprecated field still returns data
-      const queryResponse = await request.post('/graphql', {
-        data: {
-          query: `{ users { ${field.name} } }`,
-        },
-      });
-      expect(queryResponse.status()).toBe(200);
-    }
-  });
-});
-```
+Full content (verbatim, including all code samples): [references/graphql-schema-validation.md](references/graphql-schema-validation.md).
 
 ## Content-Type and Error Response Contracts
 
-```typescript
-// tests/contracts/openapi/content-type-validation.spec.ts
-import { test, expect } from '@playwright/test';
-
-test.describe('Content-Type and Error Response Contracts', () => {
-  test('JSON responses have correct Content-Type header', async ({ request }) => {
-    const response = await request.get('/api/users');
-    const contentType = response.headers()['content-type'];
-    expect(contentType).toMatch(/application\/json/);
-  });
-
-  test('error responses use consistent structure', async ({ request }) => {
-    const errorEndpoints = [
-      { path: '/api/users/nonexistent', expectedStatus: 404 },
-      { path: '/api/nonexistent-endpoint', expectedStatus: 404 },
-    ];
-
-    for (const { path, expectedStatus } of errorEndpoints) {
-      const response = await request.get(path);
-      expect(response.status()).toBe(expectedStatus);
-
-      const body = await response.json();
-      expect(body).toHaveProperty('error');
-      expect(body.error).toHaveProperty('message');
-      expect(typeof body.error.message).toBe('string');
-      expect(body.error.message.length).toBeGreaterThan(0);
-
-      // Error should not contain stack traces in production
-      expect(body.error).not.toHaveProperty('stack');
-      expect(JSON.stringify(body)).not.toContain('at Object');
-      expect(JSON.stringify(body)).not.toContain('node_modules');
-    }
-  });
-
-  test('400 validation errors include field-level details', async ({ request }) => {
-    const response = await request.post('/api/users', {
-      data: { email: 'not-an-email', name: '' },
-    });
-
-    if (response.status() === 400 || response.status() === 422) {
-      const body = await response.json();
-      expect(body.error).toHaveProperty('message');
-
-      // Should include validation details
-      if (body.error.details) {
-        expect(Array.isArray(body.error.details)).toBe(true);
-        for (const detail of body.error.details) {
-          expect(detail).toHaveProperty('field');
-          expect(detail).toHaveProperty('message');
-        }
-      }
-    }
-  });
-
-  test('API returns 406 for unsupported Accept headers', async ({ request }) => {
-    const response = await request.get('/api/users', {
-      headers: { Accept: 'application/xml' },
-    });
-
-    // Either serve JSON anyway or return 406
-    if (response.status() === 406) {
-      // Correct behavior for unsupported content type
-    } else {
-      const contentType = response.headers()['content-type'];
-      expect(contentType).toContain('application/json');
-    }
-  });
-
-  test('rate limit responses include retry headers', async ({ request }) => {
-    // Make many rapid requests to trigger rate limiting
-    let rateLimitResponse = null;
-    for (let i = 0; i < 100; i++) {
-      const response = await request.get('/api/users');
-      if (response.status() === 429) {
-        rateLimitResponse = response;
-        break;
-      }
-    }
-
-    if (rateLimitResponse) {
-      const retryAfter = rateLimitResponse.headers()['retry-after'];
-      const rateLimitRemaining =
-        rateLimitResponse.headers()['x-ratelimit-remaining'];
-      const rateLimitLimit =
-        rateLimitResponse.headers()['x-ratelimit-limit'];
-
-      expect(retryAfter || rateLimitRemaining).toBeDefined();
-      if (rateLimitLimit) {
-        expect(parseInt(rateLimitLimit)).toBeGreaterThan(0);
-      }
-    }
-  });
-});
-```
+Full content (verbatim, including all code samples): [references/content-type-and-error-response-contracts.md](references/content-type-and-error-response-contracts.md).
 
 ## Best Practices
 
@@ -1076,3 +189,33 @@ test.describe('Content-Type and Error Response Contracts', () => {
 9. **Check for schema references that do not resolve** -- OpenAPI specs use `$ref` to reference shared components. If a reference points to a non-existent schema, the validator may silently skip validation, causing false passes.
 
 10. **Verify API version routing** -- If backward compatibility tests pass but consumers report breakage, check that the API correctly routes requests to the appropriate version handler. Version misrouting is a common source of contract violations.
+
+## Failure Exits (observable)
+
+| Symptom (observable) | Way out |
+|----------------------|---------|
+| `Cannot find module` / `ajv` not installed | Install the validator dependency (`npm i -D ajv`) before running contract tests; the skill ships no runtime |
+| Test run: `ENOENT ... openapi.yaml` | Spec path wrong — resolve the spec relative to `specs/` in the project structure; confirm with `ls` before running |
+| Spectral/spec lint fails before any test runs | Fix the spec first — a malformed spec produces misleading test failures (Debugging Tip 5) |
+| AJV errors look cryptic | Re-run with `verbose: true` (Debugging Tip 1); quote the instance path in the fix |
+| Backward-compat test fails on an intentional breaking change | Do not delete the test — bump the API version and update the spec deliberately (Core Principles 2 and 6) |
+| Tests pass locally, fail in CI | Check that CI has a staging instance URL and seeded fixtures (Debugging Tip 7); never fall back to production |
+| `$ref` silently skipping validation (false pass) | Resolve all refs with a spec bundle/lint step; unresolvable refs are a build failure, not a pass |
+
+## 中文速览（Quick Guide）
+
+- **做什么**：以 OpenAPI / JSON Schema / GraphQL 契约为真源校验 API 响应，拦截删字段、改类型等破坏性变更，并给出向后兼容测试与 CI 接入模式。
+- **何时用**：检查 API 变更是否破坏契约、在 CI 校验响应符合已发布契约，或评审消费者驱动契约测试时。
+- **核心步骤**：①确保 spec 已入库、AJV 等校验器已装 ②按 schema 校验完整响应（状态码/头/错误格式） ③跑向后兼容测试 ④失败先修 spec 或实现再合入 ⑤接入 CI 每次提交执行。
+- **国内可达性**：主流程离线可完成（校验依赖 npm 包 ajv，可走 npmmirror 等镜像安装），无其它境外服务依赖。
+
+## FAQ / Wrong Way → Fix
+
+| Wrong way | Fix |
+|-----------|-----|
+| Snapshot-testing whole JSON responses as the "contract" | Replace with schema validation — snapshots break on additive changes (Anti-Pattern 1) |
+| Pointing contract tests at production "because the data is real" | Run against local/staging only (Anti-Pattern 4) |
+| Validating only the 200 response body | Test every documented status code plus headers and error formats (Best Practices 3, 5, 8) |
+| Treating a new *required request* field as non-breaking | New required request fields and changed defaults ARE breaking (Anti-Pattern 6) |
+| Keeping the OpenAPI spec only inside test code | Publish the spec as a shared artifact alongside the codebase (Anti-Pattern 5) |
+| Self-triggering contract validation on any API code change | Invoke for the named trigger scenarios; otherwise ordinary API work needs no contract run |

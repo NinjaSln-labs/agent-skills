@@ -6,7 +6,7 @@ source: self
 tags: "[ddd, tactical, events, services, repositories]"
 date_added: "2026-05-08"
 slug: ddd-domain-interactions
-version: 1.0.1
+version: 1.1.0
 displayName: ddd-domain-interactions
 ---
 
@@ -59,6 +59,21 @@ displayName: ddd-domain-interactions
 ## 回溯触发
 
 - 事件需携带另一聚合的私有数据（无法设计干净的 event schema） → 回溯至 `ddd-aggregates`（聚合边界需调整以保证事件自包含）。
+
+## 失败出口
+
+- **缺聚合目录或事件候选清单**：停下并列出缺失工件（及其来源技能 `ddd-aggregates` / `ddd-discover`），请用户先补跑上游或直接粘贴等价材料。禁止凭空补造聚合与不变量——后续所有仓储接口与事件契约都会失去验收依据。
+- **上游聚合边界存疑**（事件无法自包含）：按回溯触发回退，但必须输出触发回溯的具体事件与缺失字段清单，而不是笼统说"建模有问题"。
+- **输入与既定上下文冲突**（如事件命名规则与词汇表不一致）：以词汇表为准并在产出中标注冲突项，交用户裁定。
+
+## 错法 → 改法
+
+| 错法 | 改法 |
+| :--- | :--- |
+| 把另一聚合的字段塞进事件（如 BookingConfirmed 携带 RoomSchedule 排期详情） | 事件只含源聚合自身标识与关键字段；消费方经 ID 回查或订阅读上下文（见回溯触发） |
+| 领域服务做全套 CRUD 并直接持久化 | 服务只编排聚合与仓储接口；方法数超过 5 个通常是聚合边界没切好，先回查 `ddd-aggregates` |
+| 仓储接口暴露实现形态（`findByNameAndDateRangeSQL(...)`） | 定义语义方法（如 `findActiveBookings(roomId)`），实现留给技术栈 |
+| 所有事件一律配死信 + 去重窗口全套可靠性策略 | 只有跨上下文、影响资金或合规的事件需要全套；域内事件从简 |
 
 ## 示例
 

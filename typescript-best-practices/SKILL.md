@@ -10,7 +10,7 @@ description: >-
   TypeScript module, generating TypeScript types from JSON data, or analyzing TypeScript
   code for quality issues.
 slug: typescript-best-practices
-version: 1.0.1
+version: 1.1.1
 displayName: typescript-best-practices
 ---
 
@@ -32,6 +32,16 @@ Do NOT use this skill when:
 - Working with pure JavaScript (no TypeScript)
 - Debugging runtime errors (use debugging tools)
 - Framework-specific patterns (React, Vue, etc. - use framework skills)
+
+## Getting Started
+
+Say one of these to invoke it (anything you paste with the invocation counts as given context):
+
+- `Use typescript-best-practices to review ./src for type-safety issues and suggest fixes.`
+- `Scaffold a user-service module with tests following this skill's standards.`
+- `Generate TypeScript types from this JSON response` (+ paste the JSON).
+
+Typical flow: 1) run `scripts/analyze.ts` on the target path for a baseline, 2) apply the Core Principles and Quick Reference below (deep dives in `references/`), 3) use `scripts/scaffold-module.ts` for new modules and re-run the analyzer to confirm.
 
 ## Core Principles
 
@@ -165,6 +175,24 @@ export { validateEmail } from "./validation.ts";
 | Imports | Named imports | Default imports |
 | Errors | Result types | Throwing for flow control |
 | Loops | `for...of`, `.map()` | `for...in` on arrays |
+
+### Script Exit Codes and Failure Exits
+
+- `analyze.ts` exits `1` when **critical issues were found** (that is a finding, not a crash), when the path does not exist, or when no TypeScript files were found at the path — check the message to tell which.
+- `generate-types.ts` exits `1` on invalid JSON input or write failures; fix the JSON (or the output path) and re-run.
+- `scaffold-module.ts` exits `1` when the target directory already exists (pick another `--name`/`--path`) or `--type` is invalid (allowed: `service`, `util`, `component`, `hook`).
+- No Deno installed: the checks cannot run — fall back to manual review against the Quick Reference and Common Anti-Patterns tables instead of skipping the review.
+- Scripts are read-only helpers (except scaffold/generate output); never let a clean analyzer run override a manual review finding.
+
+## FAQ
+
+| Wrong turn | Better path |
+|------------|-------------|
+| "Analyzer passed, so the code is fine" | The analyzer catches a subset (mostly `any`/assertion issues); type design and architecture still need the Core Principles applied |
+| Reaching for `any` "just this once" for an untyped API boundary | Type it `unknown` and narrow with a type guard; see `references/type-system/type-guards.md` |
+| Fixing a reported type error with `as SomeType` | `as` silences the compiler without making the code correct — narrow or restructure instead |
+| Migrating JS → TS by renaming `.js` to `.ts` and fixing errors as they come | Start from the strict tsconfig presets in `assets/tsconfig-presets/`, then fix compile errors deliberately |
+| "Which reference file do I read?" | Error handling → `references/patterns/error-handling.md`; async → `async-patterns.md`; exports/DI → `module-patterns.md`; narrowing → `type-guards.md` |
 
 ## Code Generation Guidelines
 
@@ -324,7 +352,7 @@ deno run --allow-read --allow-write scripts/scaffold-module.ts [options]
 Options:
   --name <name>   Module name (required)
   --path <path>   Target directory (default: ./src)
-  --type <type>   Type: service, util, component
+  --type <type>   Type: service, util, component, hook
   --with-tests    Include test file
 
 Examples:
@@ -336,6 +364,20 @@ Examples:
   deno run --allow-read --allow-write scripts/scaffold-module.ts \
     --name "user-service" --type service --with-tests
 ```
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：指导 AI 生成与审查高质量 TypeScript 代码——先跑分析脚本拿基线，再按类型安全、不可变、Result 型错误处理等核心原则修正，最后用脚手架脚本落地新模块并复检。
+
+**何时用**：生成/审查 TypeScript 代码、新建模块、JS 迁移 TS，或被问到 TS 模式与类型问题时（纯 JS、运行时报错调试、框架专属模式不适用）。
+
+**核心步骤**：
+1. 对目标路径运行 `analyze.ts` 取质量基线；
+2. 对照 Core Principles 与 Quick Reference 逐条修正（`any`→`unknown`+收窄、显式返回类型、readonly 集合）；
+3. 新模块用 `scaffold-module.ts` 生成骨架并复跑分析器确认；
+4. JS→TS 迁移从 `assets/tsconfig-presets/` 严格预设起步，而非改后缀后逐错硬修。
+
+**国内可达性边界**：三个脚本依赖本机 Deno 运行时；deno.land 安装源不可达时按正文既有出口降级为对照 Quick Reference 与反模式表手工审查（结论不变）。references/、assets/ 均为仓内本地文件，主流程无其他境外服务依赖。
 
 ## Additional Resources
 

@@ -5,7 +5,7 @@ description: >-
   parallelization, wait-on health checks, and service containers. Use when configuring
   tests in CI/CD pipelines (GitHub Actions, Jenkins, GitLab).
 slug: cicd-pipeline
-version: 1.0.1
+version: 1.1.0
 displayName: cicd-pipeline
 ---
 
@@ -23,39 +23,11 @@ You are an expert DevOps engineer specializing in CI/CD pipeline configuration f
 
 ## Pipeline Strategy
 
-### Test Pyramid in CI
-
-```
-                    /\
-                   /  \  E2E Tests (slowest, fewest)
-                  /    \  ~5-15 minutes
-                 /------\
-                /        \  Integration Tests
-               /          \  ~3-10 minutes
-              /------------\
-             /              \  Unit Tests (fastest, most)
-            /                \  ~1-5 minutes
-           /------------------\
-          /                    \  Static Analysis
-         /                      \  ~30 seconds - 2 minutes
-        /________________________\
-```
-
-### Recommended Pipeline Stages
-
-```
-1. Checkout & Install    (~1 min)
-2. Static Analysis       (~1-2 min) -- lint, type check, format check
-3. Unit Tests            (~2-5 min) -- jest, pytest, junit
-4. Build                 (~2-5 min) -- compile, bundle
-5. Integration Tests     (~3-10 min) -- API tests, database tests
-6. E2E Tests             (~5-15 min) -- browser tests, mobile tests
-7. Performance Tests     (~5-30 min) -- only on main/release branches
-8. Security Scan         (~3-10 min) -- SAST, dependency audit
-9. Deploy to Staging     (~2-5 min)
-10. Smoke Tests          (~2-3 min)
-11. Report & Notify      (~1 min)
-```
+Test pyramid in CI, stage ordering, and durations: moved to
+[references/pipeline-strategy.md](references/pipeline-strategy.md). Rule that stays in
+the body: **fail fast** -- order stages cheap-to-expensive (static analysis -> unit ->
+build -> integration -> E2E -> performance), and keep stages independent so failures
+diagnose to one stage.
 
 ## GitHub Actions
 
@@ -344,106 +316,10 @@ jobs:
 
 ## Jenkins Pipeline
 
-```groovy
-pipeline {
-    agent any
-
-    environment {
-        NODE_VERSION = '20'
-        CI = 'true'
-    }
-
-    options {
-        timeout(time: 60, unit: 'MINUTES')
-        disableConcurrentBuilds()
-        buildDiscarder(logRotator(numToKeepStr: '20'))
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Install') {
-            steps {
-                sh 'npm ci'
-            }
-        }
-
-        stage('Static Analysis') {
-            parallel {
-                stage('Lint') {
-                    steps {
-                        sh 'npx eslint . --max-warnings=0'
-                    }
-                }
-                stage('Type Check') {
-                    steps {
-                        sh 'npx tsc --noEmit'
-                    }
-                }
-            }
-        }
-
-        stage('Unit Tests') {
-            steps {
-                sh 'npx jest --coverage --ci --reporters=default --reporters=jest-junit'
-            }
-            post {
-                always {
-                    junit 'test-results/unit/*.xml'
-                    publishHTML(target: [
-                        reportDir: 'coverage/lcov-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report'
-                    ])
-                }
-            }
-        }
-
-        stage('E2E Tests') {
-            steps {
-                sh 'npx playwright install --with-deps chromium'
-                sh 'npm run start:test &'
-                sh 'npx wait-on http://<app-host>:<port> --timeout 30000'
-                sh 'npx playwright test'
-            }
-            post {
-                always {
-                    publishHTML(target: [
-                        reportDir: 'playwright-report',
-                        reportFiles: 'index.html',
-                        reportName: 'E2E Test Report'
-                    ])
-                    archiveArtifacts artifacts: 'test-results/**/*', allowEmptyArchive: true
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
-        }
-        failure {
-            slackSend(
-                channel: '#test-alerts',
-                color: 'danger',
-                message: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
-        }
-        success {
-            slackSend(
-                channel: '#test-results',
-                color: 'good',
-                message: "Build Passed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
-        }
-    }
-}
-```
+The complete declarative Jenkinsfile (checkout/install, parallel static analysis,
+unit tests with junit + coverage publishing, E2E with Playwright, Slack notify) is
+externalized verbatim in [references/jenkins-pipeline.md](references/jenkins-pipeline.md) --
+edit there when adapting; same stage order as the GitHub Actions pipeline above.
 
 ## GitLab CI
 
@@ -533,42 +409,9 @@ e2e-tests:
 
 ## Test Parallelization Strategies
 
-### Shard-Based Parallelization (Playwright)
-
-```yaml
-# Split tests evenly across N machines
-strategy:
-  matrix:
-    shard: [1/4, 2/4, 3/4, 4/4]
-
-steps:
-  - run: npx playwright test --shard=${{ matrix.shard }}
-```
-
-### File-Based Parallelization (Jest)
-
-```yaml
-# Jest automatically parallelizes by file
-steps:
-  - run: npx jest --maxWorkers=4 --ci
-```
-
-### Tag-Based Parallelization
-
-```yaml
-jobs:
-  smoke-tests:
-    steps:
-      - run: npx playwright test --grep @smoke
-
-  regression-tests:
-    steps:
-      - run: npx playwright test --grep @regression
-
-  visual-tests:
-    steps:
-      - run: npx playwright test --grep @visual
-```
+Shard-based (Playwright `--shard=i/N` via matrix), file-based (Jest workers), and
+tag-based (`--grep @tag`) strategies with snippets: moved verbatim to
+[references/parallelization-strategies.md](references/parallelization-strategies.md).
 
 ## Best Practices
 
@@ -595,6 +438,53 @@ jobs:
 8. **Ignoring CI-specific config** -- Some tests need different settings in CI (headless, retries).
 9. **Single point of failure** -- If one shard fails, still collect results from others.
 10. **Not cleaning up** -- Stale containers, files, or processes can affect subsequent runs.
+
+## When to Use This Skill & NOT For
+
+Use it when the user asks to create, review, speed up, or debug **test automation in CI/CD** (GitHub Actions, Jenkins, GitLab CI): sharding, parallelization, service containers, wait-on health checks, artifact/caching setup. NOT for (say so and stop):
+
+- **Wrong repo / no repo**: no `.git` or no CI config and the user only wants local test runs -> local tooling, not this skill.
+- **No network / restricted network**: runners that cannot reach npm/ghcr/mcr.microsoft.com need mirror registries and self-hosted runners configured first -- declare that prerequisite, do not hand over templates that will fail on `npm ci` or image pulls.
+- **Deploy/infra pipeline authoring** (build-push-deploy, IaC): out of scope -- testing portion only. **Local flaky triage**: use the testing skills (`playwright-best-practices` etc.); this skill only quarantines/parallelizes in CI.
+
+## Minimal Worked Example (prerequisite -> invocation -> output excerpt)
+
+**Prerequisite**: a Node repo with `npm ci`, unit tests (`npx jest`) and an existing GitHub Actions workflow file (`.github/workflows/*.yml`).
+
+**Invocation** (what the user says):
+
+```text
+"Our PR pipeline takes 40 minutes. Split the E2E suite across 4 runners
+and add Postgres as a service container."
+```
+
+**What you produce**: a diff applying the templates above -- `strategy.matrix` shards `1/4..4/4` with `npx playwright test --shard=${{ matrix.shard }}` (E2E section), plus a `services: postgres:` block with `--health-cmd pg_isready` and `DATABASE_URL: postgresql://test:test@<db-host>:5432/testdb` (api-tests job). Net effect in this shape: 40m pipeline -> ~14m (fail-fast order: lint+unit gate before E2E).
+
+**Output excerpt** (run after the change):
+
+```text
+unit-tests        ✓ 3m12s
+e2e-tests (1/4)   ✓ 6m41s   e2e-tests (2/4)  ✓ 6m55s
+e2e-tests (3/4)   ✓ 7m02s   e2e-tests (4/4)  ✓ 6m48s
+```
+
+## Troubleshooting (Failure Exits)
+
+Observable CI failure -> what it means -> exit action (each CI run ends red/green; the red run is the observable output, not a reason to improvise):
+
+- `npm ci` fails with `E404`/registry timeout -> dependency or registry unreachable -> pin the registry/mirror in `.npmrc` or runner env; do not switch to `npm install` to mask it.
+- Service container never healthy: job hangs then aborts -> health-check options missing or wrong port mapping -> verify `ports: 5432:5432` + `--health-cmd pg_isready` (api-tests job); the fix lands there, not in the test step.
+- `wait-on ... timeout` (exit code 1) -> app under test did not start -> the real error is in the `Start Application` step log above it, not in wait-on.
+- One shard red, others green (`fail-fast: false`) -> real failure in that shard until proven flaky -> read that shard's uploaded `test-results/` artifact; quarantine only after re-qualifying as flaky. Artifacts missing on failure -> step lacked `if: always()`.
+
+## Wrong -> Fix
+
+| Wrong | Fix |
+|---|---|
+| Copying `<app-host>`/`<db-host>` placeholders literally into a real workflow | Replace with the DNS names CI provides (`localhost` for service containers on the same runner) |
+| Copying example pins (`@v4`, `postgres:16`) into a project using different versions | Read `references/pinned-versions.md` rule + the project's own workflow/lockfile; the project always wins |
+| `fail-fast: true` cancelling everything on one shard failure | `fail-fast: false` + merge reports (merge-e2e-reports job) so one flaky shard doesn't hide the others' results |
+| Retrying the whole pipeline until green | Diagnose the failed stage from its artifact; retry-to-green hides real failures (anti-pattern #3) |
 
 ## Version References
 

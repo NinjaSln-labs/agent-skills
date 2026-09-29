@@ -4,7 +4,7 @@ description: >-
   Create a Geoffrey Moore-style positioning statement. Use when clarifying who you serve,
   what problem you solve, your category, and why you're different from alternatives.
 slug: positioning-statement
-version: 1.0.3
+version: 1.1.0
 displayName: positioning-statement
 ---
 
@@ -207,6 +207,29 @@ Mini example excerpt:
 **Fix:** Pick a category buyers already understand (CRM, analytics, messaging) OR commit to category creation (requires $$$ and time).
 
 ---
+
+## Failure Exits & Edge Cases
+
+- **Input too vague to draft** ("positioning for my app"): do not guess a full statement. Ask exactly two questions — *who is the target customer?* and *what do they use today instead?* — then draft with labeled assumptions and mark each assumed slot `[assumed]`.
+- **No known competitor:** if the user cannot name a real alternative or substitute behavior, deliver the Value Proposition only and flag the Differentiation Statement as blocked (cannot be drafted honestly). Exit: "come back with the nearest alternative buyers actually use."
+- **Missing files:** `template.md` or `examples/sample.md` referenced but absent → fall back to the inline templates in Steps 2–3 of this document; do not invent new file paths.
+
+## FAQ
+
+**Is this the same as a tagline or elevator pitch?** No — a tagline compresses; a positioning statement decides. It's an internal alignment tool, not copy.
+
+**Can I position against a category instead of a competitor?** Only if buyers actually file alternatives that way ("Unlike hiring an agency…"). "Unlike traditional approaches" is the imaginary-competitor pitfall.
+
+**What if my differentiation is a feature competitors also have?** Then it's not differentiation — re-run Step 3's "could a competitor copy this in 6 months?" check.
+
+**Do I need customer research first?** The statement synthesizes research; it doesn't replace it. If you have zero user evidence, do discovery first (see When NOT to Use).
+
+## 快速参考（中文速览）
+
+- **框架**：价值主张＝**For**（目标客户）／**that need**（未被满足的需要）／**is a**（品类）／**that**（结果型收益）；差异化陈述＝**Unlike**（真实替代品）／**provides**（可验证的差异）。
+- **最短用法**：一句话说清产品＋目标客户即可开始；信息不全时技能只追问两件事——目标客户是谁、现在用什么替代品。
+- **四大陷阱**：泛化受众 · 功能堆砌 · 虚构竞品 · 无证据的差异声明。
+- **完成标准**：客户能在 "For…" 里认出自己；差异声明能用 demo/数据证实；能回答"该不该做功能 X"。
 
 ## References
 

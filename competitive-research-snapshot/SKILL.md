@@ -5,7 +5,7 @@ description: >-
   implications. Use when a product decision needs competitive grounding, not a market
   report.
 slug: competitive-research-snapshot
-version: 1.0.3
+version: 1.1.1
 displayName: competitive-research-snapshot
 ---
 
@@ -155,6 +155,37 @@ absence-of-evidence.
   each So What bullet is what makes it usable in a roadmap argument.
 - **Regenerating instead of diffing.** Re-running this skill weekly and re-reading the whole output
   is theater — that's what [`competitive-intel-watch`](../competitive-intel-watch/SKILL.md) is for.
+
+## When Things Go Wrong (Failure Exits)
+
+- **Sources unreachable or paywalled (pricing pages, review sites, filings):** Name which sources failed in the Scope section and downgrade the affected Evidence quality cells; claims that now rest on vendor-only pages become **Assumption to validate**, not Inference. Never backfill missing evidence from memory.
+- **Cannot identify 3 sourced competitors:** Emit the snapshot with fewer competitors and say so in Scope — padding with unsourced names violates the do-not-invent list. Better an honest 2-competitor matrix than a wide one with fabricated rows.
+- **Conflicting facts across sources** (e.g., pricing differs between site and reviews): Keep both, label each with its source, and flag the conflict in the So What section rather than picking the convenient one.
+- **Run-to-run variation:** Detail level and angle can differ between runs; the schema and section order never change. Diff runs with `competitive-intel-watch` instead of re-reading whole outputs and treating wording drift as a signal.
+
+## FAQ (Wrong → Right)
+
+| Wrong | Right |
+|-------|-------|
+| Recording a competitor's claimed capability as a fact | Their page is a Fact about *what they claim*; whether it works needs review sites or stays labeled Inference |
+| Asking for "a market report" | This is a decision-support snapshot: name the decision up front; sections that don't serve it get cut |
+| Adding an 8th competitor "for completeness" | Depth on 3-4 who matter beats coverage of the rest |
+| Re-running weekly and re-reading everything | That's what `competitive-intel-watch` is for — this skill sets the baseline |
+| Treating an Assumption-heavy output as unreliable garbage | Assumptions are the skill telling you where evidence ended; validate them via the Final Step's discovery questions |
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：以工作流方式研究竞争格局——先出搜索计划，选 3–4 家关键对手，做"刚好够用"的调查，每条结论带 Fact/Inference/Assumption 标签与真实来源 URL，产出一份可长期 diff 的决策支持快照（非市场报告）。
+
+**何时用**：产品决策需要竞争依据时（定位、路线图押注、赢单支持、董事会准备），而非要一份市场规模报告。
+
+**核心步骤**：
+1. 记入随调用给的上下文，只追问未答的至多 3 问（对象、决策、竞品）；
+2. 出 3 条要点搜索计划，无异议即继续；
+3. 按给定名单或自选 top 3 竞品，混合来源做 Just Enough 调查；
+4. 严格按稳定 schema 输出（范围/竞品速写/对比矩阵/So What），末尾给 4 个下一步选项。
+
+**国内可达性边界**：依赖对竞品官网、定价页、评测站（如 G2 类）、新闻与财报等外网源的实时访问；某源不可达或付费墙挡住时，在 Scope 一节点名失败来源并降级该处 Evidence quality，受影响断言改标 Assumption to validate；可改用公开中文渠道（官网中文页、公开新闻、上市/挂牌公司公开披露）补充，并以来源标注置信度——不从记忆回填证据。
 
 ## References
 

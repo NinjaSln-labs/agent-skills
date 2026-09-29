@@ -5,13 +5,70 @@ description: >-
   and env-based BASE_URL. Use when load/performance testing with k6 (thresholds,
   scenarios, metrics).
 slug: k6-performance
-version: 1.0.0
+version: 1.1.0
 displayName: k6-performance
 ---
 
 # k6 Performance Testing Skill
 
 You are an expert performance engineer specializing in k6 load testing. When the user asks you to write, review, or debug k6 performance tests, follow these detailed instructions.
+
+## When to Use This Skill
+
+Use it when the user asks to: write a k6 load/performance test, add thresholds or scenarios to an existing k6 script, interpret k6 results (percentiles, error rate), or pick a test type (smoke/load/stress/spike/soak). **NOT for** (say so and stop, do not improvise):
+
+- No k6 involved (JMeter/Gatling/Locust) -- this skill only covers k6.
+- No reachable target: if `BASE_URL` (or the default host) does not respond, fix that first (see Troubleshooting).
+- Production load testing: never without explicit ops approval (anti-pattern #10).
+- CI pipeline wiring of k6 jobs: that is the `cicd-pipeline` skill's job.
+
+## Minimal Worked Example (prerequisite -> invocation -> output excerpt)
+
+**Prerequisite**: a running service with a health endpoint, and k6 installed (`k6 version` prints a version).
+
+**Invocation** (what the user says):
+
+```text
+"Write a quick load test for my checkout API at https://staging.example.com,
+95% of requests must be under 500ms."
+```
+
+**What you produce**: a script like the Basic Load Test Script below (stages + `http_req_duration: ['p(95)<500']` threshold + checks), run as:
+
+```bash
+k6 run -e BASE_URL=https://staging.example.com scripts/load-test.js
+```
+
+**Output excerpt** (end of a passing run):
+
+```text
+  ✓ checks..............: 100.0% ✓ 2410 ✗ 0
+  ✓ http_req_duration...: p(95)=412ms p(99)=480ms
+  █ THRESHOLDS
+  ✓ http_req_duration p(95)<500
+  ✓ http_req_failed   rate<0.01
+EXIT CODE: 0 (all thresholds passed)
+```
+
+Exit code semantics: `0` = pass; non-zero (e.g. `99`) = at least one threshold was crossed -- treat a non-zero exit as a failed test, not a crashed tool.
+
+## Troubleshooting (Failure Exits)
+
+Exit code semantics: `0` = pass; non-zero (e.g. `99`) = at least one threshold was crossed -- treat a non-zero exit as a **failed test**, not a crashed tool. Quick map (full table in [references/troubleshooting.md](references/troubleshooting.md)):
+
+- `connection refused` / target unreachable -> fix `BASE_URL` / service health first (`curl BASE_URL/api/health`); do not run load stages.
+- Exit `99` with `✗` threshold lines -> a threshold was crossed; report which one and the measured value; never loosen thresholds to force green.
+- Script `SyntaxError` -> fix the line, smoke-test (`k6 run --vus 1 --duration 30s`) before real load.
+- Checks `✗` while `http_req_failed` = 0% -> fast wrong responses (4xx/5xx); inspect check names + `--http-debug`.
+
+## Wrong -> Fix
+
+Top mistakes (full table in [references/troubleshooting.md](references/troubleshooting.md)):
+
+- Full load run to "check the script works" -> smoke first (1 VU, 1 minute).
+- No `sleep()` think time -> add `sleep(1)`-`sleep(4)`.
+- Thresholds defined after seeing results -> define before the run.
+- Agent self-triggering a load test against an arbitrary URL -> load testing hits real infrastructure; run only on the user's explicit request and target.
 
 ## Core Principles
 
@@ -23,31 +80,9 @@ You are an expert performance engineer specializing in k6 load testing. When the
 
 ## Project Structure
 
-```
-k6/
-  scripts/
-    smoke-test.js
-    load-test.js
-    stress-test.js
-    spike-test.js
-    soak-test.js
-  scenarios/
-    api-scenarios.js
-    user-flows.js
-  utils/
-    helpers.js
-    auth.js
-    data-generators.js
-  data/
-    users.csv
-    payloads.json
-  thresholds/
-    default-thresholds.js
-  config/
-    environments.js
-  results/
-    .gitkeep
-```
+The recommended `k6/` directory layout (scripts/scenarios/utils/data/thresholds/config/results)
+is externalized verbatim in [references/project-structure.md](references/project-structure.md) --
+any Node/k6 repo can adopt it as-is or map it onto an existing layout.
 
 ## Basic Load Test Script
 

@@ -35,7 +35,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | Skill | Description |
 |-------|-------------|
 | architecture-patterns | Implement proven backend architecture patterns including Clean Architecture, Hexagonal… |
-| audit-item | Track audit/review findings as numbered issue files… |
+| audit-item | Track audit/review findings as numbered issue files (audit-items/NNN-slug.md, under the… |
 | cicd-pipeline | Configure testing in CI/CD pipelines for GitHub Actions, Jenkins, and GitLab CI: shards… |
 | code-review | Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes —… |
 | codebase-design | Shared vocabulary for designing deep modules. |
@@ -86,7 +86,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | competitive-research-snapshot | Research a competitive landscape with cited snapshots, a comparison matrix, and so-what… |
 | customer-journey-map | Create a customer journey map across stages, touchpoints, actions, emotions, and metrics. |
 | discovery-interview-prep | Plan customer discovery interviews with the right goal, segment, constraints, and method. |
-| grill-me | User-invoked entry that runs a /plan-grilling session — a relentless interview to sharpen a… |
+| grill-me | User-invoked entry that runs a plan-grilling session — a relentless one-question-at-a-time… |
 | plan-grilling | Grill the user relentlessly about a plan, decision, or idea. |
 | intelligence-collection-disciplines | Run competitive research like an intelligence agency: eight collection disciplines (OSINT to… |
 | jobs-to-be-done | Uncover customer jobs, pains, and gains in a structured JTBD format. |
@@ -144,7 +144,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 |-------|-------------|
 | project-handoff | Maintain a project's handoff store (.handoff/, plain text): a multi-dimensional project handoff… |
 | experiment-handoff | Experiment handoff for mid-project experiments and spikes. |
-| decision-log | Record or query architecture decision records (ADR) — Nygard template… |
+| decision-log | 记录或检索架构决策记录（ADR）——Nygard 模板（背景/决策/后果），带 proposed/accepted/superseded/rejected 状态机，写入… |
 | delegated-research | Investigate a question against high-trust primary sources and capture the findings as a… |
 | session-health | Session Health: assess the current AI coding tool session — context compaction/condensation… (deprecated) |
 | core-rules | (deprecated) — no longer maintained. |

@@ -7,7 +7,7 @@ description: >-
   refactoring a monolith to bounded contexts, implementing hexagonal or onion
   architecture, or debugging dependency cycles between application layers.
 slug: architecture-patterns
-version: 1.0.1
+version: 1.1.0
 displayName: architecture-patterns
 ---
 
@@ -26,6 +26,59 @@ Master proven backend architecture patterns including Clean Architecture, Hexago
 - Debugging dependency cycles where infrastructure code bleeds into the domain layer
 - Creating testable codebases where use-case tests do not require a running database
 - Implementing domain-driven design tactical patterns (aggregates, value objects, domain events)
+
+## When NOT to Use This Skill
+
+- There is no runnable service or codebase yet and the user only wants a topic overview — this skill drives structure decisions, not essays; ask for the target module first.
+- The code under discussion is a CLI/script or single-file utility — layering overhead exceeds benefit; observe the dependency rule only if growth is expected.
+- The question is which *bounded contexts* exist (strategic) — use a DDD strategic-design skill first; this skill assumes contexts are decided and handles what lives inside them.
+- The ask is a CQRS/Saga/event-store implementation — those are related families (see bottom), not covered here.
+
+## Quick Diagnosis (FAQ)
+
+Fast symptom → section lookup; each entry maps to the full fix in Troubleshooting below:
+
+| Q: I see... | A: Go to |
+|-------------|----------|
+| Unit tests need a real database | "Use case tests require a running database" |
+| `ImportError` between layers | "Circular imports between layers" |
+| ORM/Pydantic decorators on entities | "Framework decorators appearing in domain entities" |
+| Controllers doing business logic | "All logic ending up in controllers" |
+| Invalid `Email`/`Money` objects exist at runtime | "Value objects raising errors too late" |
+| One context importing another's entities | "Context bleed across bounded contexts" |
+
+## Failure Exits and Edge Handling (observable)
+
+| Situation | Observable exit |
+|-----------|-----------------|
+| No repository/module given ("make our code clean") | Ask which service or module to architect; do not produce a generic lecture. |
+| Repo absent or the named module does not exist | Stop and report "module not found: <path>"; do not invent a structure for code you cannot see. |
+| Existing code deliberately violates layering (framework-coupled core by team decision) | Flag the deviation and its cost once, then follow the team's convention — do not silently rewrite. |
+| `references/details.md` / `references/advanced-patterns.md` missing from the package | Continue with the navigation-tier content in this file; report "reference file missing" instead of paraphrasing from memory as if quoted. |
+
+## Minimal Worked Example
+
+**Preconditions:** a module (`use_cases/`, `domain/`, `adapters/`) exists and is testable.
+
+**Invocation:**
+
+```
+/architecture-patterns design the create-user flow in services/identity so
+use-case tests run without Postgres
+```
+
+**Excerpt of the produced output (what "done" looks like):**
+
+```text
+Structure:
+  domain/interfaces/user_repository.py   → IUserRepository (port)
+  domain/entities/user.py                → User entity, no framework imports
+  use_cases/create_user.py               → CreateUserUseCase(repo: IUserRepository)
+  adapters/repositories/pg_user_repo.py  → Postgres adapter (wired in composition root)
+
+Dependency rule check: use_cases imports only domain/  ✓
+Test boundary: InMemoryUserRepository substitutes the port — no DB, no Docker ✓
+```
 
 ## Core Concepts
 

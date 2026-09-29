@@ -4,7 +4,7 @@ description: >-
   Research a company, industry, or competitor set using web search and seven analytical
   lenses. Use when you need structured intel that feeds downstream PM skills.
 slug: company-intel
-version: 1.0.7
+version: 1.1.1
 displayName: company-intel
 ---
 
@@ -26,6 +26,51 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 **Arriving empty-handed? That works too.** The workflow opens by asking for the target and what the intel will feed.
 
 **Example invocation:** `Research Figma and its top 3 competitors — output feeds a positioning workshop next week.`
+
+## Shortest Worked Example
+
+**Precondition:** a named company; web search available for primary sourcing.
+**Invocation:** the example line above.
+**Output excerpt (what you should see):**
+
+```markdown
+## 2. How It Makes Money
+Subscription revenue from team plans (~70% of ARR), plus enterprise seats.
+Seasonal trough in Q3 hiring cycles. [Fact — FY2025 annual report]
+
+## 11. Sources and Confidence
+- FY2025 annual report (investor relations) — Section 2
+- 3 executive appointments, last 12 months — Section 9 [Inference: platform shift]
+```
+
+**Done when:** every section pushes past description to PM implication, every factual claim carries a source, and inferences are labeled.
+
+## Failure Exits (closed set)
+
+- **No web access / search fails:** say so in one line, then produce the skeleton (all 11 section headers) filled from supplied context only, every claim tagged [UNVERIFIED—NEEDS SOURCE] — don't present recall as research.
+- **Search returns nothing on the target:** state "no public signal found on [X] in [lens N]" per empty lens — an empty Section 9 (Strategic Signals) is a valid finding, not a failure.
+- **Target isn't a company** (a product name, a person, a topic): one-line restate ("that's a product of [company] / an industry — proceed at sector level?"), ask one question, don't research the wrong entity.
+- **Ambiguous entry point:** ask the one clarifying question from Key Concepts; don't guess between single-company and competitor-set modes.
+- **Reference files missing** (`references/worked-examples.md`, `references/downstream-composition.md` not found): `ls` this skill's directory and report the missing file — don't improvise the 11-section structure.
+
+## Wrong → Fix (quick table)
+
+| Wrong | Fix |
+|---|---|
+| Output reads like a Wikipedia summary | Push each section to "what does this mean for product decisions?" |
+| Features listed without outcomes | Answer: what problem, for whom, what behavioral change |
+| "The CEO said X" with no citation | Source + date + outlet (e.g., "Q1 2026 earnings call, Seeking Alpha transcript") |
+| One run, never refreshed | Set a rerun cadence; lead the rerun with "What's Changed" |
+| Inference presented as fact | Label it: "Inference based on [evidence]" |
+
+## Completion Checklist (done = all checkable)
+
+- [ ] Entry point detected and stated (single / sector / set / discover)
+- [ ] All 11 sections present (12 for competitor sets), none left as bare headers
+- [ ] Every factual claim has source + date; inferences labeled Fact / Inference / Assumption
+- [ ] Section 9 includes at least one of: patent, hiring, or leadership signals — or an explicit "no significant signal" finding
+- [ ] Sections older than 18 months flagged
+- [ ] Handoff menu offered at the end
 
 ## Key Concepts
 
@@ -429,4 +474,13 @@ per-section downstream use, and which sections to pass to which consumer — see
 ### Provenance
 - Adapted from Dean Peters' company-profile-executive-insights-research prompt and TAM-SAM-SOM prompt generator in the product-manager-prompts repo
 - Incorporates the Seven Research Lenses framework developed for Productside enterprise PM training
+
+---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：用网络检索＋七个分析透镜产出结构化的公司／行业／竞对情报（11 节固定结构），是喂给下游技能的研究原语，不是百科式概述。
+- **何时用**：需要为 battlecard、SWOT、定位、市场规模等下游工作准备结构化情报时。
+- **核心步骤**：定目标与下游用途 → 按 11 节结构逐节检索与推断 → 每条事实带来源、推断打标签 → 汇总「来源与置信度」节。
+- **国内可达性边界**：主流程依赖网络搜索，且正文 Research Sources 多为境外源（投资者关系页、SEC、Reuters 等）——不可达时用可访问的公开中文渠道替代，并在来源节如实标注渠道与置信度；搜索完全不可用时按 Failure Exits 降级为 11 节骨架＋`[UNVERIFIED—NEEDS SOURCE]`，不把模型记忆当检索结果。
 

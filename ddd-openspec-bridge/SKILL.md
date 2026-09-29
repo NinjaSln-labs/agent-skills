@@ -6,7 +6,7 @@ source: self
 tags: "[ddd, implementation, openspec, sdd]"
 date_added: "2026-05-11"
 slug: ddd-openspec-bridge
-version: 1.0.1
+version: 1.1.0
 displayName: ddd-openspec-bridge
 ---
 
@@ -78,6 +78,26 @@ displayName: ddd-openspec-bridge
 - Scenario 中无法移除技术细节（数据库 / HTTP / ORM 等）→ 违反业务规则优先原则；先在本 Skill 内重写，若语义仍无法纯化则回溯至 `ddd-aggregates` 重新界定聚合行为。
 - 单个 Requirement 挂载超过 5 个 Scenario 或跨多聚合根 → 违反粒度约定，回溯至 `ddd-domain-interactions` 拆分命令与领域服务。
 - 术语未收录在 `ddd-contexts` 词汇表 → 回溯至 `ddd-contexts` 补录或统一术语。
+
+## 失败闭集
+
+- **必需输入缺失**（无聚合目录、无领域交互定义等）：不要继续生成 spec——列出缺失工件及其来源技能，请用户先补齐或粘贴等价材料。强行生成会产出没有不变量支撑、无法验收的 Scenario。
+- **`openspec/changes/<change-id>/` 已存在同名变更集**：先读现有 `.openspec.yaml` 判断是续作还是新变更，与用户确认后再动；禁止静默覆盖。
+- **`openspec/config.yaml` 不存在**：说明 `ddd-contexts` 未跑或未落盘——先回补该文件（上下文-目录映射）再建 `specs/` 目录，否则限界上下文分目录无从谈起。
+- **映射后 Scenario 无法纯化技术细节**：先在本 Skill 内重写；重写一次仍失败则按回溯触发第 3 条回退，并指出具体是哪条不变量与哪个技术词冲突。
+
+## 错法 → 改法
+
+| 错法 | 改法 |
+| :--- | :--- |
+| Scenario 写"调用 POST /api/bookings，存入 bookings 表" | 写业务规则"当请求时段已被占用时预订失败"（Given/When/Then）；技术细节只进 `design.md` |
+| 建 `specs/domain-model/` 扁平目录 | 按 `specs/<bounded-context>/<capability>/spec.md` 组织，保持与上下文目录对齐 |
+| 一个 Requirement 挂 8 个 Scenario | 拆成两条 Requirement；若根因在交互层定义过粗，回溯 `ddd-domain-interactions` 拆分 |
+| spec 里直接使用词汇表外的新造术语 | 先回写 `ddd-contexts` 词汇表或改用同义词，再进入 spec |
+
+## 怎么调用
+
+直接说一句即可，例如："把 <项目名> 的建模产出转成 OpenSpec 变更集，变更 id 用 `add-booking-flow`"。变更 id 未给定时默认取"动词-对象"形（如 `add-booking-flow`）；未给定时也可直接说"按已完成建模生成 OpenSpec 变更集"由本 Skill 按上下文取名。
 
 ## 示例
 

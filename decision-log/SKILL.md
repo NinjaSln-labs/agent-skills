@@ -1,14 +1,13 @@
 ---
 name: decision-log
 description: >-
-  Record or query architecture decision records (ADR) — Nygard template
-  (context/decision/consequences) with a proposed/accepted/superseded/rejected status
-  state machine, written to docs/decisions/NNN-slug.md plus the index table update —
-  and, where the project keeps a handoff store, a reference line in it. Use when a semantic ruling or adjudication happens in
-  a stage, or on "记录裁定" / "写进决策日志" / "ADR" / querying "决策 X 的现状". NOT for:
-  writing the session handoff itself — the store references ADR numbers, never copies them.
+  记录或检索架构决策记录（ADR）——Nygard 模板（背景/决策/后果），带
+  proposed/accepted/superseded/rejected 状态机，写入 docs/decisions/NNN-slug.md 并更新索引表；
+  若项目保有交接存储，则在其中留一条引用行。当阶段内发生语义裁定或用户说
+  「记录裁定」「写进决策日志」「ADR」或要查「决策 X 的现状」时使用。不适用于：
+  撰写会话交接本身——交接存储只引用 ADR 编号、绝不复制正文。
 slug: decision-log
-version: 1.0.7
+version: 1.1.0
 displayName: decision-log
 ---
 
@@ -28,6 +27,43 @@ displayName: decision-log
 ## 触发纪律
 
 每次语义裁定后 3 分钟内完成记录。拿不准是否够格 → 记（轻量；比漏记好——历史链靠它）。
+
+## 最短真实样例
+
+**前置：** 阶段内刚发生一条裁定（如「S1.1 审计裁定：C8 按 A 案落地」）；`docs/decisions/` 已存在。
+**调用：** `记录裁定：审计项 C8 裁定走 A 案，理由是测试面覆盖不足，来源 §4.1 审计报告`
+**产出摘录：**
+
+```markdown
+# 004 — C8 按 A 案落地（来源：§4.1 审计报告）
+
+- Status: accepted
+- Date: 2026-09-29
+
+## Decision
+- C8 采用 A 案；B 案（逐条改写）不采用——测试面覆盖不足
+```
+
+**完成判据：** `docs/decisions/004-*.md` 存在且含 status/date/相关；`docs/decisions/000-decision-log.md` 索引已加一行（#004）。
+
+## 失败闭集
+
+- **`docs/decisions/` 不存在**：本项目未建决策目录 → 只报告「无 `docs/decisions/`，未写入」并停；**不自主建目录**（建/迁存储须用户显式调用）。
+- **索引缺失（`000-decision-log.md` 不在）**：先补索引表头再写 ADR，并在产出里注明「索引为本次新建」。
+- **项目根/路径不明确**：问一句「项目根在哪」；不猜路径乱写。
+- **拿不准是否够格记 ADR**：记（轻量）；宁多勿漏——历史链靠连续。
+
+## 错法 → 改法
+
+| 错法 | 后果 | 改法 |
+|---|---|---|
+| 裁定发生了但不记录（「等有空」） | 历史链断，查询返回空 | 当阶段记，3 分钟内 |
+| 把 ADR 全文复制进 `.handoff/`（手改真源） | 双源漂移 | 存储只引用 ADR 编号，不复制内容 |
+| 被 superseded 后删除旧 ADR | 链断，无法追溯 | 旧文件保留，状态改 superseded |
+| 编号跳号或覆盖旧文件 | 引用悬空 | 索引最大号 +1，只追加 |
+| 未发生裁定也自主记一条 | 噪音淹没真裁定 | 仅语义裁定发生时（或用户点名）记 |
+
+**「语义裁定」通俗版：** 凡「两种做法都行、最终拍了板」的时刻——审计项怎么处置、边界怎么划、A 案还是 B 案——就是语义裁定；纯事实陈述（「测试失败了」）不算。
 
 ## 流程（记录）
 

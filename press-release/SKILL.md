@@ -4,7 +4,7 @@ description: >-
   Write an Amazon-style press release that defines customer value before building. Use
   when aligning stakeholders on a new product, feature, or strategic bet.
 slug: press-release
-version: 1.0.3
+version: 1.1.1
 displayName: press-release
 ---
 
@@ -25,6 +25,36 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 **Arriving empty-handed? That works too.** The skill asks who the customer is and what changes for them on launch day — the two things a working-backwards press release cannot fake.
 
 **Example invocation:** `Amazon-style press release: instant expense approval for field technicians, launching Q3.`
+
+## Shortest Worked Example
+
+**Precondition:** the product/feature idea plus the target customer; no research repo or web access needed — working backwards from what you already know.
+**Invocation:** the example line above.
+**Output excerpt (what you should see):**
+
+```markdown
+**Headline:** Acme Launches SmartInvoice to Cut Invoice Processing Time by 60% for Small Businesses
+**Problem:** Small businesses spend 8 hours/month on manual invoice data entry
+**Solution:** Automates extraction and approvals — no new system to maintain
+```
+
+**Done when:** the headline names a customer benefit (not a feature list), the problem is quantified, and every claim traces to a customer outcome.
+
+## Failure Exits (closed set)
+
+- **No product idea given:** ask one question ("what are we shipping, and for whom?") — don't draft a generic release.
+- **No customer named:** ask who hurts today; if unknown, proceed with the persona line tagged [ASSUMPTION—VALIDATE] rather than stalling.
+- **Template/examples missing** (`template.md`, `examples/sample.md` not found): `ls` this skill's directory and report the missing file — don't invent another structure.
+- **No validation data:** keep claims qualitative and tagged; never fabricate statistics (see Pitfall 5).
+
+## Wrong → Fix (quick table)
+
+| Wrong | Fix |
+|---|---|
+| "Includes AI, ML, OCR, NLP" (Pitfall 1) | Translate each feature into a customer outcome |
+| "Solves inefficiency in workflows" (Pitfall 2) | Quantify: "8 hours/month on manual invoice entry" |
+| "Leverages cutting-edge ML models" (Pitfall 3) | Write like you'd explain it to a friend |
+| "We're excited to bring innovation to market" (Pitfall 4) | The quote must say something only this company would say |
 
 ## Key Concepts
 
@@ -255,6 +285,13 @@ Mini example excerpt:
 **Fix:** Add data: "Beta users saved an average of 5 hours per month" or "68% of SMBs cite invoice processing as their top admin burden."
 
 ---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：按 Amazon「Working Backwards」方法在开工前写一篇设想中的新闻稿，用来对齐利益相关者并检验产品故事是否站得住。
+- **何时用**：新产品／大功能立项对齐、战略押注讨论之前，把它当作逼出清晰度的工具，而非发布日营销物料。
+- **核心步骤**：定客户与痛点 → 写标题（客户收益而非功能清单）→ 量化问题 → 描述方案与客户引语 → 逐条核对每项主张可追溯到客户结果。
+- **国内可达性边界**：主流程可离线完成，无境外服务依赖；正文引述的 Quora／书籍出处仅为延伸阅读，不访问不影响产出；没有验证数据就不编造统计数字。
 
 ## References
 

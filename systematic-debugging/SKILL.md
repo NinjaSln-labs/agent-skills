@@ -7,7 +7,7 @@ description: >-
   For a reported problem that is not yet a confirmed technical code defect, start with
   problem-handling; this skill is the code-bug root-cause protocol used inside it.
 slug: systematic-debugging
-version: 1.0.3
+version: 1.1.1
 displayName: systematic-debugging
 ---
 
@@ -48,6 +48,26 @@ Use for ANY technical issue:
 - Issue seems simple (simple bugs have root causes too)
 - You're in a hurry (rushing guarantees rework)
 - Manager wants it fixed NOW (systematic is faster than thrashing)
+
+## How to Invoke
+
+Say: `Use systematic-debugging on <symptom>` — then paste, in one shot if possible:
+
+- the exact error message / stack trace (complete, not paraphrased),
+- repro steps or the failing command + expected vs. actual behavior,
+- what recently changed (commits, deps, config) if known.
+
+It also runs as the diagnostic stage inside [`problem-handling`](../problem-handling/SKILL.md) when a reported problem turns out to be a technical code defect (A2) — you don't invoke it separately there. If invoked on something that is not a confirmed code bug, route back to `problem-handling` (see boundary below).
+
+## Where This Does NOT Apply (Boundary)
+
+Observable tests — if any of these match, this is the wrong tool:
+
+- **Not a defect**: feature requests, new capabilities, "make it nicer" — there is no root cause to find; go to planning/spec skills.
+- **No technical ground truth**: UX/design opinions, product prioritization calls — nothing to reproduce or measure.
+- **Known, documented behavior** (not a bug): check the docs/changelog first; debugging documented behavior wastes the process.
+- **Reported problem not yet confirmed as a code defect** (may be user error, data issue, expectations gap): start with `problem-handling`'s diagnosis and grading, not here.
+- **No observability at all** (can't reproduce, can't instrument, no logs/state): if Phase 1 instrumentation is impossible, the honest exit is the "No Root Cause" protocol below — document what you investigated, add monitoring, and hand back; do not guess-fix.
 
 ## The Four Phases
 
@@ -281,6 +301,21 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 4. Add monitoring/logging for future investigation
 
 **But:** 95% of "no root cause" cases are incomplete investigation.
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：一套代码缺陷根因排查协议——铁律是"未做根因调查不得提修复"。四阶段依次推进：先查根因（读报错、稳定复现、查最近变更、跨组件埋点取证），再做模式对比，然后形成单一假设做最小验证，最后先写失败测试再单点修复；修 3 次仍失败则停下质疑架构，而不是继续打补丁。
+
+**何时用**：遇到任何测试失败、线上 bug、意外行为、构建失败等技术问题，且在提出任何修法之前；非代码缺陷的上报问题先走 `problem-handling`。
+
+**核心步骤**：
+1. 完整读报错与堆栈，稳定复现，查最近改动（diff/依赖/配置）；
+2. 找同类可用代码作参照，逐项列出差异；
+3. 一次只改一个变量验证单一假设，未验证通过不叠加修复；
+4. 先写最小失败测试，再实现单一修复并全量回归；
+5. 修复 3 次以上仍失败→停下与人对架构的质疑。
+
+**国内可达性边界**：主流程可离线完成，无境外服务依赖——技术全部基于本仓本地文件（`root-cause-tracing.md` 等）与代码库自身证据，不依赖外网检索或付费源。
 
 ## Supporting Techniques
 

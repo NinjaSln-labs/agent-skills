@@ -5,7 +5,7 @@ description: >-
   when reviewing configuration security for containers, Kubernetes, Terraform, or
   application settings.
 slug: config-scan
-version: 1.0.0
+version: 1.1.1
 displayName: config-scan
 ---
 
@@ -403,18 +403,69 @@ resource "aws_s3_bucket_public_access_block" "data" {
 }
 ```
 
+## Worked Example
+
+Precondition: repo root containing a `Dockerfile` with no `USER` directive, a committed `.env` with `API_KEY=realvalue`, and `terraform/s3.tf` with `acl = "public-read"`.
+
+Ask the agent: "Run config-scan on this repo."
+
+Output excerpt (same shape as the Output Format section above):
+
+```
+CONFIG SCAN RESULTS
+===================
+Files scanned: 3
+Issues found: 3
+
+CRITICAL (2)
+------------
+[!] .env:2 - Secret in committed env file
+    API_KEY=****
+    Fix: Move to a secrets manager; add .env to .gitignore
+
+[!] terraform/s3.tf:12 - Public S3 bucket
+    acl = "public-read"
+    Fix: Remove public ACL, use bucket policies
+
+HIGH (1)
+--------
+[H] Dockerfile:1 - Running as root
+    No USER directive found
+    Fix: Add "USER node" or similar non-root user
+```
+
+## Failure Exits and Boundaries
+
+- No matching files: if the scanned tree contains none of `.env*`, `Dockerfile`, `docker-compose*.yml`, k8s manifests, `*.tf`, or app config, report "0 files scanned" and ask for the correct path — never scan a parent directory silently and never fabricate findings.
+- Unreadable or malformed `.config-scan.yaml` / `.config-scan-ignore`: report the exact path and parse error, then continue with defaults and say so — do not silently drop ignore rules.
+- `git` unavailable (committed-.env check needs `git ls-files`): state that this specific check was skipped and why; run the remaining file-based checks.
+- Scanning is performed by the agent applying the detection patterns in this document; there is no bundled script. Any output claiming a tool ran is wrong.
+
+## NOT for / Anti-patterns
+
+- NOT for dependency vulnerabilities — if the target is `package-lock.json` / `requirements.txt`, that is `/dependency-scan`.
+- NOT for source-code security review (SQLi, XSS in app code) — that is `/security-scan`.
+- NOT for credential rotation or auto-fixing: report findings (truncate secret values to a short prefix); never edit files to "fix" them unless the user asks.
+- Anti-pattern: scanning generated/vendor trees (`node_modules/`, `vendor/`, `dist/`) — exclude them; findings there are noise.
+- Anti-pattern: treating dev-only files (`docker-compose.dev.yml`, `.env.example`) as production — check filename and profile before assigning severity.
+
+## Wrong → Right (FAQ)
+
+| Wrong | Right |
+|---|---|
+| Reporting `.env.example` placeholders as leaked secrets | Values like `changeme`/empty are not leaks; example files are MEDIUM at most |
+| Printing full secret values in the report | Show file:line and key name only; truncate the value |
+| Running once locally and calling CI covered | Run this skill via the agent in CI with `--fail-on` exit-code semantics (see CI/CD Integration) and re-run per PR |
+| "Fixing" a finding by deleting the config file | Fix in place via the Remediation Examples section |
+
 ## CI/CD Integration
 
-```yaml
-# GitHub Actions
-- name: Config Security Scan
-  run: |
-    /config-scan --fail-on high
+This skill is executed by an agent — a CI pipeline cannot run a slash command as a shell step. The working pattern:
 
-- name: Docker Scan
-  run: |
-    /config-scan --docker --fail-on critical
-```
+- In CI, have the agent run this skill against the PR's changed config files (Docker/k8s/Terraform/env per `--docker`/`--k8s`/`--terraform`/`--env` scoping).
+- Decide the CI step's exit code using the `--fail-on <level>` semantics: exit non-zero when any finding at or above the given severity is present (e.g. fail on `high` for general config, `critical` for the Docker/IaC checks).
+- Concretely: the CI job invokes the coding agent with an instruction to run the config scan on the PR and to fail the step if findings at the chosen severity exist; the agent prints the report in the same Output Format as a local run.
+- Re-run per PR — a one-time local scan does not keep CI covered.
 
 ## Related Skills
 

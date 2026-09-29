@@ -4,7 +4,7 @@ description: >-
   Uncover customer jobs, pains, and gains in a structured JTBD format. Use when clarifying
   unmet needs, repositioning a product, or improving discovery and messaging.
 slug: jobs-to-be-done
-version: 1.0.2
+version: 1.1.1
 displayName: jobs-to-be-done
 ---
 
@@ -89,201 +89,17 @@ Before exploring JTBD, clarify:
 ---
 
 ### Step 2: Explore Customer Jobs
-
-#### Functional Jobs
-Ask: "What tasks are you trying to complete?"
-
-```markdown
-### Functional Jobs:
-- [Task 1 customer needs to perform]
-- [Task 2 customer needs to perform]
-- [Task 3 customer needs to perform]
-```
-
-**Examples:**
-- "Reconcile monthly expenses for tax filing"
-- "Onboard a new team member in under 2 hours"
-- "Deploy code to production without downtime"
-
-**Quality checks:**
-- **Verb-driven:** Jobs are actions ("send," "analyze," "coordinate")
-- **Solution-agnostic:** Don't say "use email to communicate"—say "communicate with remote teammates"
-- **Specific:** "Manage finances" is too broad; "Track business expenses for tax deductions" is specific
-
----
-
-#### Social Jobs
-Ask: "How do you want to be perceived by others?"
-
-```markdown
-### Social Jobs:
-- [Way customer wants to be perceived socially 1]
-- [Way customer wants to be perceived socially 2]
-- [Way customer wants to be perceived socially 3]
-```
-
-**Examples:**
-- "Be seen as a strategic thinker by my exec team"
-- "Appear responsive and reliable to clients"
-- "Look tech-savvy to my younger colleagues"
-
-**Quality checks:**
-- **Audience-specific:** Who is the customer trying to impress? (boss, clients, peers, etc.)
-- **Emotional weight:** Social jobs often drive adoption more than functional jobs
-
----
-
-#### Emotional Jobs
-Ask: "What emotional state do you want to achieve or avoid?"
-
-```markdown
-### Emotional Jobs:
-- [Emotional state customer seeks or avoids 1]
-- [Emotional state customer seeks or avoids 2]
-- [Emotional state customer seeks or avoids 3]
-```
-
-**Examples:**
-- "Feel confident I'm not missing important details"
-- "Avoid the anxiety of manual data entry errors"
-- "Feel a sense of accomplishment at the end of the day"
-
-**Quality checks:**
-- **Positive and negative:** Include both what they seek ("feel in control") and what they avoid ("avoid embarrassment")
-- **Rooted in research:** Don't fabricate emotions—use customer quotes
+Functional / Social / Emotional jobs — each with the interview ask, fill-in template, examples, and quality checks (full tables: [references/jtbd-methods.md](references/jtbd-methods.md)).
 
 ---
 
 ### Step 3: Identify Pains
-
-#### Challenges
-Ask: "What obstacles are preventing you from completing this job?"
-
-```markdown
-### Challenges:
-- [Obstacle customer faces 1]
-- [Obstacle customer faces 2]
-- [Obstacle customer faces 3]
-```
-
-**Examples:**
-- "Tools don't integrate, forcing manual data entry"
-- "No visibility into what teammates are working on"
-- "Approval processes take 3+ days, blocking progress"
-
----
-
-#### Costliness
-Ask: "What takes too much time, money, or effort?"
-
-```markdown
-### Costliness:
-- [What's too costly in time, money, or effort 1]
-- [What's too costly in time, money, or effort 2]
-```
-
-**Examples:**
-- "Generating monthly reports takes 8 hours of manual work"
-- "Hiring a specialist costs $10k, which we can't afford"
-- "Learning the current tool requires 20+ hours of training"
-
----
-
-#### Common Mistakes
-Ask: "What errors do you make frequently that could be prevented?"
-
-```markdown
-### Common Mistakes:
-- [Frequent error 1]
-- [Frequent error 2]
-```
-
-**Examples:**
-- "Forgetting to CC stakeholders on critical emails"
-- "Miscalculating tax deductions due to missing receipts"
-- "Accidentally overwriting someone else's work in shared files"
-
----
-
-#### Unresolved Problems
-Ask: "What problems do current solutions fail to address?"
-
-```markdown
-### Unresolved Problems:
-- [Problem not solved by current solutions 1]
-- [Problem not solved by current solutions 2]
-```
-
-**Examples:**
-- "Current CRM doesn't track customer health scores"
-- "Email doesn't preserve conversation context when people are added mid-thread"
-- "Existing tools require technical expertise we don't have"
+Four pain lenses — Challenges / Costliness / Common Mistakes / Unresolved Problems, each with ask, template, and examples (full tables: [references/jtbd-methods.md](references/jtbd-methods.md)).
 
 ---
 
 ### Step 4: Uncover Gains
-
-#### Expectations
-Ask: "What would make you love a solution?"
-
-```markdown
-### Expectations:
-- [What could exceed expectations 1]
-- [What could exceed expectations 2]
-```
-
-**Examples:**
-- "Automatically categorizes expenses without manual tagging"
-- "Suggests next steps based on project status"
-- "Integrates seamlessly with tools we already use"
-
----
-
-#### Savings
-Ask: "What savings in time, money, or effort would delight you?"
-
-```markdown
-### Savings:
-- [Way of saving time, money, or effort 1]
-- [Way of saving time, money, or effort 2]
-```
-
-**Examples:**
-- "Reduce report generation from 8 hours to 10 minutes"
-- "Eliminate the need for a full-time admin"
-- "Cut onboarding time from 2 weeks to 2 days"
-
----
-
-#### Adoption Factors
-Ask: "What would make you switch from your current solution?"
-
-```markdown
-### Adoption Factors:
-- [Factor increasing likelihood of adoption 1]
-- [Factor increasing likelihood of adoption 2]
-```
-
-**Examples:**
-- "Free trial with no credit card required"
-- "Migration support to import existing data"
-- "Testimonials from companies like ours"
-
----
-
-#### Life Improvement
-Ask: "How would your life be better if this job were easier?"
-
-```markdown
-### Life Improvement:
-- [How solution makes life easier or more enjoyable 1]
-- [How solution makes life easier or more enjoyable 2]
-```
-
-**Examples:**
-- "I could leave work on time instead of staying late to finish reports"
-- "I'd feel less stressed about missing important deadlines"
-- "I could focus on strategic work instead of busywork"
+Four gain lenses — Expectations / Savings / Adoption Factors / Life Improvement, each with ask, template, and examples (full tables: [references/jtbd-methods.md](references/jtbd-methods.md)).
 
 ---
 
@@ -356,6 +172,45 @@ Mini example excerpt:
 **Fix:** Rank pains by intensity (acute vs. mild). Ask "If we only solved one pain, which would have the biggest impact?"
 
 ---
+
+## Failure Exits & Edge Cases
+
+- **No customer data at all (empty-handed):** ask the two opening questions (who is the customer, what
+  progress are they making). If they go unanswered, produce the JTBD skeleton with every entry labeled
+  **Assumption** and a top-of-output note "unvalidated — mine interviews/tickets before acting on any
+  row." Do not present assumed jobs as findings.
+- **Only feature requests in the input** ("add AI, add dashboards"): treat them as raw material, not
+  jobs — run each through the Pitfall 1 "Why?" ladder and record the job it points to; say in one line
+  that the input was feature-shaped.
+- **Interview material contradicts the persona:** report the conflict (which source says what) rather
+  than averaging it; conflicting jobs by segment are a prioritization input, not noise.
+- **Segment too broad to analyze** ("everyone who needs invoicing"): ask once for a narrower segment or
+  trigger situation; if declined, split the output by the segments present in the data and mark the
+  split as an assumption.
+
+### Wrong way → fix (quick reference)
+
+| Wrong | Fix |
+|---|---|
+| Copying verbatims into the jobs section unchanged | Translate each into a verb-driven, solution-agnostic job statement |
+| Every pain marked "high intensity" | Rank: pick the one pain whose absence would block the job entirely |
+| Emotions invented to fill the template | Leave the row empty or quote a real customer sentence |
+| JTBD treated as final validation | It produces hypotheses; quantitative validation comes after (see When NOT to Use) |
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：用 JTBD 框架结构化挖掘客户"要完成的事"（功能/社交/情感三类任务）、痛点与期望收益——把功能请求还原成背后的任务，把痛点按强度排序，产出可验证的未满足需求假设，而非问卷报告。
+
+**何时用**：澄清未满足需求、重新定位产品、改进发现访谈与营销话术时；产品定型后复盘或琐碎小功能分析不适用。
+
+**核心步骤**：
+1. 定上下文：目标客群、触发情境、现用替代方案（含"换用访谈"）；
+2. 分三类探索客户任务（功能/社交/情感），每条用"为什么"追问到解决方案无关层；
+3. 四个视角识别痛点（障碍/代价/常见错误/未解决问题），按强度排序；
+4. 四个视角挖掘收益（期望/节省/采用因素/生活改善）；
+5. 交叉验证人设差异，用更大样本定量验证——JTBD 出假设，数据下结论。
+
+**国内可达性边界**：主流程可离线完成，无境外服务依赖——框架与模板均为仓内本地文件；References 所列书目为出处说明，不参与执行，无需在线获取。
 
 ## References
 

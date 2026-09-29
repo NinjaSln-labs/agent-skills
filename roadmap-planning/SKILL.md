@@ -4,7 +4,7 @@ description: >-
   Plan a strategic roadmap across prioritization, epic definition, stakeholder alignment,
   and sequencing. Use when turning strategy into a release plan that teams can execute.
 slug: roadmap-planning
-version: 1.0.1
+version: 1.1.1
 displayName: roadmap-planning
 ---
 
@@ -25,6 +25,10 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 **Arriving empty-handed? That works too.** The workflow starts by establishing strategic context, then moves through prioritization, epic definition, and sequencing.
 
 **Example invocation:** `Plan a 2-quarter roadmap for our mobile app: here are our 3 OKRs and a list of 12 candidate initiatives.`
+
+**More ways to start it:**
+- `Reframe our feature-list roadmap into Now/Next/Later — here's the current list and our 2 OKRs.` (Phase 1 collapses to review; the work is Phases 2-4)
+- `Quarterly planning: strategy is set (OKRs pasted), epics already exist with estimates — just prioritize and sequence.` (skips Phases 1-2)
 
 ## Key Concepts
 
@@ -376,41 +380,7 @@ LATER (Future):
 
 ## Complete Workflow: End-to-End Summary
 
-```
-Week 1:
-├─ Day 1-2: Gather Inputs
-│  ├─ Review business goals (OKRs)
-│  ├─ Review customer problems (discovery insights)
-│  ├─ Review technical constraints
-│  └─ Review stakeholder requests
-│
-├─ Day 3-4: Define Initiatives (Epics)
-│  ├─ Write epic hypotheses (60 min per epic)
-│  ├─ Estimate effort (90 min)
-│  └─ Map to business outcomes
-│
-├─ Day 5: Prioritize Initiatives
-│  ├─ Choose prioritization framework (30 min)
-│  ├─ Score epics (120 min)
-│  └─ Adjust for strategic fit
-│
-└─ Day 6-7: Sequence Roadmap
-   ├─ Map dependencies
-   ├─ Sequence by quarter (Q1, Q2, Q3)
-   └─ Validate with engineering
-
-Week 2:
-└─ Communicate Roadmap
-   ├─ Create presentation (2-3 hours)
-   ├─ Present to stakeholders (60 min)
-   ├─ Gather feedback
-   ├─ Refine roadmap (1-2 days)
-   └─ Publish roadmap
-```
-
-**Total Time Investment:**
-- **Fast track:** 1 week (existing epics, quick alignment)
-- **Typical:** 1.5-2 weeks (define epics, stakeholder review)
+See [`references/workflow-summary.md`](references/workflow-summary.md) for the full end-to-end workflow summary (verbatim) — phases, day-by-day schedule, and total time investment.
 
 ---
 
@@ -473,6 +443,28 @@ Later: Mobile workflows (DAU lift)
 
 ---
 
+## When Things Go Wrong (Failure Exits)
+
+- **No strategy or OKRs available:** Don't invent them. Stop after Phase 1 with a raw inventory of inputs as the deliverable, and tell the user a strategy session should come first (Phase 1 outputs become that session's input).
+- **No candidate initiative list:** Generate epic hypotheses from the customer problems gathered in Phase 1, explicitly labeled as assumptions for stakeholder review — never present generated epics as validated.
+- **Dependency cycle found in Phase 4** (B needs A, but A is sequenced later): Surface the cycle to the user instead of silently reordering; propose splitting the epic or accepting the slip in writing.
+- **Capacity conflict with engineering in Phase 4 validation:** Downgrade the least-scored epic to Next/Later and re-present — don't silently shrink epic scope to make the math work.
+
+## Wrong Approach → Right Approach
+
+| Wrong | Right |
+|-------|-------|
+| "Here's our feature list — just sequence it" | Write hypotheses with success metrics first (Phase 2); sequencing a bare feature list is Pitfall 1 |
+| "The VP wants Epic A at #1" | Score transparently, then apply the strategic override in Phase 3 step 3 — with the reason documented |
+| "The roadmap slipped, so planning failed" | Roadmaps are plans, not commitments (Pitfall 3) — re-sequence in the next cycle rather than relitigating |
+| "Dependencies? We'll discover them in delivery" | Map them in Phase 4 and validate with engineering — Q2 blocked by Q1 is the predictable failure (Pitfall 4) |
+
+## 中文速览（Quick Guide）
+
+- **做什么**：按五阶段把战略转成结果导向路线图：收集输入→定义 epic→优先级排序→排期→对齐沟通。
+- **何时用**：把策略/OKR 变成团队可执行的季度或年度发布计划、或重构现有功能清单式路线图时。
+- **核心步骤**：①汇总战略与候选清单 ②写 epic 假设 ③选框架做优先级 ④按依赖排 Now/Next/Later ⑤向干系人沟通对齐。
+- **国内可达性**：主流程离线可完成，无境外服务依赖；References 点名的书目（Product Roadmaps Relaunched、RICE）仅作方法论出处。
 ## References
 
 ### Related Capabilities (Embedded in This Workflow)

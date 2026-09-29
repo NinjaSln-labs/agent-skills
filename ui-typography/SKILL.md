@@ -8,7 +8,7 @@ description: >-
   Trigger on UI/landing/component/dashboard/document generation or "fix the typography".
   NOT for: marketing copywriting strategy, print-only typesetting, or non-UI prose.
 slug: ui-typography
-version: 1.0.1
+version: 1.1.1
 displayName: ui-typography
 ---
 
@@ -30,6 +30,40 @@ validated by how the human eye reads. They do not go out of style.
 correct HTML entities, proper CSS. Do not ask permission. Do not explain. Just produce correct typography.
 
 **AUDIT:** When reviewing existing code or design, identify violations and provide before/after fixes.
+
+## Worked Example (shortest real run)
+
+**Precondition:** a JSX component with visible text; nothing installed, no network needed.
+**Invocation:** `Fix the typography in src/components/PricingCard.tsx`
+**Output excerpt (what you should see back):**
+
+```jsx
+// Before
+<p>Don't say "dynamic" — it's a 70's idea!</p>
+// After
+<p>Don&rsquo;t say &ldquo;dynamic&rdquo; &mdash; it&rsquo;s a &rsquo;70s idea!</p>
+// (in JSX text nodes, paste the real characters ’ “ — not \u escapes)
+```
+
+**Done when:** every quote/dash/ellipsis in the touched file is a real typographic character (or a JSX-safe expression), and no straight `'`/`"` remains in rendered text.
+
+## Failure Exits (closed set)
+
+- **Reference file missing** (`references/css-templates.md` / `references/html-entities.md` not found): run `ls references/` in this skill's directory. If empty or renamed, stop and report the missing filename — do not invent entity codes from memory; fall back to pasting literal UTF-8 characters (always correct).
+- **Wrong file type:** these rules target UI/screen text only. Print-only typesetting or marketing prose → out of scope, say so and stop rather than half-applying rules.
+- **Ambiguous scope** (whole app vs one component): apply to the named file first, then list the other candidates — don't sweep the repo unasked.
+
+## FAQ — wrong → fix
+
+| Wrong | Why it fails | Fix |
+|-------|--------------|-----|
+| `\u2019` pasted into JSX text | Renders literally as `\u2019` | Paste the real `’` or use `{'\u2019'}` inside braces |
+| `sed "s/'/’/g"` with escape sequences | Replaces code-string apostrophes too | Bulk-fix only text nodes; check diffs for broken string literals |
+| Two spaces after a period | Creates rivers, breaks measure | Exactly one space |
+| Straight `"` in shipped UI copy | Typewriter artifact | `“ ”` / `&ldquo;` `&rdquo;` |
+| Letter-spacing on lowercase body text | Gaps split words apart | Letterspacing only on ALL CAPS / small caps (5–12%) |
+
+**Boundary:** this skill fires on UI generation or "fix the typography" type requests. It never rewrites marketing strategy, print book layouts, or non-UI prose — if the request is really one of those, name the mismatch instead of editing.
 
 **Reference files** (read when generating CSS or looking up entities):
 - `references/css-templates.md` — Full CSS baseline template, responsive patterns, OpenType features
@@ -341,3 +375,18 @@ Test on macOS and Windows (antialiasing differs).
 6. **Relate new to existing** — each element constrains the next
 7. **Keep it simple** — 3 colors and 5 fonts? Think again
 8. **Imitate what you like** — emulate good typography from the wild
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：一套面向 UI/屏幕文本的常设排版规则——弯引号、三种连字符/破折号、省略号、行距 120–145%、行长 45–90 字符、全大写加字距等；默认 ENFORCEMENT 模式：生成任何带可见文本的 UI 时静默自动套用，AUDIT 模式用于审查存量界面并给前后对照修法。
+
+**何时用**：生成或修复任何 HTML/CSS/React 界面的可见文本时；纯印刷排版、营销文案策略、非 UI 散文不适用。
+
+**核心步骤**：
+1. 确认范围（点名文件优先，不未经要求全仓扫）；
+2. 逐项替换打字机字符：直引号→弯引号、`--`→en/em dash、三个句点→`…`；
+3. 套版式规则：`line-height: 1.2–1.45`、`max-width: 65ch`、全大写标题加 5–12% 字距、kerning 常开；
+4. JSX 文本节点直接粘贴真实 UTF-8 字符（`\u` 转义会字面渲染）；
+5. 对照 FAQ 表自检：不留直引号、不双空格、小写正文不加字距。
+
+**国内可达性边界**：主流程可离线完成——全部规则、实体表与 CSS 模板均为仓内本地文件；文首对 practicaltypography.com 的署名链接仅为出处致谢，规则本体自包含，链接不可达不影响执行。

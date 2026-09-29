@@ -5,7 +5,7 @@ description: >-
   metrics. Use when diagnosing a broken experience or aligning a team on the full customer
   flow.
 slug: customer-journey-map
-version: 1.0.3
+version: 1.1.1
 displayName: customer-journey-map
 ---
 
@@ -26,6 +26,43 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 **Arriving empty-handed? That works too.** The skill asks for persona and scenario first — a journey map without a specific actor and goal turns into a generic funnel diagram.
 
 **Example invocation:** `Map the journey for a mid-market ops manager going from free trial to paid rollout across their team.`
+
+## Triggers — When This Fires
+
+Invoke on any of:
+- Diagnosing a broken experience ("users drop off between trial and paid", "support tickets spike after signup")
+- Aligning a team on the full customer flow (workshop or kickoff doc)
+- Auditing touchpoints across marketing / sales / product / support
+- Prioritizing CX improvements ("where do we fix first?")
+
+**Best invocation** names actor + scenario + goal in one line: `Customer journey map for a mid-market ops manager going from free trial to paid rollout; goal: find where teams abandon setup.` Anything appended to the invocation counts as answers already given.
+
+## Shortest Worked Example
+
+**Precondition:** one actor (or proto-persona) and one scenario; no research repo needed — known stages and touchpoints suffice, no web access required.
+**Output excerpt (what you should see):**
+
+| Stage | Customer Actions | Touchpoints | Experience | KPIs |
+|---|---|---|---|---|
+| Consideration | Compares tools, reads reviews | G2, peer Slack groups | "Anxious about setup time" | Demo requests: 100/mo |
+| Decision | Starts free trial, tests with real data | Product onboarding email | Relieved if setup is easy | Trial→paid: 20% |
+
+**Done when:** every stage row has observable actions, named touchpoints, an emotion, and a measurable KPI.
+
+## Failure Exits (closed set)
+
+- **No actor or scenario given:** ask one question ("whose journey, toward what goal?") — don't produce a generic funnel diagram.
+- **No stages known:** default to Awareness → Consideration → Decision → Service → Loyalty and say so, rather than stalling.
+- **No persona defined yet:** run [`proto-persona`](../proto-persona/SKILL.md) first, or proceed with the named segment flagged [ASSUMPTION].
+- **Template/examples missing** (`template.md`, `examples/sample.md` not found): `ls` this skill's directory and report the missing file — don't invent another structure.
+- **Thin research:** gaps become `[ASSUMPTION—VALIDATE]` tags, not blockers.
+
+## Boundaries — Observable NOT-for
+
+- Persona doesn't exist yet → [`proto-persona`](../proto-persona/SKILL.md) (this map consumes one; it doesn't create one).
+- Feature-level usage flow (steps inside one product) → story mapping, not this.
+- Quantitative funnel drop-off analysis → analytics work; this map adds the emotion/qualitative layer.
+- One-time artifact: if the map won't be revisited quarterly or on behavior change, say so at delivery — it decays.
 
 ## Key Concepts
 
@@ -324,6 +361,13 @@ Mini example excerpt:
 **Fix:** Review quarterly. Update based on new data, product changes, or market shifts.
 
 ---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：为指定客户在指定场景下绘制跨阶段旅程图（动作／触点／情绪／KPI／责任团队），定位体验断点并支撑跨团队对齐。
+- **何时用**：诊断体验问题（如试用到付费流失）、团队对齐全客户流程、审计营销／销售／产品／支持各渠道触点时。
+- **核心步骤**：先定人物与场景 → 划分阶段（未知时默认 Awareness→Consideration→Decision→Service→Loyalty 并声明）→ 逐阶段填可观察动作、命名触点、情绪与可测 KPI → 汇总痛点排优先级。
+- **国内可达性边界**：主流程可离线完成，无境外服务依赖；研究缺口打 `[ASSUMPTION—VALIDATE]`，不虚构数据。
 
 ## References
 

@@ -11,7 +11,7 @@ description: >-
   the agent must not auto-invoke it — the user runs it explicitly. NOT for: static
   description-vs-body compliance review of a SKILL.md.
 slug: skill-eval
-version: 1.1.0
+version: 1.2.0
 displayName: skill-eval
 disable-model-invocation: true
 ---
@@ -112,6 +112,57 @@ disable-model-invocation: true
 | `skill-description-audit` | 静态描述合规（description↔正文）；skill-eval = 动态（pass-rate ＋ trigger rate）——先合规后行为 |
 | `verification-before-completion` | 判定纪律来源（AC 证据判定，不信自报） |
 | `delegated-research` | 不适用——评估是受控实验，不是调研 |
+
+## 最短真实样例
+
+**前置**：目标 skill `writing-plans` 在库内（`ls writing-plans/SKILL.md` 可解析）；评估目录可建；3 个代表任务已带 AC 定义。
+
+**调用句**（用户点名）：
+
+> 用 skill-eval 评估 writing-plans，每任务跑 3 次
+
+**产出摘录**（评估目录里 `report.md` 的核心表）：
+
+```markdown
+# Skill Eval: writing-plans（2026-09-29）
+
+| 任务 | 无 skill (N) | 有 skill (N) | Δ | 结论 |
+|------|-------------|-------------|---|------|
+| 拆 12 步迁移计划 | 1/3 | 3/3 | +2 | skill 有效 |
+| 补验收 AC | 2/3 | 2/3 | 0 | 无差异——改进点：AC 节缺「机器可验证」示例 |
+
+## 改进项
+1. writing-plans/SKILL.md「验收」节补 1 条机器可验证 AC 示例（文件含 X / 命令退出码）
+```
+
+触发率模式摘录（同一报告附表）：查询集 20 条、每条 3 跑；应触发组 trigger rate 0.83（漏 1 条→WHEN 缺「对比评审」触发词）、不应触发组 0.00。
+
+## 失败出口（可操作，非「降级标注」）
+
+| 情形 | 可观察信号 | 出口 |
+|------|-----------|------|
+| 目标 skill 名不对 | `ls <name>/SKILL.md` 非零退出 | 停止评估，列出库内近名技能请用户确认；不得猜名开跑 |
+| 无法开 fresh agent（只有单一会话） | 无新建会话手段 | 报告「本环境不可评估」并终止——两组条件不一致的结论比没有结论更有害，禁止降级出表 |
+| AC 无法机器验证 | 判定只能凭阅读/感觉 | 停在该任务，与用户重写 AC（改成文件存在/输出匹配/命令退出码）；其余可判任务照常 |
+| 评估目录写不进 | 落盘命令非零退出 | 换 `.scratch/<项目>/skill-eval/<skill>-<date>/` 下可用路径并在报告头注明实际路径 |
+| 触发实测无网（需拉取环境/模型不可用） | 每条查询 3 跑均无法产生结果 | 只交付 pass-rate 模式报告，触发率节标注「未执行：环境不可用」——不编造触发次数 |
+
+## 错法 → 改法
+
+| 错法 | 改法 |
+|------|------|
+| agent 不等用户点名，自主跑评估并改他人 SKILL.md | 本技能 USER-INVOKED ONLY：只在用户显式调用时运行；改写前先出报告征得用户确认 |
+| 同一会话先后跑两组 | 每组每次 fresh agent；发现同会话即作废已跑数据重跑 |
+| 两组 prompt 有细微差别（多塞了一句提示） | 两组 prompt 逐字一致，唯一差异＝是否加载 skill 指令 |
+| pass/fail 采信 agent 自报成功 | 只按 AC 证据判定（命令退出码/文件内容），自报不作为证据 |
+| 在 validation 查询集上调完 description 再报结果 | 只据 train 集改 description；validation 仅复测，结果并入报告 |
+| 触发查询集 20 条全是正例 | 必含 8–10 条近似反例，否则误触发测不出 |
+
+## 边界判定句
+
+- 无仓／无目标 skill：`ls <name>/SKILL.md` 非零 ＝ 错仓或错名，不评估。
+- 单会话、无法 fresh agent ＝ 不可评估（见失败出口第 2 行），不是「尽力而为」。
+- 目标 skill 属于审计/发布/删除类高影响技能时，其行为评估照常，但写回改进项前须用户显式授权（AGENTS.md 规则 7）。
 
 ## 反模式
 

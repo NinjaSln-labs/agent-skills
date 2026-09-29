@@ -9,7 +9,7 @@ description: >-
   skill executes solo). NOT for: verify-only stage completion checks against a spec —
   those only verify and never execute.
 slug: executing-plans
-version: 1.0.2
+version: 1.1.0
 displayName: executing-plans
 ---
 
@@ -69,6 +69,45 @@ After all tasks complete and verified:
 - Fundamental approach needs rethinking
 
 **Don't force through blockers** - stop and ask.
+
+## Worked Example
+
+Precondition: a written plan at `plans/add-export-button.md` with 3 tasks, each ending in a runnable verification.
+
+Ask: "Execute the plan at plans/add-export-button.md."
+
+Observable flow:
+
+1. Announce: "I'm using the executing-plans skill to implement this plan."
+2. Create or verify an isolated worktree/branch (never main/master without explicit consent).
+3. Review the plan. Example concern worth raising before starting: a task says "verify: run `npm test`" but the repo has no `package.json` — that is a critical gap; ask, don't guess.
+4. Task by task: mark `in_progress` → follow the steps exactly → run the verification that task specifies → mark `completed`.
+5. Completion report excerpt:
+
+```
+All 3 tasks complete.
+- Task 1: Add ExportButton component — done (tsc passes)
+- Task 2: Wire into toolbar — done (npm test: 12 passed)
+- Task 3: Update docs — done
+Branch: feat/export-button. Next: merge / open a PR / keep / discard — your choice.
+```
+
+## Failure Exits
+
+- Plan path missing or never given: ask the human for the path — do not search the repo and pick a candidate file.
+- A verification fails and the cause is not clearly your own edit: STOP, show the failing command and its output, and ask. Do not modify the plan, weaken the test, or skip the task.
+- A verification needs a tool that is not installed: report exactly which command failed, ask whether to install it — do not install silently.
+- Instruction unclear: quote the step, ask one specific question, and wait for the answer.
+
+## Wrong → Right (FAQ)
+
+| Wrong | Right |
+|---|---|
+| Verifying a stage against a DoD spec instead of executing | That is `stage-gate`'s job (see 边界 above); this skill executes |
+| Batching edits for several tasks, then running all verifications at once | One task at a time; its verification runs before it is marked completed |
+| Fixing a failing test by changing the test | Stop and ask — verification failures are blockers, not obstacles to route around |
+| Starting on main/master "because the plan is small" | Create the isolated worktree/branch first; main only with explicit consent |
+| Silently reordering tasks to unblock yourself | Execute in plan order; if the order is wrong, raise it in review (Step 1) |
 
 ## Remember
 - Review plan critically first

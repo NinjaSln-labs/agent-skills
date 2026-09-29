@@ -9,11 +9,47 @@ description: >-
   before touching code. NOT for: stage contract specs (DoD/gate assertions + TDD grid) —
   those are stage-spec, executed by stage-gate.
 slug: writing-plans
-version: 1.0.2
+version: 1.1.1
 displayName: writing-plans
 ---
 
 # Writing Plans
+
+## When to Use / How to Invoke
+
+Use this skill when **all** of these hold (do not self-trigger otherwise):
+
+- There is a spec, requirements doc, or user-described feature for **multi-step** work.
+- Code has not been touched yet for this work — plans come before implementation.
+- The work needs task decomposition with exact file paths, code, and verification steps.
+
+Explicit invocation form: `use writing-plans: <paste spec or point to spec file>`. Defaults applied when unspecified: save location `docs/plans/` (probed/overridden as below), filename `YYYY-MM-DD-<feature-name>.md`, TDD-style task structure.
+
+**NOT for:** stage contract specs (DoD/gate assertions + TDD grid) — those are `stage-spec`, executed by `stage-gate` (see 边界 below). Not for single-step fixes that don't need a plan.
+
+## Example (precondition → invocation → output excerpt)
+
+Precondition: a short spec exists (e.g. "add rate limiting to the login endpoint").
+
+Invocation:
+
+```text
+use writing-plans: spec below — add per-IP rate limiting to POST /login, 5 req/min, Redis backed
+```
+
+Output excerpt (saved to `docs/plans/2026-09-29-login-rate-limit.md`):
+
+```markdown
+# Login Rate Limit Implementation Plan
+**Goal:** Cap POST /login at 5 requests/minute per IP using Redis.
+### Task 1: Rate limiter middleware
+**Files:**
+- Create: src/middleware/rate-limit.ts
+- Test: tests/middleware/rate-limit.test.ts
+- [ ] **Step 1: Write the failing test**
+...
+- [ ] **Step 2: Run test to verify it fails** — Run: `npm test -- rate-limit` Expected: FAIL
+```
 
 ## Overview
 
@@ -64,77 +100,11 @@ independently testable deliverable.
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
-
-```markdown
-# [Feature Name] Implementation Plan
-
-> **For agentic workers:** REQUIRED WORKFLOW: implement this plan task-by-task — either dispatch a fresh subagent per task with a review gate between tasks (recommended), or execute inline with checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
-
-**Goal:** [One sentence describing what this builds]
-
-**Architecture:** [2-3 sentences about approach]
-
-**Tech Stack:** [Key technologies/libraries]
-
-## Global Constraints
-
-[The spec's project-wide requirements — version floors, dependency limits,
-naming and copy rules, platform requirements — one line each, with exact
-values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
-
----
-```
+**Every plan MUST start with this header** — Goal/Architecture/Tech Stack + a Global Constraints section carrying the spec's project-wide requirements verbatim (full template: [references/plan-templates.md](references/plan-templates.md)).
 
 ## Task Structure
 
-````markdown
-### Task N: [Component Name]
-
-**Files:**
-- Create: `exact/path/to/file.py`
-- Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
-
-**Interfaces:**
-- Consumes: [what this task uses from earlier tasks — exact signatures]
-- Produces: [what later tasks rely on — exact function names, parameter
-  and return types. A task's implementer sees only their own task; this
-  block is how they learn the names and types neighboring tasks use.]
-
-- [ ] **Step 1: Write the failing test**
-
-```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
-```
-
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
-
-- [ ] **Step 3: Write minimal implementation**
-
-```python
-def function(input):
-    return expected
-```
-
-- [ ] **Step 4: Run test to verify it passes**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature"
-```
-````
+Each task = exact Files (Create/Modify/Test) + Interfaces (Consumes/Produces with exact signatures) + a fixed test-first step cycle: write failing test → verify FAIL → minimal implementation → verify PASS → commit (full template: [references/plan-templates.md](references/plan-templates.md)).
 
 ## No Placeholders
 
@@ -157,6 +127,24 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+
+## Failure Exits (observable)
+
+- **Spec too vague to plan** (no measurable behavior, no target files, contradictory requirements): do **not** generate a placeholder-ridden plan. Output a blocking question list naming the missing decisions (e.g. "undefined: rate limit window; no test runner configured — which?") and stop. Observable exit: the response ends with numbered questions, no plan file is written.
+- **No repo / empty directory**: state that file paths cannot be exact, ask whether to scaffold first or plan against a target stack, and do not invent paths under an assumed layout.
+- **Plans directory unwritable or probe fails**: say where the plan *would* be saved, ask the user to confirm an alternative location, do not silently write elsewhere.
+- **Spec covers multiple independent subsystems** (see Scope Check): stop and propose the split before writing any plan.
+
+## FAQ / Wrong Way → Fix
+
+| Wrong way | Fix |
+|-----------|-----|
+| Generating a plan from a one-line vague request without asking anything | Run the Failure Exit: list missing decisions, wait for answers, then plan |
+| Writing "TBD" / "add appropriate error handling" to keep momentum | That is a plan failure — write the actual code or the exact assertion (see No Placeholders) |
+| Planning stage DoD/gate assertions because the spec is staged | That is `stage-spec` territory; check the 边界 section and hand off |
+| One giant task "implement the feature" | Split into bite-sized tasks, each with its own test→fail→pass→commit cycle |
+| Inventing file paths in a repo you haven't inspected | Read the repo first (File Structure section); exact paths are a hard requirement |
+| Self-triggering plan writing on any coding request | Only when a spec precedes multi-step implementation; otherwise just do the work |
 
 ## 边界（与 stage-spec 分工）
 

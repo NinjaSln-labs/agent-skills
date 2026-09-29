@@ -5,7 +5,7 @@ description: >-
   switching triggers — with quoted evidence. Use when you want customer voice without
   waiting on interviews.
 slug: voice-of-customer-miner
-version: 1.0.3
+version: 1.1.0
 displayName: voice-of-customer-miner
 ---
 
@@ -149,6 +149,23 @@ shows the thin-voice case — what honest mining looks like when the market bare
   the satisfied-and-silent majority never posts. Bias notes per source are mandatory.
 - **Skipping the validation handoff.** Shipping themes straight into the roadmap. The output's
   "assumptions to validate in real interviews" section is the bridge to discovery — use it.
+
+## When Sources Are Out of Reach (Failure Exits)
+
+- **Review sites unreachable or paywalled (G2, Capterra, app stores):** Say which sources failed and switch to what is reachable — user-provided review exports, support tickets, community archives, or locally accessible sources the user nominates (for Chinese markets: practitioner forums, Zhihu-style Q&A, app store CN listings). Same sweep discipline applies; note each substitute source's skew like any other.
+- **Not a single verbatim URL captured:** Stop and say so. Do not emit a theme with zero verbatims — paraphrased "quotes" are verbatim laundering (see Pitfalls). The honest deliverable is "no public voice found; here is what to do instead" → run `discovery-interview-prep`.
+- **Thin-voice market:** Follow the `examples/sample-industrial.md` pattern — fewer themes, lower confidence caps, explicit absence-of-evidence notes; never pad frequency claims to look busy.
+- **Garbage or contradictory input** (gibberish product names, conflicting decisions): Ask one clarifying question naming the specific contradiction; if it stays unclear, proceed only on labeled Assumptions and mark the whole run's confidence accordingly — do not silently guess.
+
+## FAQ (Wrong → Right)
+
+| Wrong | Right |
+|-------|-------|
+| Clustering by feature ("export complaints") | Theme by underlying need ("getting data out at contract end") — the name should survive solution changes |
+| Paraphrasing a review into a "quote" | Only real excerpts at real URLs get quote marks; everything else is a labeled summary |
+| Treating one vivid rant as a theme | Label frequency honestly: recurring across sources / concentrated / isolated |
+| Feeding themes straight into the roadmap | Themes are hypotheses; the "assumptions to validate in real interviews" section is the required bridge |
+| Trusting the source mix as representative | Every source has a skew (reviewers negative, vendor communities loyal) — bias note per source is mandatory |
 
 ## References
 

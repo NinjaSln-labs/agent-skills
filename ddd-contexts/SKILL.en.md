@@ -24,6 +24,7 @@ date_added: "2026-05-08"
 
 - **Required**: Subdomain classification table and core domain declaration (from `ddd-subdomains`), event flows and hotspot annotations (from `ddd-discover`).
 - **Optional**: Organizational information (team boundaries, delivery cadence), terminology seeds (from `ddd-scope`).
+- **When input is incomplete**: missing subdomain classification or event flows → state what is missing in one line and point to the skill that produces it ("missing the subdomain classification table — run `ddd-subdomains` first, or paste your subdomain list"); if the user insists on a verbal description only → cluster from the description but label every context as Assumption and list "pending inputs" at the top of the output. Never silently fill required inputs with guesses.
 
 ## Process
 
@@ -70,3 +71,28 @@ Based on the following subdomain classification and event flows, help me design 
 [paste event flow table]
 Please output context directory, Ubiquitous Language glossary, and boundary ADRs.
 ```
+
+Output excerpt (same scenario, abridged):
+
+```text
+| Context    | Responsibility          | Core terms        | Data ownership | Team    |
+| :--------- | :---------------------- | :---------------- | :------------- | :------ |
+| Booking    | create/cancel/arbitrate | Booking, Conflict | booking table  | Booking |
+| Room Mgmt  | rooms/capacity upkeep   | Room, Capacity    | rooms table    | Rooms   |
+
+Boundary ADR-1: Booking and Room live in separate contexts — the booking side holds
+only a room_id reference; cross-context lookups go through a "room snapshot" translation
+(rationale: availability rules change far more often than room master data;
+risk: stale capacity shown while translation lags; alternative: one merged context —
+rejected by team boundaries).
+```
+
+## Wrong way → fix
+
+| Wrong | Fix |
+| :--- | :--- |
+| Slicing contexts by technical layers ("data/service/UI layer") | Cluster by consistency and language boundaries; layers are not bounded contexts |
+| Treating a term's cross-context meaning clash as "close enough" | Same-name-different-meaning must be explicitly translated or renamed, recorded as an ADR |
+| Glossary with nouns only, no anti-terms | The anti-term list is a required artifact (Manager/Handler-style generic words, vague business words) |
+| Drawing boundaries without ADRs — "why this cut" is unanswerable later | At least 1 trade-off + risk per context (see validation checklist) |
+| Forcing clusters without a subdomain classification, output looking complete | State the missing input in one line and mark Assumptions (see "when input is incomplete") |

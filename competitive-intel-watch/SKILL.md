@@ -5,7 +5,7 @@ description: >-
   snapshot. Use when tracking competitors on a cadence: material shifts only, cited
   evidence, battle-card update flags, runs unattended.
 slug: competitive-intel-watch
-version: 1.0.3
+version: 1.1.1
 displayName: competitive-intel-watch
 ---
 
@@ -165,6 +165,45 @@ reported as material.
   diffing the old frame. Re-baseline when the scope changes; say so in the run header.
 - **Orphaned intelligence.** A changelog with no update flags. If no artifact needs updating, the
   shift probably didn't clear the bar — flags are how research becomes action.
+
+## Failure Exits & Edge Cases
+
+- **No prior snapshot and none attached:** do not guess a baseline — switch to baseline mode, say so
+  in one line ("No prior snapshot found; producing a first snapshot as baseline"), and stop after it.
+  Delta reporting starts next run.
+- **Malformed or mismatched prior snapshot** (truncated paste, wrong artifact, no dates): name what is
+  wrong in one line and ask one targeted question ("This looks like a battle card, not a snapshot —
+  paste the snapshot or say `baseline` to start over"). Never silently diff against a mismatched
+  document.
+- **No network / sources unreachable:** report which checks could not run in the Run Header
+  ("Competitors checked: 3 of 5 — pricing pages unreachable"), label affected claims as Assumption,
+  and put the missed checks on the watchlist — do not emit a changelog built from memory.
+- **Competitor missing from the prior snapshot:** treat as a scope question — add it, mark
+  "new competitor, no baseline" in its entry, and put "extend baseline" on the watchlist.
+
+### Wrong way → fix
+
+| Wrong | Fix |
+|---|---|
+| Diffing from memory because the snapshot is long | Re-read the snapshot; the diff target is the document |
+| Inventing "probable" pricing moves to fill a quiet cycle | Empty changelog + watchlist entry |
+| Swallowing a truncated input and proceeding | One-line diagnosis + one targeted question (max 2 total) |
+| Reporting a below-bar blog post to look productive | Log it on the watchlist only |
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：把竞争研究从一次性文档变成节律化监控——拿上一份快照做基线，diff 出"实质性变化"并逐条给带日期的证据，同时点名哪些下游工件（战卡、定价、路线图）因之过期；无实质变化时，空的 changelog 就是正确产出。
+
+**何时用**：需要按周期（周扫/月报/季查）跟踪竞品动向时；没有基线快照就先用 `competitive-research-snapshot` 建基线。
+
+**核心步骤**：
+1. 判定模式：有前次快照→delta 模式；无→基线模式出首份快照即停；
+2. 追问至多 2 问（有无快照、本轮特别关注什么）；
+3. 先完整重读基线快照再搜索——diff 的是文档，不是记忆；
+4. 出 3 条搜索计划，逐竞品扫过实质性门槛（定价/发布/定位/融资等）；
+5. 按 schema 输出 changelog＋更新标记＋下轮观察名单。
+
+**国内可达性边界**：依赖对竞品官网、定价页、发布说明、招聘页、新闻与投资者材料等外网源的访问；某源不可达时在 Run Header 写明"3/5 竞品已查、定价页不可达"，受影响断言标 Assumption，漏查项放进观察名单——不从记忆编造 changelog；可改用公开中文渠道（竞品中文官网、公开新闻稿）补查并保留同样的 URL+日期纪律。
 
 ## References
 

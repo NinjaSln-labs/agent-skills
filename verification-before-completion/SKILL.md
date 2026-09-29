@@ -7,7 +7,7 @@ description: >-
   NOT for: stage-level aggregation of a whole DoD spec — that is stage-gate, which runs
   the full gate and never fixes.
 slug: verification-before-completion
-version: 1.0.2
+version: 1.1.0
 displayName: verification-before-completion
 ---
 
@@ -128,3 +128,49 @@ Skip any step = lying, not verifying
 - Paraphrases and synonyms
 - Implications of success
 - ANY communication suggesting completion/correctness
+
+## How to invoke
+
+This is a behavior rule the agent loads and applies to itself — no script, no parameters. Invocation
+is plain text, inline or as a slash-style reference:
+
+```text
+verification-before-completion: verify the last claim before I report this task done
+```
+
+```text
+Use verification-before-completion — about to commit; run the test suite and show me fresh output first.
+```
+
+**When to reach for it (trigger summary):** the moment you are about to write any success/completion
+wording ("done", "passing", "fixed", "all green"), before commit/PR, before handing a task off to
+another agent, and after any agent reports success. If no such claim is imminent, this rule has nothing
+to gate — that is not a violation, just nothing to verify yet.
+
+## When verification FAILS — the recovery script
+
+A failed verification is not a dead end; it is the system working. The wrong recovery is silence,
+softening, or "almost done." The required wording:
+
+```text
+Verification failed: [command] exited 1 — [3 of 34 tests failing: <names>].
+Actual status: NOT complete. Next: [the concrete fix or investigation step].
+```
+
+Rules for the recovery:
+
+- State the command, the exit code, and the failure count — never "mostly passing."
+- Claim stays withdrawn until a fresh rerun passes; a fix followed by no rerun is still an unverified
+  claim.
+- If the verification command itself cannot run (missing dependency, wrong path), say exactly that
+  ("test suite not runnable: no `package.json` scripts found") and stop — an unrunnable gate is a
+  failure to report, not a pass to assume.
+
+### Wrong way → fix
+
+| Wrong | Fix |
+|---|---|
+| "Fixed it, should pass now" | Rerun the command; report exit code + counts |
+| "Tests fail but the build works, so we're good" | Both gates must pass; report the failing one as the status |
+| Silent retry loop without telling the user | First failure gets the recovery script above, immediately |
+| "Verification isn't possible here" (as a pass) | Name what cannot run and why; that is the status — NOT done |

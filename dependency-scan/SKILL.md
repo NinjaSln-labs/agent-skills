@@ -11,7 +11,7 @@ description: >-
   source-code security review, secrets or credential detection, or
   configuration and IaC misconfiguration scanning.
 slug: dependency-scan
-version: 1.0.1
+version: 1.1.1
 displayName: dependency-scan
 ---
 
@@ -328,8 +328,80 @@ Unmaintained (>2 years): 2
 License Issues: 0
 ```
 
+## Minimal worked example
+
+Precondition: a Node.js project with `package.json` + `package-lock.json` at the repo root.
+
+User says: **"scan the dependencies for vulnerabilities"**
+
+What happens:
+
+1. Detect `package.json` → ecosystem = npm; no `--npm`/`--pip` flag given, so only detected managers run.
+2. Run `npm audit --json`.
+3. Report excerpt (summary view):
+
+```
+DEPENDENCY SCAN RESULTS
+=======================
+
+Scanned: package.json
+Packages analyzed: 78
+
+VULNERABILITIES BY SEVERITY
+  Critical: 1
+  High: 1
+
+TOP ISSUES
+
+[!] CRITICAL: lodash < 4.17.21
+    CVE-2021-23337: Command Injection
+    Affected: lodash@4.17.19
+    Fix: npm update lodash
+```
+
+If `--fix` was requested, follow with the AUTO-FIX REPORT (see below) and show the resulting `package.json`/lockfile diff before the user commits anything.
+
+## Failure exits (offline / wrong repo / missing tool)
+
+Every failure below is observable via a command's exit status or message — act on it, don't silently downgrade the report.
+
+| Situation | Observable signal | Exit action |
+|-----------|-------------------|-------------|
+| No lockfile for npm | `npm audit` exits non-zero with `EUSAGE` ("Either your app has no lockfile...") | Report that npm audit needs `package-lock.json`; offer `npm install` to generate it, then rerun. Scan other detected ecosystems meanwhile. |
+| pip-audit / safety not installed | `pip-audit: command not found` (exit 127) | Install: `pipx install pip-audit` (or `pip install pip-audit`), rerun. Never report the ecosystem as "clean" without running the tool. |
+| bundler-audit advisory DB stale | `bundle-audit update` exits non-zero / fetch error | Report "advisory DB could not be refreshed — results may miss recent advisories"; still show results from the local DB. |
+| No network at all | every advisory-DB fetch / registry call fails (timeouts, DNS errors) | Stop and report "offline: vulnerability databases unreachable". Do not fabricate a clean result; ask the user to rerun with network or a mirror. |
+| Manifest exists but not a real project (wrong repo / stray file) | manifest parses but the manager's tool errors on resolution, or the path is outside the repo root | Ask the user which directory is the project root; never guess across repos. |
+| Go/Rust tool missing | `govulncheck: command not found` / `cargo: command not found` | Name the skipped ecosystem explicitly in the report ("go: skipped, govulncheck not installed") and continue with the rest. |
+
+## FAQ (wrong way → right way)
+
+| Wrong | Right |
+|-------|-------|
+| Trusting a "0 vulnerabilities" result without checking what was scanned | Verify the `Scanned:` line lists the manifests you expected; a missing manifest means that manager was never scanned |
+| Using this skill to review source code for injection/XSS | Out of scope (see NOT for) — use `security-scan` |
+| Hunting for leaked API keys in the repo | Use `secrets-scan` |
+| Committing `--fix` changes without review | Auto-fix only bumps semver-compatible ranges; review the diff, and use `--force` only for confirmed major upgrades |
+| Ignoring a CVE forever via `.dependency-scan-ignore` | Every ignore entry needs a reason and an `expires` date; expired entries resurface |
+| Treating "no known CVE" as "dependency is healthy" | Run `--health` for outdated/deprecated/unmaintained/license checks too |
+
+## Completion checklist
+
+- [ ] Each detected package manager either ran its audit tool or is explicitly listed as skipped with the reason (not installed / no lockfile / offline)
+- [ ] Output shows severity counts per the format above (or the health report when `--health`)
+- [ ] Every Critical/High finding carries: CVE id, affected version, patched version, fix command
+- [ ] If `--fix` ran: fix report shown and the manifest/lockfile diff presented for review before any commit
+- [ ] If ignores were applied: each has a reason and a future `expires` date
+
 ## Related Skills
 
 - `/security-scan` - Full security analysis
 - `/secrets-scan` - Credential detection
 - `/config-scan` - Configuration security
+
+## 中文速览（Quick Guide）
+
+- **做什么**：调用各生态官方审计工具（npm audit、pip-audit、cargo-audit 等）扫描依赖 CVE 与健康度，按 CVSS 分级给出 CVE 编号、修复版本与命令，`--fix` 可自动升级。
+- **何时用**：审计依赖已知漏洞、修复带洞依赖，或检查过期/弃维护/许可证风险时。
+- **核心步骤**：①识别包管理器与锁文件 ②跑对应审计工具 ③按严重度过滤汇总 ④逐条给 CVE/修复命令 ⑤ `--fix` 后先出示 diff 供审再提交。
+- **国内可达性**：漏洞数据来自 npm/PyPI/RustSec 等官方 advisory 源（多在境外），不可达时把该生态列为 skipped 并注明原因；装包可改用 npmmirror 等镜像源；报告中的 nvd.nist.gov / github.com 详情链接需代理才可打开，仅作参考。

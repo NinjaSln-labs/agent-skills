@@ -8,7 +8,7 @@ description: >-
   single-file edits, auditing one skill's SKILL.md, or reviewing a small diff — those
   belong to code-review / skill-description-audit.
 slug: deep-codebase-analysis
-version: 1.0.0
+version: 1.1.1
 displayName: deep-codebase-analysis
 ---
 
@@ -61,6 +61,72 @@ When you need to analyze a codebase, start by asking the Agent:
 - "Analyze the overall architecture of this project."
 - "How does the processing flow work from when a user clicks 'Pay' to when it's saved in the DB?"
 - "What are the main design patterns used in this project?"
+
+## Quick Start (helper script)
+
+Precondition: a checkout at `/path/to/repo`.
+
+```bash
+python3 scripts/analyze_structure.py /path/to/repo --depth 2
+```
+
+Output excerpt (actual script behavior — prints a two-level directory tree):
+
+```
+--- Project Structure: /path/to/repo ---
+repo/
+    src/
+        api/
+        models/
+    tests/
+    package.json
+```
+
+The script is a preliminary aid only; the analysis itself (architecture, patterns, flows) is done by the agent reading the source per the Workflow section. Defaults: `--depth 2`; `--exclude` already skips `node_modules`, `vendor`, `.git`, `__pycache__`, `.DS_Store`.
+
+## Worked Example
+
+Ask: "Analyze the overall architecture of this project."
+
+Observable flow: run the helper script (Quick Start) → scan/index → trace entry points → produce a report naming the architecture model, key components, communication mechanisms, and a data-flow narrative, each backed by cited source paths. Excerpt of an expected finding:
+
+```
+Architecture: modular monolith
+- Entry points: src/main.ts, src/worker.ts
+- Communication: REST (Express) internally; Kafka for async jobs
+- Persistence: PostgreSQL via Prisma; Redis for sessions
+```
+
+## Failure Exits
+
+- Path does not exist or is not a directory: the script prints only the `--- Project Structure: ... ---` header with no tree under it — treat that as a wrong-path signal, tell the user the path was empty, and ask for the correct one. Do not "analyze" nothing.
+- Empty or skeleton repo (fewer than ~10 source files): say so and analyze directly — the full workflow adds no value there.
+- Monorepo: run the helper once per package, then analyze cross-package boundaries separately instead of treating the monorepo as one flat tree.
+- Documentation contradicts the code: trust the code and report the contradiction as a finding — do not average the two.
+
+## NOT for / Anti-patterns (observable)
+
+- NOT for reviewing a small diff or a single file — "review my last commit" belongs to `code-review`.
+- NOT for security auditing — misconfigurations and secrets belong to `config-scan` / `secrets-scan`.
+- Anti-pattern: summarizing the README and calling it analysis — every claim must cite a source path.
+- Anti-pattern: reading the whole tree file-by-file before forming hypotheses — hypothesize early, then verify by deep-diving (Workflow step 5).
+- Anti-pattern: naming patterns without evidence ("uses Factory") — name the class/file where the pattern lives.
+
+## Wrong → Right (FAQ)
+
+| Wrong | Right |
+|---|---|
+| Running the helper on a nonexistent path and continuing | Header with no tree = wrong path; stop and ask |
+| One flat analysis of a monorepo | Per-package structure + a separate boundary analysis |
+| Claims sourced from docs/comments only | Verify in code; report doc/code contradictions |
+| Reporting every design pattern found | Report the load-bearing ones and their consistency |
+
+## 中文速览（Quick Guide）
+
+- **做什么**：通读整个代码库，产出架构模型、组件通信、设计模式与业务流程的分析报告，每个结论都引用源码路径佐证。
+- **何时用**：接手新系统、维护或重构前需要整体理解代码库结构时（小 diff / 单文件评审不适用）。
+- **核心步骤**：①扫描建索引 ②静态分析追入口与调用链 ③（可选）画依赖图 ④结合文档与提交史推断设计意图 ⑤提出假设并回源码验证。
+- **国内可达性**：主流程离线可完成（本地源码 + 自带脚本），无境外服务依赖。
 
 ## Resources
 

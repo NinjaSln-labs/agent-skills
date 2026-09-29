@@ -14,7 +14,7 @@ description: >-
   USER-INVOKED ONLY: run only when the user asks for a security scan; never
   auto-trigger from any code-writing task.
 slug: security-scan
-version: 1.0.2
+version: 1.1.0
 displayName: security-scan
 disable-model-invocation: true
 ---
@@ -361,3 +361,69 @@ Flags below are conversational conventions the agent interprets — no bundled C
 - `references/patterns/secret-formats.md` - Provider credential formats (refresh-managed table: lastUpdated + 60-day interval + confidence)
 - `references/remediation/` - Fix guidance by vulnerability type
 - `assets/severity-matrix.md` - Severity scoring criteria
+
+---
+
+## Worked Example (shortest path)
+
+**Precondition:** a code directory with source files; no network, no extra tools needed.
+
+**User says:** "Scan this project for security issues" → full scan (default mode).
+
+**Output excerpt (what the report looks like):**
+
+```
+SECURITY SCAN RESULTS
+=====================
+Scope: ./
+Files scanned: 127
+
+FINDINGS BY SEVERITY
+  Critical: 1   High: 2   Medium: 4
+
+TOP ISSUES
+1. [!] injection: SQL string concatenation in src/api/users.ts:45
+   Pattern: query built with `+ userId`
+   Fix: parameterized query / prepared statement
+2. [!] secrets: AWS access key in src/config.ts:12
+   Pattern: AKIA...9f3c (masked; hash_prefix 3a1f0b92)
+   Fix: revoke key, move to env/secret manager
+```
+
+Every finding carries `file:line`, the matched pattern name (never the raw credential), a risk sentence, and a fix. The summary ends with the count per severity — if your run's output has none of these four fields on a finding, treat the run as incomplete and re-scan.
+
+## Failure Exits (observable — each names the check and the way out)
+
+| Situation | Observable exit |
+|-----------|-----------------|
+| Target path doesn't exist / isn't readable | Report the exact path and the failure ("`--scope src/` — path not found"), list what *was* found at the repo root, and ask whether to scan a corrected path. Never report "0 findings" for an unreadable path. |
+| A reference file is missing (e.g. `references/patterns/secret-formats.md`) | Name the missing file in the report and continue with the rules that ARE present, stating coverage is reduced. Do not invent replacement patterns. |
+| Empty or binary-only directory | Say "no scannable source files found under <path>" and stop with that statement — not a clean-scan verdict. |
+| Unknown flag (e.g. `--deep`) | Reply: "`--deep` is not a supported flag" + list the valid flags from Command Reference. Never silently ignore an unknown flag. |
+| A fix is requested | Default is report-first: propose patches and wait for explicit approval per finding; if the user already approved in the request, still show the diff of each edit as it is applied. |
+| Credential-looking hit in a test fixture already listed in `.security-scan-ignore` | Count it in the report as INFO ("ignored by .security-scan-ignore: <line>"), not silently dropped. |
+
+## Boundary Conditions (offline / wrong-repo / non-code)
+
+- **Fully offline-capable.** No step of this skill requires network access — detection is pattern-based over local files. If any proposed step (e.g. fetching an advisory list) would need the network, it is out of this skill's main path and requires the user's tooling + approval.
+- **Wrong repo type.** If the directory contains no recognizable application code (docs-only repo, dotfiles, infra-only), say so in the first line of the report and run only the categories that apply (config, secrets). Observable: the report names which categories were skipped and why.
+- **Domestic-platform coverage.** Token formats for platforms not in `references/patterns/secret-formats.md` (e.g. Aliyun, WeChat, ByteDance ecosystem keys) are coverage gaps by design: report the gap, match their access-key shapes only if present in the table, and recommend adding a custom pattern to `.security-scan.yaml` (Configuration → patterns) — do not improvise regexes mid-scan.
+
+## FAQ (wrong → fix)
+
+| Wrong move | Observable symptom | Fix |
+|------------|--------------------|-----|
+| Auto-triggering a scan from ordinary coding tasks | A scan starts after unrelated edits without the user asking | Violation of user-invoked-only; stop, and only scan on explicit request. |
+| Echoing a found credential verbatim | Full token appears in report/log/JSON | Masked form + hash_prefix only (Credential Masking). Rewrite the report; the full value must not persist anywhere in output. |
+| Using this scan as a dependency CVE check | "CVE" findings with no external advisory tool present | Out of scope by design — state the limitation and route to `/dependency-scan` or external tooling. |
+| Treating one regex hit as a confirmed taint path | Finding claims "user input reaches sink" with no source-to-sink reading shown | Downgrade wording to "pattern match — data flow not verified"; note no SAST engine ships with this skill. |
+| Scanning `node_modules/` / `vendor/` | Thousands of noise findings, runtime blown | Use the default excludes (`.security-scan.yaml` scan.exclude); re-scan scoped to first-party code. |
+| Silencing a true positive with `.security-scan-ignore` | Violation gone from report but the code is unchanged | Ignore entries are for false positives/test fixtures only; real findings get fixed or accepted explicitly, never hidden. |
+| Applying `--fix` edits without approval | Files changed after a scan the user only asked to report | Report-first default; every applied edit needs explicit per-finding approval. |
+
+## NOT For (each observable)
+
+- Single-category deep dive → observable exit: the reply names the dedicated scanner (`/secrets-scan`, `/config-scan`, `/dependency-scan`) instead of running a partial full scan.
+- Applying fixes without explicit approval → observable exit: patches are proposed as diffs and nothing is written until approval.
+- Continuous monitoring / runtime intrusion detection → this is a point-in-time static pass; output is one report per run.
+- Proving absence of vulnerabilities → a clean report means "no pattern matches", never "secure".

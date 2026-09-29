@@ -4,7 +4,7 @@ description: >-
   Create a proto-persona from current research, market signals, and team knowledge. Use
   when you need a working customer profile before deeper validation.
 slug: proto-persona
-version: 1.0.3
+version: 1.1.1
 displayName: proto-persona
 ---
 
@@ -25,6 +25,36 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 **Arriving empty-handed? That works too.** The skill asks who you think the user is and what you already know, then structures it and flags the assumptions needing validation.
 
 **Example invocation:** `Proto-persona for solo bookkeepers adopting our receipt-scanning app — signal: 30 support tickets and 4 sales call notes.`
+
+## Shortest Worked Example
+
+**Precondition:** a few support tickets or interview notes (raw pasted text is fine); no research repo, tooling, or network required.
+**Invocation:** `Proto-persona for solo bookkeepers adopting our receipt-scanning app — signal: 30 support tickets and 4 sales call notes.`
+**Output excerpt (what you should see):**
+
+```markdown
+### Name
+- Bookkeeper Beth
+
+### Pains
+- Spends 3+ hours/week retyping receipts into spreadsheets [ASSUMPTION—VALIDATE]
+- Current tools require an accountant to set up
+
+### Quotes
+- "I bought this to save time, and now I have a second system to maintain." (support ticket #214)
+```
+
+**Done when:** the persona has a name, behaviors (not just demographics), and an `[ASSUMPTION—VALIDATE]` tag on every unverified claim.
+
+## Failure Exits (closed set)
+
+- **Nothing supplied with the invocation:** ask who the user is and what signal exists, then proceed with whatever comes back — don't stall.
+- **Input isn't about a user** (a feature request, a code dump, a competitor name): say so in one line, restate it as "who struggles with this and what you already know," ask one question.
+- **Zero signal** (no research, no anecdotes): build the skeleton from stated assumptions only, tag every field `[ASSUMPTION—VALIDATE]`, and list the first 3 interviews to run. Never fabricate quotes — write `[PLACEHOLDER—NEEDS RESEARCH]`.
+- **Partial or contradictory signal:** structure what's given, log the conflicts as open questions, keep it marked proto — don't average contradictions into a fake consensus.
+- **Template or example files missing** (`template.md` / `examples/sample.md` not found): run `ls` in this skill's directory and report the missing filename — don't improvise a different structure.
+
+---
 
 ## Key Concepts
 
@@ -311,6 +341,13 @@ Mini example excerpt:
 **Fix:** Plan research sprints to validate key assumptions. Evolve the proto-persona as you learn. Graduate it to a validated persona when confidence is high.
 
 ---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：把现有研究、市场信号与团队已知整合成一份假设型用户画像（proto-persona）；每条未证实论断都打 `[ASSUMPTION—VALIDATE]` 标，它是待验证的占位假设，不是定论。
+- **何时用**：产品早期、新功能立项或团队需要就「为谁设计」快速对齐时；已有充分用户研究后应改做验证型画像。
+- **核心步骤**：收集现有信号 → 定身份与行为（不止人口统计）→ 捕捉真实引语 → 记录痛点／目标／决策影响 → 标注假设并规划下一步访谈。
+- **国内可达性边界**：主流程可离线完成，无境外服务依赖；引语必须来自真实素材，没有就写占位符，不虚构。
 
 ## References
 

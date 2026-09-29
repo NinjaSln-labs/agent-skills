@@ -11,7 +11,7 @@ description: >-
   /experiment-handoff to start, hand off, or close an experiment/spike. NOT for: the
   project-wide handoff store or resuming prior work on a project.
 slug: experiment-handoff
-version: 1.0.4
+version: 1.1.0
 displayName: experiment-handoff
 disable-model-invocation: true
 ---
@@ -150,6 +150,21 @@ experiment.ps1 list  [write]
 - [ ] 收束：按结论合并或丢弃；合并后有验证 + 按项目交接约定引用一行
 - [ ] 沙箱/分支已清理；文档已迁 `archive/`
 - [ ] 无敏感信息
+
+## 常见错法 → 改法 / FAQ
+
+| 错法 | 改法 |
+| :--- | :--- |
+| 直接改主工作树"就试一下" | 停手——先 `experiment.sh init <slug>`，改动进沙箱 |
+| `init` 报 `exit 2`（用法错） | 核对调用形：`experiment.sh init <slug> [--title T] [--mode ...] [--base REF]`；slug 必填 |
+| `init` 报 `exit 1`（执行错） | 看 stderr 首行：多为 worktree 不可用或主树未提交改动未 stash——按提示处理后重跑 |
+| `close` 想只带部分文件 | 用 `--paths p1,p2`；不带则全量合并，`--discard` 则丢弃 |
+| `close --keep` 后测试不过 | 回滚锚点＝文档里的基线 hash：`git reset --hard <base>`；copy 系原副本仍在，可重来 |
+| 主树有未提交改动时开 worktree | 先 `git stash` 或 commit——worktree 看不到未提交改动 |
+| 手改 `.experiments/EXPERIMENTS.md` | 索引是自动生成的，手改会被覆盖；改状态请改各自实验文档的 `状态:` 字段 |
+| 实验做完忘了收 | `experiment.sh list` 会列出 open/running 的实验与告警（活跃 >10 条） |
+
+**边界判定：** 无 git 仓 → 自动走 copy，无需选择；slug 与已有实验重名 → 先 `list` 查看再用新 slug，不覆盖旧文档；沙箱目录已存在 → 报错退出（exit 1），换 slug 或先清理，不静默复用。
 
 ## 方法论来源（2026-09 调研）
 

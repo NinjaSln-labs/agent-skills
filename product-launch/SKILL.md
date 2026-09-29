@@ -10,7 +10,7 @@ description: >-
   whenever someone is preparing to release something publicly. For ongoing marketing after
   launch, turn the launch outputs into fresh channel and content ideas to keep promoting.
 slug: product-launch
-version: 1.0.4
+version: 1.1.1
 displayName: product-launch
 ---
 
@@ -22,6 +22,10 @@ You are an expert in SaaS product launches and feature announcements. Your goal 
 
 **Check for product marketing context first:**
 If `.agents/product-marketing.md` exists (or `.claude/product-marketing.md`, or the legacy `product-marketing-context.md` filename, in older setups), read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
+
+## How to Use
+
+There is no CLI or bundled script — this is a planning method applied through conversation. The knobs are your answers to the Task-Specific Questions below. Defaults if you provide nothing: new product (not a feature), no existing audience, no owned channels yet, no timeline given, no prior launch, Product Hunt optional.
 
 ---
 
@@ -350,13 +354,77 @@ Even small changelog updates remind customers your product is evolving. This bui
 5. Have you launched before? What worked/didn't work?
 6. Are you considering Product Hunt? What's your preparation status?
 
+## Worked Example
+
+**Precondition:** an existing product (working prototype, some early users) with a Product Hunt launch date set.
+
+**Invocation:** "My product is a form-builder SaaS. We have ~300 beta users, an email list of 800, and our Product Hunt launch is in 3 weeks. Build the launch plan."
+
+**Output excerpt (launch checklist produced, applying the Five-Phase approach + Launch Checklist):**
+
+```
+Launch plan (3 weeks to PH launch day)
+Phase status: Phases 1-2 done (beta users onboard, waitlist at 800)
+
+Before launch day:
+- [ ] Optimize PH listing: tagline + 60s demo video (week 1)
+- [ ] Prepare announcement email to the 800-person list (week 2)
+- [ ] Pre-launch teasers: 2-3 posts on X/LinkedIn showing the problem you solve
+- [ ] Recruit 5-10 supporters for launch-day engagement
+
+Launch day:
+- [ ] PH listing live at 00:01 PT (all-day engagement, reply to every comment)
+- [ ] Announcement email + in-app banner to beta users
+- [ ] Website banner linking to the PH listing
+- [ ] Monitor signups → capture into owned email list
+
+Post-launch:
+- [ ] Follow-up email to everyone who engaged
+- [ ] Changelog + minor-update announcements cadence (matrix: major/medium/minor)
+- [ ] Plan next launch moment (feature announcements sustain momentum)
+```
+
+## Beyond Product Hunt: Other Markets
+
+The ORB framework and the five phases are market-agnostic; the channel names above are US/EU defaults. Map them rather than forcing them:
+
+| US default | Mainland China counterpart |
+|---|---|
+| Email list (owned) | WeChat official account (公众号) + private WeChat group |
+| Blog (owned) | 知乎专栏, 少数派, or your own site |
+| Twitter/X, LinkedIn, Reddit (rented) | 微博, 即刻, 小红书, B站 — same rule: 1–2 platforms where the audience is |
+| Product Hunt (borrowed) | 少数派首页, V2EX 分享节点, 即刻精选 (PH still works but reach is limited) |
+| Influencer seeding (borrowed) | B站/小红书 KOC reviews — send the product, don't buy an ad |
+| App marketplace listing | Chinese app stores + WeChat mini program |
+
+Same discipline applies: rented → owned. Every viral post on 微博/小红书 must funnel into the 公众号 or the private group, or the momentum evaporates.
+
+## Failure Exits
+
+- Missing context: if the brief does not answer the Task-Specific Questions (what, audience, channels, timeline), ask those questions explicitly — do not invent audience size or channel history and present a plan built on them.
+- `.agents/product-marketing.md` (or its variants) does not exist: say you checked and proceed with the questions above — do not silently skip the check.
+- Out of scope: ongoing SEO/content operations, paid ad buying, pricing strategy — name the boundary and hand off by capability (e.g. "this needs SEO operations / CRO / pricing expertise — if a skill covering that capability is available in this setup, invoke it; otherwise say so and stop"); do not half-answer.
+- Too early: no working prototype — the correct output is a Phase 1 (internal launch) plan only, not a launch-day checklist.
+
+## Wrong → Right (FAQ)
+
+| Wrong | Right |
+|---|---|
+| Treating the launch as one launch-day post | Work the five phases; launch day is the last 10% |
+| Being on 5 rented platforms at once | 1–2 owned channels first; rent only where the audience already is |
+| Paying an influencer for one post | Seed the actual product (TRMNL model) and set up affiliates |
+| Announcing every bug fix as a full campaign | Use the major/medium/minor matrix — minor = changelog only |
+| Copying a US channel list for a China launch | Remap via the table above; Product Hunt ≠ 少数派/V2EX |
+
 ---
 
 ## Related Skills
 
-- **Launch tactic ideation**: For additional launch tactics (more Product Hunt angles, early-access referral loops)
-- **emails**: For launch and onboarding email sequences
-- **cro**: For optimizing launch landing pages
-- **marketing-psychology**: For psychology behind waitlists and exclusivity
-- **programmatic-seo**: For comparison pages mentioned in post-launch
-- **sales-enablement**: For launch sales collateral and enablement materials
+The capabilities below are named by what they do, not by a fixed skill name — if a skill covering the capability exists in this setup, hand off to it; if not, apply the capability directly or say it is out of reach:
+
+- **Launch tactic ideation** — for additional launch tactics (more Product Hunt angles, early-access referral loops)
+- **Launch and onboarding email sequences** — writing the announcement and drip emails for the launch checklist
+- **Conversion-rate optimization** — for optimizing launch landing pages
+- **Marketing psychology** — for the psychology behind waitlists and exclusivity
+- **Programmatic SEO** — for the comparison pages mentioned in post-launch
+- **Sales enablement** — for launch sales collateral and enablement materials

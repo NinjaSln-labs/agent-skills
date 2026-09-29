@@ -6,13 +6,18 @@ description: >-
   testing, UI regression, visual diff, or Chromatic setup. For free local
   flows prefer a no-service comparator; use this when you need hosted Chromatic baselines.
 slug: visual-regression-tester
-version: 1.0.4
+version: 1.1.1
 displayName: visual-regression-tester
 ---
 
 # Visual Regression Tester
 
 **Note:** Use pixel-perfect by default (free); use this skill for hosted Chromatic baselines.
+
+## When to use / NOT for
+
+- **Use when**: the user asks to set up visual regression / screenshot testing, a visual diff pipeline, hosted Chromatic baselines, or to debug why screenshots changed.
+- **NOT for**: functional/E2E behavior testing (assert behavior, not pixels — this skill never replaces behavioral assertions); performance testing; purely local one-off pixel comparisons without a baseline pipeline (`pixel-perfect` covers that). If the user only wants "check this page looks right once", propose `pixel-perfect` first and use this skill when they need baselines + CI.
 
 ## Core Workflow
 1. **Choose tool**: Playwright, Chromatic
@@ -297,103 +302,7 @@ test.describe('Dark Mode', () => {
 
 ## Chromatic Integration
 
-### Setup
-
-```bash
-npm install -D chromatic
-```
-
-### Configuration
-
-```typescript
-// .storybook/main.ts
-export default {
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: ['@chromatic-com/storybook'],
-};
-```
-
-### CI Configuration
-
-```yaml
-# .github/workflows/chromatic.yml
-name: Chromatic
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-jobs:
-  chromatic:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - name: Publish to Chromatic
-        uses: chromaui/action@latest
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          exitZeroOnChanges: true
-          exitOnceUploaded: true
-          onlyChanged: true
-```
-
-### Chromatic Story Configuration
-
-```typescript
-// Button.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './Button';
-
-const meta: Meta<typeof Button> = {
-  component: Button,
-  parameters: {
-    chromatic: {
-      // Capture multiple viewports
-      viewports: [375, 768, 1280],
-      // Delay for animations
-      delay: 300,
-      // Disable animations
-      pauseAnimationAtEnd: true,
-    },
-  },
-};
-
-export default meta;
-
-export const Primary: StoryObj<typeof Button> = {
-  args: {
-    variant: 'primary',
-    children: 'Button'
-  },
-};
-
-export const AllStates: StoryObj<typeof Button> = {
-  parameters: {
-    chromatic: {
-      // Test interaction states
-      modes: {
-        hover: { pseudo: { hover: true } },
-        focus: { pseudo: { focus: true } },
-        active: { pseudo: { active: true } },
-      },
-    },
-  },
-  render: () => (
-    <div style={{ display: 'flex', gap: '1rem' }}>
-      <Button variant="primary">Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button disabled>Disabled</Button>
-    </div>
-  ),
-};
-```
+Full Chromatic setup (install, `.storybook/main.ts` config, CI workflow with `CHROMATIC_PROJECT_TOKEN`, multi-viewport/pseudo-state story parameters) is extracted to **`references/chromatic.md`** — read it when the user chooses Chromatic. Requires a Chromatic project token; without it the publish step exits non-zero with an auth error.
 
 ## CI Integration
 
@@ -462,6 +371,53 @@ jobs:
 7. **Organize snapshots**: Clear naming convention
 8. **Update intentionally**: Review all baseline changes
 
+## Minimal worked example
+
+Precondition: npm project with `@playwright/test` installed (per Installation above), app served by the `webServer` command in the config.
+
+Command (default values: all 4 projects in the config, 3 retries in CI, `maxDiffPixelRatio: 0.01`):
+
+```bash
+npx playwright test --project="Desktop Chrome"
+```
+
+Output excerpt, first run (no baselines yet — Playwright writes them and fails):
+
+```
+Error: A snapshot doesn't exist at tests/visual/__snapshots__/homepage-visual-ts-homepage-full-darwin.png, writing actual.
+  1 failed
+```
+
+Second run after reviewing and committing the written baseline:
+
+```
+✓  homepage.visual.ts:16:5 › full page screenshot (1.2s)
+  3 passed (4.1s)
+```
+
+A real regression shows a `*-diff.png` under `test-results/` highlighting changed pixels; review it before touching baselines.
+
+## Failure exits (troubleshooting)
+
+| Situation | Observable signal | Exit action |
+|-----------|-------------------|-------------|
+| Browsers not installed | `Executable doesn't exist ... run "npx playwright install"` (non-zero exit) | Run `npx playwright install --with-deps chromium`, then rerun. |
+| No network / blocked CDN during browser download | `npx playwright install` fails with a download error | Set `PLAYWRIGHT_DOWNLOAD_HOST` to an accessible mirror and retry; if the machine is fully offline, stop and report "cannot install browsers" — do not ship a setup that was never run. |
+| Baseline missing (first run on a new machine/OS) | `A snapshot doesn't exist at ...` | Verify the screenshot is actually correct, then run `npx playwright test --update-snapshots` once and commit the baselines. |
+| App never comes up | `webServer` timeout after 120s ("Timed out waiting for...") | Confirm `npm run start` works standalone; fix the `webServer.url`/command in the config, not the tests. |
+| Diffs on every run, unrelated to the change | Small pixel-count failures across many tests, especially after deploy | Check animations are disabled and `networkidle` was awaited (see Best Practices); platform font differences → generate baselines in the same environment as CI (Playwright Docker image). |
+| Chromatic publish fails | non-zero exit with auth error | `CHROMATIC_PROJECT_TOKEN` missing/invalid — get the token from the Chromatic dashboard and add it to CI secrets (see `references/chromatic.md`). |
+
+## FAQ (wrong way → right way)
+
+| Wrong | Right |
+|-------|-------|
+| Running `--update-snapshots` to make a red build green without inspecting diffs | Review each `*-diff.png`; update baselines only for intentional visual changes |
+| Generating baselines locally on macOS while CI runs Linux | Produce and accept baselines in the same platform as CI (Playwright Docker image), or diffs will fire on every run |
+| Asserting exact pixel equality with no threshold | Set `maxDiffPixels` / `maxDiffPixelRatio` per config above; 0 tolerance is flaky across renders |
+| Testing one viewport only | Cover at least mobile + desktop (see Responsive Testing); the config's 4 projects exist for this |
+| Auto-running visual tests on every trivial UI edit unprompted | Run when the user asks for visual regression setup or a screenshot diff investigation; propose the setup first |
+
 ## Output Checklist
 
 Every visual testing setup should include:
@@ -476,3 +432,10 @@ Every visual testing setup should include:
 - [ ] Diff threshold configuration
 - [ ] Baseline update workflow
 - [ ] Artifact storage
+
+## 中文速览（Quick Guide）
+
+- **做什么**：用 Playwright 或 Chromatic 搭截图对比与视觉回归流水线：基线生成、diff 检测、多视口/暗色模式覆盖与 CI 集成。
+- **何时用**：用户要求视觉回归/截图测试/视觉 diff 或托管 Chromatic 基线时；免费本地对比优先 pixel-perfect。
+- **核心步骤**：①选工具并安装配置 ②首跑生成基线并人工确认 ③跑 diff 排查变化原因 ④补多视口与暗色覆盖 ⑤接入 CI 并约定基线更新流程。
+- **国内可达性**：`npx playwright install` 下载浏览器走境外 CDN，失败时设 `PLAYWRIGHT_DOWNLOAD_HOST` 指向可达镜像重试（正文 Failure Exits 已给该出口），完全离线则停手报告；Chromatic 为境外托管服务且需项目 token，不可用即退回纯 Playwright 本地对比。

@@ -2,15 +2,68 @@
 name: test-data-generation
 description: >-
   Test data strategies using Faker.js, factories, builders, and database seeding. Use when
-  generating test data, fixtures, or seeded databases.
+  generating test data, fixtures, or seeded databases, or when flaky tests fail on
+  inconsistent data — deterministic seeds and factory patterns are the fix.
 slug: test-data-generation
-version: 1.0.1
+version: 1.1.0
 displayName: test-data-generation
 ---
 
 # Test Data Generation Skill
 
 You are an expert QA engineer specializing in test data generation and management. When the user asks you to create, review, or improve test data strategies, follow these detailed instructions.
+
+## When to use / NOT for
+
+- **Use when**: the user asks to generate test data or fixtures, set up factories/builders, seed a test database, or make flaky data-dependent tests deterministic.
+- **NOT for**: anonymizing or masking real production data (different risk model — use a dedicated data-masking process); production seed scripts; load-testing datasets at scale (generate a small fixture set here, scale separately). If the request involves real PII at all, stop and confirm the data is synthetic (see Anti-Pattern 6).
+
+## Minimal worked example
+
+Precondition: npm project with `@faker-js/faker` installed (`npm install --save-dev @faker-js/faker`).
+
+Invocation (paste the TypeScript Factory + "Using Factories in Tests" snippets from this skill into `tests/data/factories/user.factory.ts` and a spec file), then run:
+
+```bash
+npx playwright test
+```
+
+Output excerpt — a generated input looks like:
+
+```json
+{ "email": "kianna.satterfield47@unknown-fawn.name", "firstName": "Marcos", "lastName": "Yundt", "password": "u7#kQ2vPz9xR", "role": "user" }
+```
+
+and the test asserts:
+
+```
+✓  should create a new user
+  expect(received).toBe(expected) // response.status() === 201
+  1 passed
+```
+
+Note: re-running with the same `faker.seed(12345)` reproduces the exact same email/firstName; without a seed, every run generates different values (both are valid — see Seeded Random Data).
+
+## Failure exits
+
+| Situation | Observable signal | Exit action |
+|-----------|-------------------|-------------|
+| Faker not installed | `Cannot find module '@faker-js/faker'` (test run exits non-zero) | Run `npm install --save-dev @faker-js/faker`, rerun. |
+| Same test, different data each run (reproducibility broken) | assertion on a generated value fails intermittently | Confirm `faker.seed(N)` is called before generation with the same N in both runs; unseeded random data must never be asserted exactly (Anti-Pattern 7). |
+| App validation rejects generated data | API returns 400/422 on factory-created input | Tighten the factory field to the app's format constraints (Anti-Pattern 9) — do not loosen the validation to fit the data. |
+| Parallel tests collide | duplicate unique-key errors (e.g. same email twice) | Replace hardcoded fields with per-test unique values (uuid/timestamp); see Anti-Pattern 1. |
+| Faker seed method error / old version | `faker.seed is not a function` | The snippet targets `@faker-js/faker` v7+; check `npm ls @faker-js/faker` and upgrade. |
+| Wrong repo / no test framework | no `tests/` dir, no playwright/vitest/jest config found | Ask the user which framework and directory the tests live in; do not scaffold into a guessed location. |
+
+## FAQ (wrong way → right way)
+
+| Wrong | Right |
+|-------|-------|
+| Hardcoding `"user1@test.com"` in every test | `UserFactory.createInput()` — unique per test, overrides only what matters |
+| Asserting exact values on unseeded random data | Either seed (`faker.seed(42)`) or assert shape/presence, not exact content |
+| One shared user row mutated by many tests (`beforeAll` setup) | Each test creates its own data (Core Principle 4); teardown deletes it |
+| Pasting real user emails/names into fixtures | Always faker-generated or clearly fake (`test@example.com`) — never real PII |
+| Generating 1000 rows "to be safe" | Generate the minimum the test asserts on (Core Principle 3) |
 
 ## Core Principles
 
@@ -109,24 +162,7 @@ const transaction = {
 
 ### Locale-Specific Data
 
-```typescript
-import { faker } from '@faker-js/faker';
-import { fakerDE } from '@faker-js/faker';
-import { fakerJA } from '@faker-js/faker';
-
-// German locale
-const germanUser = {
-  name: fakerDE.person.fullName(),
-  address: fakerDE.location.streetAddress(),
-  phone: fakerDE.phone.number(),
-};
-
-// Japanese locale
-const japaneseUser = {
-  name: fakerJA.person.fullName(),
-  address: fakerJA.location.streetAddress(),
-};
-```
+For `fakerDE` / `fakerJA` locale examples, see `references/more-examples.md` (Locale-Specific Data).
 
 ## Factory Pattern
 
@@ -344,148 +380,15 @@ const order = new OrderBuilder()
 
 ## Python -- Faker and Factory Boy
 
-### Faker (Python)
-
-```python
-from faker import Faker
-
-fake = Faker()
-Faker.seed(42)  # For reproducibility
-
-user = {
-    "id": fake.uuid4(),
-    "email": fake.email(),
-    "first_name": fake.first_name(),
-    "last_name": fake.last_name(),
-    "phone": fake.phone_number(),
-    "address": fake.address(),
-    "company": fake.company(),
-    "created_at": fake.date_time_this_year().isoformat(),
-}
-```
-
-### Factory Boy (Python)
-
-```python
-import factory
-from faker import Faker
-from myapp.models import User, Order
-
-fake = Faker()
-
-class UserFactory(factory.Factory):
-    class Meta:
-        model = User
-
-    id = factory.LazyFunction(fake.uuid4)
-    email = factory.LazyFunction(fake.email)
-    first_name = factory.LazyFunction(fake.first_name)
-    last_name = factory.LazyFunction(fake.last_name)
-    role = "user"
-    is_active = True
-
-    class Params:
-        admin = factory.Trait(role="admin")
-        inactive = factory.Trait(is_active=False)
-
-# Usage
-user = UserFactory()
-admin = UserFactory(admin=True)
-inactive_users = UserFactory.create_batch(5, inactive=True)
-```
+Full Python examples (Faker + Factory Boy) moved to `references/more-examples.md` (Python section).
 
 ## Java -- Test Data Generation
 
-```java
-import com.github.javafaker.Faker;
-import java.util.Locale;
-
-public class TestDataGenerator {
-    private static final Faker faker = new Faker(new Locale("en-US"));
-
-    public static Map<String, Object> generateUser() {
-        Map<String, Object> user = new HashMap<>();
-        user.put("email", faker.internet().emailAddress());
-        user.put("firstName", faker.name().firstName());
-        user.put("lastName", faker.name().lastName());
-        user.put("phone", faker.phoneNumber().cellPhone());
-        user.put("address", faker.address().fullAddress());
-        return user;
-    }
-
-    public static Map<String, Object> generateProduct() {
-        Map<String, Object> product = new HashMap<>();
-        product.put("name", faker.commerce().productName());
-        product.put("price", Double.parseDouble(faker.commerce().price()));
-        product.put("category", faker.commerce().department());
-        product.put("description", faker.lorem().paragraph());
-        return product;
-    }
-}
-```
+The JavaFaker `TestDataGenerator` example moved to `references/more-examples.md` (Java section).
 
 ## Database Seeding
 
-```typescript
-// seeders/db-seeder.ts
-import { UserFactory } from '../factories/user.factory';
-import { ProductFactory } from '../factories/product.factory';
-import { OrderBuilder } from '../builders/order.builder';
-import { db } from '../../src/database';
-
-export class DatabaseSeeder {
-  async seedUsers(count: number = 50): Promise<string[]> {
-    const users = UserFactory.createMany(count);
-    const ids: string[] = [];
-
-    for (const user of users) {
-      const result = await db.users.create({ data: user });
-      ids.push(result.id);
-    }
-
-    return ids;
-  }
-
-  async seedProducts(count: number = 100): Promise<string[]> {
-    const products = ProductFactory.createMany(count);
-    const ids: string[] = [];
-
-    for (const product of products) {
-      const result = await db.products.create({ data: product });
-      ids.push(result.id);
-    }
-
-    return ids;
-  }
-
-  async seedOrders(userIds: string[], productIds: string[], count: number = 200): Promise<void> {
-    for (let i = 0; i < count; i++) {
-      const customerId = userIds[Math.floor(Math.random() * userIds.length)];
-      const order = new OrderBuilder()
-        .withCustomer(customerId)
-        .withItems(Math.floor(Math.random() * 5) + 1)
-        .withStatus(['pending', 'confirmed', 'shipped', 'delivered'][Math.floor(Math.random() * 4)] as any)
-        .build();
-
-      await db.orders.create({ data: order });
-    }
-  }
-
-  async seedAll(): Promise<void> {
-    const userIds = await this.seedUsers();
-    const productIds = await this.seedProducts();
-    await this.seedOrders(userIds, productIds);
-    console.log('Database seeded successfully');
-  }
-
-  async cleanup(): Promise<void> {
-    await db.orders.deleteMany({});
-    await db.products.deleteMany({});
-    await db.users.deleteMany({});
-    console.log('Database cleaned up');
-  }
-}
-```
+The full `DatabaseSeeder` class (seedUsers / seedProducts / seedOrders / seedAll / cleanup against `db.users` / `db.products` / `db.orders`) moved to `references/more-examples.md` (Database Seeding section). Seeding order matters: users → products → orders (orders reference both); cleanup runs in reverse order.
 
 ## Test Data Strategies
 

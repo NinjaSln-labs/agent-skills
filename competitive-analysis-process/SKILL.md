@@ -11,7 +11,7 @@ description: >-
   field-action card, scheduled monitoring of an existing snapshot, or market sizing alone
   — boundaries by task, no skill name implied.
 slug: competitive-analysis-process
-version: 1.0.3
+version: 1.1.1
 displayName: competitive-analysis-process
 ---
 
@@ -189,6 +189,45 @@ steps merged, one run out of order, cadence slowed — with each call's reasonin
   isn't optional — research is only done when it names the artifact it changes.
 - **One-time heroics.** A grand annual analysis that's stale by month three. The process ends by
   installing the watch cadence, or it didn't end — it just stopped.
+
+## Failure Exits & Edge Cases
+
+- **A delegated skill is not installed/unavailable** (e.g., `company-intel` missing from the mount):
+  say so in one line and either run the step's frameworks inline as a reduced pass (label the output
+  "inline reduced pass — not the delegated skill's full artifact") or record the step as skipped in the
+  engagement tracker. Never silently substitute a lighter output for the named artifact.
+- **No decision given:** ask once ("what does this analysis change — market entry, roadmap bet,
+  positioning, deal defense?"); if unanswered, run Steps 1-2 as the default spine and mark Steps 3-6 as
+  "pending decision" in the tracker instead of running all six on autopilot.
+- **No existing intelligence in session:** Step 0 recommends starting from
+  [`market-landscape-scan`](../market-landscape-scan/SKILL.md) to find the competitor set — scoping a
+  six-step analysis on a guessed competitor list is the failure this exit prevents.
+- **Time-boxed request ("need something by tomorrow"):** offer the deal-defense subset explicitly
+  (Steps 2, 3, 5 → battle card, per the scoping example) rather than a thin version of all six.
+
+### FAQ / Wrong way → fix
+
+| Wrong | Fix |
+|---|---|
+| "Just run the whole process" on every request | Scope to the decision; recorded skips are the orchestrator's output, not laziness |
+| Treating this skill as the analyzer | It orchestrates — each step names the skill that does the work; don't inline full research here |
+| Citing Five Forces / Kano without producing ratings | A framework earns its mention by producing a judgment; otherwise drop the name |
+| Ending at Step 5 because the brief shipped | Without Step 7's artifacts and the watch cadence, the analysis didn't end — it stopped |
+| Dependency skill missing → quietly writing shallower prose instead | One-line disclosure + reduced-pass label or recorded skip (see failure exits) |
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：端到端编排完整的竞争分析——六个分析步骤（市场格局/产品级对比/需求满足度/经营基线/感知定位/战略方向）各自委托给对应技能执行，本件管顺序、框架与取舍，最终收敛到四类可消费产出：战卡、高管对比矩阵、定位反制、威胁评估简报。
+
+**何时用**：一个决策需要整幅竞争图景时（市场进入、路线图押注、定位刷新、交易防守），或真问题是"该跑哪几步、跳过哪几步"；单次快照或单张战卡不必动用本件。
+
+**核心步骤**：
+1. 定范围：确认决策与竞品集，按决策推荐六步的子集而非全跑；
+2. 逐步执行并记录跳过项——每步引用的框架要产出判断，不空点名；
+3. 不要跳过第 6 步（竞品战略方向）：多源信号堆叠置信度后再下结论；
+4. 第 7 步必须落产出物（战卡/矩阵/反制/简报），并安装 watch 节律保持新鲜。
+
+**国内可达性边界**：各步依赖被委托技能的外网源访问（官网、评测站、财报与专利库等）；某步的证据源不可达或付费墙挡住时，按正文出口降级为"inline reduced pass"并在产出中标注置信度，或在该步记录为跳过；可改用公开中文渠道（公开新闻、上市/挂牌公司公开披露、竞品中文官网）补证据并保留 Fact/Inference/Assumption 标签纪律。
 
 ## References
 

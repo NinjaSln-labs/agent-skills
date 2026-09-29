@@ -3,14 +3,14 @@ name: ux-heuristics
 description: >-
   Evaluate and improve interface usability using heuristic analysis. Use when the user
   mentions "usability audit", "users are confused", "form usability", "navigation
-  problems", "Nielsen heuristics", "cognitive walkthrough", or "is this easy to use". Also
+  problems", "Nielsen heuristics", or "is this easy to use". Also
   trigger when reviewing a design for usability issues, improving form-completion rates,
-  or evaluating information architecture and navigation. Covers Krug''s laws, Nielsen''s
+  or evaluating information architecture and navigation. Covers Krug's laws, Nielsen's
   10 heuristics, severity ratings, dark-pattern recognition, and accessibility. NOT for:
   visual redesign or design-system style choices, or conversion-funnel optimization —
   no skill name implied (boundaries by task, not by who else could do it).
 slug: ux-heuristics
-version: 1.0.1
+version: 1.1.1
 displayName: ux-heuristics
 ---
 
@@ -25,6 +25,28 @@ Practical usability principles for evaluating and improving user interfaces. Use
 ## Scoring
 
 **Goal: 10/10.** Audit the interface, rate every issue on the severity scale below, then score the interface from its Quick Diagnostic results: start at 10 and subtract per failed diagnostic row, weighted by the worst severity it triggers (catastrophic/major rows cost ~2, minor/cosmetic ~1). Bands: **9-10** = no severity-3+ issues and ≤1 failed diagnostic row; **6-8** = some major issues or several failed rows; **3-5** = a catastrophic issue or many failed rows; **≤2** = core tasks blocked. Always state the current score, the highest-severity issues, and the specific fixes needed to reach 10/10.
+
+## Shortest Worked Example
+
+**Precondition:** a screen, flow, or URL to evaluate (live UI, screenshot, wireframe, or a written description); no tooling or web access required.
+**Invocation:** `Usability audit of our checkout flow — 3 steps, users abandon at payment.`
+**Output excerpt (what you should see):**
+
+```markdown
+Score: 6/10
+- [Severity 3] Payment step asks users to pick card type before typing — remove the selector (H6: recognition over recall)
+- [Severity 2] "Continue" vs "Pay now" labels inconsistent across steps (H4: consistency)
+Fixes to reach 10: drop the card-type selector, unify CTA label, add inline card-number validation (H5).
+```
+
+**Done when:** every issue carries a severity, the heuristic it violates, and a specific fix — and the score plus top fixes are stated up front.
+
+## Failure Exits (closed set)
+
+- **Nothing to evaluate** (no UI, flow, screenshot, or description): ask for one — an audit with no artifact produces invented findings; don't proceed.
+- **Out of scope** (visual restyle, design-system style choices, conversion-funnel optimization): name the mismatch in one line instead of auditing — this skill judges usability, not aesthetics or revenue.
+- **Reference files missing** (`references/audit-template.md`, `references/krug-principles.md`, etc. not found): `ls` this skill's directory and report the missing file — run the audit from the heuristics in this file rather than inventing replacements.
+- **Heuristics conflict** (e.g., minimalism vs. help and documentation): default to progressive disclosure, flag the trade-off explicitly — don't silently pick one (see Heuristic Conflicts below).
 
 ## Krug's Usability Principles
 
@@ -246,3 +268,12 @@ Based on usability principles developed by Steve Krug and Jakob Nielsen:
 **Steve Krug** is a usability consultant whose *Don't Make Me Think* (2000, revised 2014) is the most widely read book on web usability. He demonstrated that usability testing doesn't require a lab or large budget — just watching a few real users try to accomplish tasks.
 
 **Jakob Nielsen, PhD** is co-founder of the Nielsen Norman Group and author of the 10 Usability Heuristics (1994), still the most-used framework for heuristic evaluation worldwide. *The New York Times* called him "the guru of Web page usability."
+---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：用 Krug 三定律与 Nielsen 十启发式对界面做可用性审计，输出带严重度、违规启发式与具体修复的评分报告（目标 10 分）。
+- **何时用**：可用性审计、表单／导航疑难、「用户说难用」类问题；不做视觉风格重设计与转化漏斗优化。
+- **核心步骤**：拿到界面／截图／文字描述 → 过快速诊断逐行检查 → 每条问题定严重度并指出违规启发式 → 给出达到 10 分所需的具体修复。
+- **国内可达性边界**：审计主流程可离线完成，无境外服务依赖；文末 Amazon／NN/g 外链仅为书源延伸阅读，不访问不影响审计；审计时优先读仓内 `references/*.md` 副本。
+

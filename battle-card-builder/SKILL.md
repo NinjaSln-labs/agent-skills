@@ -4,7 +4,7 @@ description: >-
   Research and draft a competitive battle card from public evidence — every claim labeled
   and sourced. Use when a rep needs a field-action card, not a research report.
 slug: battle-card-builder
-version: 1.0.1
+version: 1.1.1
 displayName: battle-card-builder
 ---
 
@@ -163,6 +163,50 @@ industrial version, where the channel partner is a card audience and pricing is 
   logo.
 - **Skipping "Do Not Say."** The section that protects reps from the team's own stale folklore is the
   one most often omitted — usually because nobody wants to write down which beloved claims are dead.
+
+## FAQ / Wrong way → fix
+
+| Wrong | Fix |
+|---|---|
+| Card full of talking points, no labels — "everyone knows these are true" | Unlabeled claims are folklore; label every claim Fact/Inference/Assumption with URL + date, or move it to "Do Not Say" |
+| A useful claim exists but has no source URL | It ships as Assumption in "Assumptions to Validate," never as a talking point |
+| No competitor named — "make us a card against the market" | One card targets one competitor; ask which deal/loss triggered it, build per competitor |
+| Their pricing page shows "contact sales" | Record what is published + the hiding, labeled — never estimate the number |
+| The evidence contradicts a beloved talking point | It moves to "Do Not Say" with the disproof cited; do not soften or keep it anyway |
+| Card finished but no as-of date | The card is invalid without it — add the date and a watch feeding it update flags |
+
+**Failure exits & edge cases:**
+
+- **No evidence at all for the competitor (no network, all sources unreachable):** emit the schema with
+  empty sections, every entry Assumption, and one line stating which checks failed ("pricing page and
+  reviews unreachable") — an empty labeled card is the honest artifact; an invented one is not.
+- **Session evidence is stale (>1 quarter old):** search only for the stale sections and say which were
+  refreshed; do not silently reuse old pricing or release data.
+- **The "one competitor" turns out to be two** (e.g., product + their platform partner): pick the deal's
+  actual blocker, build that card, and note the second as a candidate card in the Final Step.
+
+### Completion checklist (machine-checkable)
+
+- [ ] Every "Say This" and "Ask This" row has a URL, a date, and a label
+- [ ] "Do Not Say" section exists and is non-empty (or states explicitly why it is empty)
+- [ ] As-of date present in the header
+- [ ] Zero claims on the do-not-invent list without a source (features, pricing, market share, customer wins, roadmap items, quotes)
+- [ ] Card body fits the thirty-second read; overflow went to the appendix
+
+## 中文速览（Quick Guide）
+
+**这个技能做什么**：从公开证据构建一张销售可现场使用的竞争战卡——每条话术、每个陷阱提问都带来源 URL、日期和 Fact/Inference/Assumption 标签，正文三十秒读完，深度全部进附录；没有证据的说法要么标注 Assumption，要么进"Do Not Say"。
+
+**何时用**：销售在单笔交易中需要针对某一竞品的行动卡时（通常由具体丢单理由或高频异议触发）；要研究报告而非行动卡时不用本技能。
+
+**核心步骤**：
+1. 优先复用会话内已有的快照/watch 产出，只补缺与过期（超一季度）的部分；
+2. 追问至多 3 问（我方产品＋目标竞品、客群与买手、触发异议）；
+3. 若需新调查，先出 3 条搜索计划（定价页、发布说明、评测、客户案例）；
+4. 严格按 schema 出卡：三十秒速读/该说的/该问的/当心的/定价速写/不可说的＋证据附录；
+5. 收尾给 4 个选项（对抗演练、第二张卡、接入 watch 保持新鲜、压缩移动版）。
+
+**国内可达性边界**：依赖对竞品官网、定价页、文档、评测站等外网源的访问；全部不可达时按正文出口出一张全空但逐条标 Assumption 的卡并写明哪些检查失败——不虚构证据；部分源可达时优先用可公开核验的渠道（竞品中文官网、公开新闻稿、公开文档）补充并同样保留 URL+日期+标签纪律。
 
 ## References
 

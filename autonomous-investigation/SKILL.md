@@ -7,7 +7,7 @@ description: >-
   Fact/Inference/Assumption labels, confidence stacking, diffable outputs. NOT for
   answering a one-off research question or producing a single research report.
 slug: autonomous-investigation
-version: 1.0.2
+version: 1.1.0
 displayName: autonomous-investigation
 ---
 
@@ -192,6 +192,38 @@ conflict case: four channels agree, one disagrees, and the dig changes the strat
   delta monitor downstream now compares apples to a reorganized orchard.
 - **Single-source certainty.** One signal is an anecdote. Escalate confidence only as independent
   channels agree — that's the stacking rule doing its job.
+
+## Wrong Way → Fix
+
+| Wrong way | Observable symptom | Fix |
+|-----------|--------------------|-----|
+| Triggering this skill on its own to "do research" | A run starts with no target and no decision stated | This skill is a protocol, not a research executor. It only runs when an investigation skill that references it (or a user invocation naming a target) asks for it. Answer: whose contract are you honoring? If none, stop. |
+| Asking more than the question budget allows | A third or fourth clarifying question appears before research starts | Budget is a hard cap (default 3). Past the cap, proceed with labeled Assumptions instead of asking again. |
+| Inventing missing facts to fill gaps | A key claim has no URL or date next to it | Move it to the gaps list or label it Assumption. An unlabeled claim without a source is fabrication, not research. |
+| Renaming or reordering output sections between runs | Run N+1 does not diff cleanly against run N | Restore the skill's stable schema exactly; improvements go through the skill's owner, not mid-run. |
+| Treating a press release as commitment | Plan re-routed on an announcement alone | Apply the corollary: announcements are intent; corroborate with funding, hiring, procurement, or contracts first. |
+
+## Failure Exits
+
+No scripts ship with this skill — the failure surface is input and environment, and each exit is observable in the output:
+
+- **No target / no decision supplied (standalone invocation):** do not guess one. Ask the single highest-value budget question ("what decision does this support?"); if nobody answers (scheduled/unattended run), state the assumed decision as the first Assumption in the output and proceed — the run must remain schedulable, not stall.
+- **Referenced skills unavailable** (e.g. `intelligence-collection-disciplines` not installed): the protocol still applies — apply its channel vocabulary only if present; otherwise name the collection channels you used in plain words (site checks, filings, job posts, press). Never cite a component you could not read.
+- **Search plan gate gets no response:** continue. The gate auto-continues by design; say in one line that the plan stands un-revised.
+- **Sources unreachable (offline / blocked domain):** record the source in the gaps list with the failure reason; do not substitute an unsourced claim. If no sources at all are reachable, emit the schema with empty sections, an explicit "no sources reachable" note in the gaps list, and the Final Step block — a diffable empty run beats a stalled or fabricated one.
+
+## Invocation, Parameters, Defaults
+
+Explicit invocation form (all parts optional except a target when used standalone):
+
+```
+Run an autonomous investigation on <TARGET> [for <decision>] [schema: <skill-name>] [budget: <n>]
+```
+
+- `TARGET` — the company/product/market under investigation. Default: none; without it, fall back to the failure exit above.
+- `for <decision>` — the decision research supports; determines "just enough". Default: infer from context if stated, else treat as an Assumption.
+- `schema: <skill-name>` — output schema to honor. Default: the invoking skill's own schema; standalone runs use the clause-7 shape shown in Examples.
+- `budget: <n>` — clarifying-question cap. Default: 3. Inline context counts against it and is never re-asked.
 
 ## References
 

@@ -6,7 +6,7 @@ description: >-
   configuration, build optimization, code splitting, lazy loading, HMR, bundle size,
   asset handling (images/fonts/SVG), environment variables, or React performance.
 slug: react-vite-best-practices
-version: 1.0.2
+version: 1.1.1
 displayName: react-vite-best-practices
 ---
 
@@ -182,3 +182,50 @@ rules/env-vite-prefix.md
 ## Full Compiled Document
 
 For the complete guide with all rules expanded: `REFERENCE.md`
+
+## How to Invoke (Example Phrasings)
+
+Name the category or rule prefix in your request; the skill reads the matching `rules/*.md` files:
+
+- "Review my `vite.config.ts` for build optimization" → build rules
+- "My initial page load is slow — help me split routes" → `split-route-lazy`, `split-dynamic-imports`
+- "Images are killing my LCP" → asset rules
+- "Where should I put secrets — `.env` or code?" → env rules
+- "Bundle is 2 MB, help me find what's in it" → `bundle-visualizer`
+
+## Example Session (Shortest Path)
+
+**Precondition:** a React + Vite repo with `vite.config.ts` present.
+**Invocation:** "Apply build-optimization rules to my vite.config.ts."
+**Outcome:** `build-manual-chunks` + `build-target-modern` applied to the config (vendor chunk split, modern browser target), quoting the Incorrect/Correct snippets from the cited rule files, with a completion check: `npm run build` succeeds and output chunk sizes are reported.
+
+## When NOT to Apply
+
+- Non-Vite build tooling (webpack, CRA, Rspack) or non-React frameworks — rule file paths and APIs are Vite-specific.
+- Runtime performance profiling (React DevTools, `performance.mark`) — this skill covers build-time and asset-level optimization, not runtime profiling methodology.
+- General linting/formatting (ESLint, Prettier) or backend/API performance — out of scope.
+
+## Failure Exits
+
+| Situation | Observable signal | Exit |
+| --- | --- | --- |
+| Rule file missing | `rules/<name>.md` referenced by the task does not exist on disk (read fails, e.g. `rules/split-route-lazy.md: No such file`) | Say which rule files were unavailable; apply the Quick Reference summary for those prefixes only — do not invent rule content or cite snippets that were never read. |
+| Dependencies not installed | `npm run build` fails with `vite: not found` / `sh: vite: command not found`, or imports of `react`/`vite` fail to resolve | Ask the user (or run) `npm install` first; state that build-based verification could not run until then — do not report optimization results from a project that cannot build. |
+| `npm run build` exits non-zero after changes | Compiler/resolution errors in the build output, exit code != 0 | Treat it as a finding: the applied change is unverified. Identify whether the config change caused it (revert the specific edit if so), fix or report, and re-run until the build passes — never declare success with a red build. |
+
+## FAQ
+
+**"The rules mention 20–50% improvements — is that guaranteed?"** No. Impact descriptions are directional, from typical cases; verify on your project with `npx vite build` output or `bundle-visualizer` before/after.
+
+**"No automated checker?"** Correct — documentation-only skill. Apply the CRITICAL `build-` and `split-` rules manually first.
+
+**"Which rules first for a small project?"** `split-route-lazy`, `build-manual-chunks`, `env-sensitive-data` — highest impact per minute spent.
+---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：为 React + Vite 项目提供 23 条性能优化规则，覆盖构建优化／代码分割／开发体验／静态资源／环境变量／包分析六类。
+- **何时用**：配置 Vite、做代码分割与懒加载、压包体、处理图片字体 SVG 与环境变量时。
+- **核心步骤**：按规则前缀定位并**先读仓内 `rules/*.md` 本地副本**（含 Incorrect/Correct 片段）→ 按摘要套用到配置与代码 → `npm run build` 跑通并报告 chunk 体积后才算完成。
+- **国内可达性边界**：正文与 `rules/` 全部是本地文档，读规则无需网络；vite.dev／react.dev／rollupjs.org 外链仅为官方文档延伸阅读，不访问不影响使用；`npm install` 依赖下载可走 npmmirror 等镜像源。
+

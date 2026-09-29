@@ -14,7 +14,7 @@ description: >-
   NOT for: git branching / commit / PR flow, or dependency pinning and vulnerability
   scanning.
 slug: version-management
-version: 1.2.1
+version: 1.3.1
 displayName: version-management
 ---
 
@@ -206,3 +206,42 @@ HTTP / API 场景用标准信号，便于调用方**自动化**发现：`Depreca
 ## 方法论来源（摘要）
 
 Semantic Versioning 2.0.0 · Keep a Changelog 1.1.0 · Conventional Commits 1.0.0 · Calendar Versioning（CalVer）· PEP 440 · Go Module version numbering · Kubernetes Deprecation Policy · Hyrum's Law · RFC 9745 / RFC 8594。完整出处见 [`references/research.md`](references/research.md)。
+
+## 最短真实样例（调用 → 产出）
+
+**前置**：变更集已明确（diff / commit 列表 / 需求描述任一）。
+
+调用句：`当前 1.4.2（源 package.json），这批改动：新增导出的 buildReport(options) API、修复日期时区解析 bug、把 timeout 默认从 30s 改为 10s。该发哪个版本？`
+
+产出（按「输出格式」落位，摘录）：
+
+```
+## 版本决策
+现状：当前 1.4.2（源：package.json:3）· 变更：新增 API + 修 bug + 改默认值
+判定：MAJOR · 理由：改默认值（timeout 30s→10s）破坏可观察行为（隐式接口），按 Hyrum's Law 已被依赖
+## 落地
+- 版本源：package.json:3 → 2.0.0
+- CHANGELOG：## [2.0.0] - 2026-09-29，Added/Changed/Fixed 三组；Changed 首行列「timeout 默认值变更 + 迁移写法」
+- 发布标记：git tag v2.0.0（附注 tag 承载发布说明）
+- 破坏性自检：默认值变更命中自检清单第 6 条；导出 API 为新增（MINOR 项，并入 MAJOR）
+```
+
+无 git 项目走 RELEASES.md 记录行，其余相同。
+
+## 失败闭集
+
+| 情形 | 处置出口 |
+|---|---|
+| 版本号无法判定（找不到版本源，或同一制品多处独立维护版本号） | 按硬约束 1 先归一：定位唯一源，其余标注「应派生」。没有任何版本源时，不擅自定号——给出建议（如建 `VERSION` 或从 `0.1.0` 起步）并问用户；有疑不默认（硬约束 3）。 |
+| 多包仓根版本歧义（仓库根与各包版本号不一致，或不知该信哪个） | 先确认仓库采用的是 independent / fixed / linked 哪种策略（读仓库约定文档、changesets/release-please 配置）；仓库未声明策略时问用户，不默认套用。对齐结论连同适用范围写进该批 CHANGELOG。 |
+| CHANGELOG 与 git tag 不一致（tag 指向的提交无对应 CHANGELOG 节，或版本节无 tag） | 以版本源与制品内容为真相比对，先判定哪一侧错。未发布的错标：只删重打标记、补正 CHANGELOG（打错只删标记，不动制品）。已发布的：绝不移动 tag（`git-workflow` 边界且需用户确认），改走新版本号，并在 CHANGELOG 显式记录差异。 |
+
+## FAQ
+
+**「只改了一个默认值」也要 MAJOR？** 是——若该行为可被外部观察到（错误语义、时序、默认参数），它就是隐式接口；拿不准时问用户，不默认（硬约束 3）。
+
+**弃用窗口和我的发版节奏冲突怎么办？** 弃用发 MINOR 后至少存活到下一个 MAJOR；节奏紧就延长弃用期（K8s 分级窗口是下限参照，不是上限），绝不缩短到「本次直接移除」。
+
+**依赖升级把我的依赖传递弄破坏了，算我的 MAJOR 吗？** 若你的公开契约因此改变（错误语义、最低环境要求）就按你的契约判；只是内部锁文件变化不算。判定依据写进决策记录，可回溯。
+
+**内部库没有外部使用者，还要这么严吗？** 使用者是其他团队/服务时照常执行；单人私有项目可放宽到决策表 + 一条 CHANGELOG，但「单版本源」与「已发布不可改」两条无豁免。

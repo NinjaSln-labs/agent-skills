@@ -7,7 +7,7 @@ description: >-
   debugging Playwright tests. NOT for: non-Playwright frameworks (Cypress/Selenium-only)
   or general CI without Playwright.
 slug: playwright-best-practices
-version: 1.0.0
+version: 1.1.1
 displayName: playwright-best-practices
 ---
 
@@ -305,3 +305,38 @@ After writing or modifying tests:
    - Re-run tests
 3. **Only proceed when all tests pass**
 4. **Run multiple times** for critical tests: `npx playwright test --repeat-each=5`
+
+## When to Use This Skill
+
+Use this skill whenever the task involves **Playwright** — writing, debugging, refactoring, or running Playwright tests, or setting up Playwright infrastructure. Example invocations:
+
+- "My Playwright test is flaky — it passes locally but fails in CI" → [debugging/flaky-tests.md](debugging/flaky-tests.md)
+- "Write an E2E test for the login flow" → core/test-suite-structure.md, core/locators.md, advanced/authentication.md
+- "How do I mock an API response in Playwright?" → advanced/network-advanced.md
+- "Set up Playwright in GitHub Actions" → infrastructure-ci-cd/github-actions.md
+- "Should I use Page Objects or fixtures?" → architecture/pom-vs-fixtures.md
+
+**Shortest example:** precondition — a repo with `@playwright/test` installed. Invocation: "Fix this flaky Playwright test: <paste failing test + error>". Outcome: root-cause identified via the flaky-tests reference (missing wait / shared state / race), fixed test code, and a validation loop (`npx playwright test --repeat-each=5`) confirming stability.
+
+## NOT for
+
+- Cypress, Selenium, WebdriverIO, or any non-Playwright framework — file contents and APIs are Playwright-specific and will mislead on other tools.
+- General CI/CD setup with no Playwright tests in it (use a CI/CD resource instead).
+- Unit testing without a browser (Jest/Vitest) — this skill covers browser-based testing only.
+
+## FAQ
+
+**Which file should I open first?** Don't read everything — use the decision tree above to jump to 1–2 files for your exact task. The skill is an on-demand reference, not a linear course.
+
+**The suite is slow — where do I start?** [infrastructure-ci-cd/performance.md](infrastructure-ci-cd/performance.md), then parallel-sharding; check for explicit waits via core/assertions-waiting.md.
+
+**Chinese-language environments:** Playwright itself works as documented in China; npm registry and browser-download mirrors apply as with any npm project. Local docs in this skill require no network.
+---
+
+## 中文速览（Quick Guide）
+
+- **做什么**：Playwright 测试全场景实践参考——E2E／组件／API／视觉／可访问性测试、flaky 修复、POM、CI/CD、mock、认证等，按任务跳转对应参考文件。
+- **何时用**：写新 Playwright 测试、调 flaky 用例、搭 CI、做 mock／认证／上传等任何 Playwright 相关任务；非 Playwright 框架不适用。
+- **核心步骤**：按正文决策树定位 1–2 个参考文件 → 依其写／改测试 → `npx playwright test` 验证，关键用例 `--repeat-each=5` 复跑确认稳定。
+- **国内可达性边界**：全部参考文档为仓内本地副本，读文档无需网络；`npm install` 与 `npx playwright install` 的浏览器二进制下载在境内网络可能较慢或失败——npm 包可走 npmmirror 等镜像源，浏览器二进制可按 Playwright 官方文档配置下载镜像后再安装；运行测试本身无境外服务依赖。
+

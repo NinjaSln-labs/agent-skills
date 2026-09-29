@@ -9,7 +9,7 @@ description: >-
   accessibility/WCAG compliance review, UI code review against style guides, or marketing sales
   copy (boundaries by task; no other skill implied).
 slug: frontend-design
-version: 1.0.2
+version: 1.1.0
 displayName: frontend-design
 ---
 
@@ -50,6 +50,58 @@ Try to do a lot of this planning and iteration in your thinking, and only show i
 ## Restraint and self-critique
 
 Spend your boldness in one place. Let the signature element be the one memorable thing, keep everything around it quiet and disciplined, and cut any decoration that does not serve the brief. Not taking a risk can be a risk itself! Build to a quality floor without announcing it: responsive down to mobile, visible keyboard focus, reduced motion respected. Critique your own work as you build, taking screenshots if your environment supports it – a picture is worth 1000 tokens. Consider Chanel's advice: before leaving the house, take a look in the mirror and remove one accessory. Human creators have memory and always try to do something new, so if you have a space to quickly jot down notes about what you've tried, it can help you in future passes.
+
+## How to invoke
+
+There is no CLI or bundled script — trigger it with a design ask. Prompts that route here:
+
+- "Design a landing page for <product> — make it distinctive, not templated."
+- "This dashboard looks generic; give it a stronger point of view."
+- "Pick fonts and a palette for our docs site."
+
+Defaults when you supply nothing else: the skill pins the subject, audience, and the page's single job itself (see "Ground it in the subject"), then produces a plan with a 4–6 color palette, 2+ type roles, one layout concept, and one signature element — and shows the plan before writing code.
+
+## Worked Example
+
+Brief: "Landing page for a tide-pool logging app for marine volunteers."
+
+Ask: "Design the landing page."
+
+Expected plan excerpt (the token system from the Process section):
+
+```
+Color:  #0B3C49 deep slate-teal, #EAF4F2 foam, #F2A541 buoy orange, #1B7F79 kelp
+Type:   display "Fraunces" (hero thesis only), body "Public Sans"
+Layout: full-bleed tide-pool hero with the headline set low-left; the social-proof
+        section is a species-log table mirroring the app's own UI
+Signature: a tide-chart divider that fills as you scroll, echoing the app's log chart
+```
+
+The plan is then critiqued against the three AI-look defaults and revised (with the revision stated) before any code is written.
+
+## Failure exits and boundaries
+
+- Brief names no subject and there is no memory of the human's context: pick one concrete subject and state it — this is documented behavior, not an error; if the human corrects it, restart from the token system with the correction.
+- Brief pins a look ("use cream and serif", "copy brand X"): follow it exactly even when it matches one of the three default looks — the brief wins; say so rather than re-briefing.
+- No way to run or screenshot code: deliver plan + code and state plainly that screenshot self-critique was skipped — never claim screenshots you did not take.
+
+## NOT for / Anti-patterns (observable)
+
+- NOT for accessibility audits: the quality floor here (focus visible, reduced motion, responsive) is a floor — "is this WCAG compliant?" is a different task.
+- NOT for checking existing UI code against a style guide or design tokens — that is a code-review task, not a design one.
+- NOT for marketing sales copy: interface copy (buttons, errors, empty states) is in scope; persuasive landing-page sales copy is not.
+- Anti-pattern: shipping the first plan — output with no stated revision is a skipped two-pass step.
+- Anti-pattern: reaching for cream+serif+terracotta, black+acid-green, or broadsheet hairlines when the brief left those axes free.
+
+## Wrong → Right
+
+| Wrong | Right |
+|---|---|
+| "Just make it look nice" → designing silently | Pin subject/audience/job, state the choice, then design |
+| Five accents and three display faces | 4–6 named colors; one display face used with restraint |
+| Animation on every section | One orchestrated moment; cut the rest |
+| 01/02/03 numbering on unordered content | Number only real sequences |
+| Asking "is this accessible?" | Out of scope — run an accessibility review instead |
 
 ## More on writing in design
 

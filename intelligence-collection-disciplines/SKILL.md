@@ -5,7 +5,7 @@ description: >-
   (OSINT to MASINT), signal-to-inference chains, and fusion. Use when one-source research
   isn't enough.
 slug: intelligence-collection-disciplines
-version: 1.0.3
+version: 1.1.0
 displayName: intelligence-collection-disciplines
 ---
 
@@ -78,15 +78,7 @@ integration roadmap.`
 
 *What a good beat reporter knows before the press release drops.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| [TARGET] press & newsroom | Company newsroom pages, Google Alerts, PR Newswire feeds | Meltwater, Cision |
-| Industry periodicals | Trade publications, association newsletters, vertical Substacks for [MARKET] | Analyst subscriptions |
-| Analyst coverage | Gartner/Forrester press summaries, free webinar replays | Gartner, Forrester, IDC full reports |
-| Social & community | LinkedIn exec posts, Reddit, Hacker News, X | Brandwatch, Sprout listening |
-| Review sites | Whichever your [BUYER] reads: G2, Capterra, TrustRadius, app stores, Trustpilot | G2 Buyer Intent data |
-| Conference footprint | Session titles, sponsor tiers, booth size, speaker rosters at [MARKET] events | n/a |
-| Prediction markets | Polymarket, Kalshi, Metaculus, Manifold (crowd-priced odds on regulation, approvals, tech milestones relevant to [MARKET]) | n/a |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -104,14 +96,7 @@ integration roadmap.`
 
 *Follow the money. Companies lie in press releases. They lie less in filings, because lying there is a felony.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| Public filings | SEC EDGAR (US), Companies House (UK), BRIS and European e-Justice company search (EU), national securities regulators for [GEOGRAPHY] | AlphaSense, Sentieo |
-| Earnings calls | Company IR pages, Seeking Alpha transcripts | AlphaSense (search across calls) |
-| Private company signals | Crunchbase free tier, incorporation records, insolvency registers, beneficial-ownership registers where legally accessible | PitchBook, CB Insights |
-| Government spend & procurement | USAspending.gov, SAM.gov (US), TED and national procurement portals (EU), country platforms (MENA), development-bank procurement (World Bank, EBRD, AfDB, UNGM) | GovWin |
-| Competition & state-aid cases | European Commission merger/antitrust/state-aid databases; national competition authorities | n/a |
-| State & sovereign capital | Sovereign wealth fund reports, state-owned enterprise annual reports, PPP pipelines | n/a |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -133,15 +118,7 @@ sizing recipe), account targeting (procurement award patterns).
 *The terrain map, not troop movement. Government statistics are free intelligence most PMs never open —
 and the backbone of every ICP, persona, and TAM that survives scrutiny.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| US market structure | Census Bureau (County Business Patterns, Economic Census, NAICS establishment counts), BEA | IBISWorld, Statista, Grand View Research |
-| US labor & buyers | BLS (occupation counts, wages, industry employment), FRED (macro conditions gating budgets) | TalentNeuron |
-| EU market structure | Eurostat, PRODCOM manufacturing statistics, national statistical institutes, ECB data | national data resellers |
-| EU trade flows | Eurostat COMEXT, Access2Markets, TARIC (tariffs, quotas, rules of origin) | Panjiva, S&P Global |
-| MENA regional | GCC-Stat, Arab Development Portal, ESCWA, Arab Monetary Fund, SESRIC | n/a |
-| MENA national | GASTAT (Saudi), FCSC (UAE), CAPMAS (Egypt), HCP (Morocco), and peers | n/a |
-| Global cross-check | World Bank Data and Enterprise Surveys, IMF country reports, OECD.Stat, UN Comtrade, ITC Trade Map | n/a |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -176,15 +153,7 @@ messaging localization, market entry prioritization, pricing corridor validation
 
 *R&D leaves fingerprints 12-18 months before products ship.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| Patents | patents.google.com, USPTO Patent Center, EPO Espacenet, WIPO PatentScope | Clarivate, LexisNexis PatentSight+ |
-| Technographics | BuiltWith free lookups, Wappalyzer | HG Insights, BuiltWith Pro, 6sense |
-| Product telemetry | Public changelogs, API docs diffs, status pages, GitHub org activity | n/a |
-| Standards bodies | Whichever govern [MARKET]: IETF, W3C, ISO committees, CEN/CENELEC/ETSI work programs, industry consortia | n/a |
-| Funded research | CORDIS and Horizon Europe project databases, university project repositories | n/a |
-| Academic & preprints | arXiv, Google Scholar, Semantic Scholar, SSRN, the conferences that matter to [MARKET] | Dimensions, Scopus |
-| Trademark filings | USPTO TESS, EUIPO, WIPO Global Brand Database | Corsearch |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -206,13 +175,7 @@ countdown clocks), build/buy/partner decisions.
 
 *Organizations announce strategy through job boards long before press releases. People are the tell.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| Job postings | LinkedIn Jobs, [TARGET] careers pages, Indeed | JobsPikr, TalentNeuron, Revelio Labs |
-| Employee sentiment | Glassdoor, Blind, Reddit communities for [MARKET] | n/a |
-| Leadership moves | LinkedIn announcements, press | BoardEx, The Org |
-| Win/Loss | Your own sales team debriefs, churned-customer interviews | Clozd, DoubleCheck |
-| Conference hallway | Your field team's ears at [MARKET] trade shows | n/a |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -231,14 +194,7 @@ countdown clocks), build/buy/partner decisions.
 
 *Companies broadcast constantly through what they change on the public internet. Most competitors never listen.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| Website diffs | Wayback Machine, Visualping free tier | Visualping, Klue, Crayon (auto-monitoring) |
-| Pricing pages | Manual snapshots + Wayback | Klue, Crayon, Kompyte |
-| SEO/SEM moves | Google "site:" queries, free Semrush lookups | Semrush, Ahrefs, SpyFu |
-| App store metadata | Version notes, screenshot changes, keyword shifts | Sensor Tower, data.ai |
-| DNS/infrastructure | crt.sh (new SSL certs reveal new subdomains), DNS records | n/a |
-| Webinar/event cadence | [TARGET] events pages, registration platforms | n/a |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -255,12 +211,7 @@ strategy, positioning counter-moves.
 
 *Measure the physical and operational exhaust. Abnormal resource allocation never lies.*
 
-| Source Type | Free | Paid |
-|---|---|---|
-| Supply chain | Import/export records via ImportYeti (free tier), Eurostat COMEXT and customs codes, UN Comtrade | S&P Global Supply Chain Intelligence, Panjiva, ImportGenius |
-| Facilities & projects | Commercial real estate news, local business journals, permits in [GEOGRAPHY]; industrial-zone tenant announcements, environmental permits, EPC contract awards; satellite imagery | CoStar |
-| Ops capacity | Support response time sampling, status page incident frequency | n/a |
-| Certifications & safety | Whichever gate [MARKET]: ISO, SOC 2, FedRAMP, CE marks; notified-body designations and safety recalls (EU); sector registries | n/a |
+Source list: see [`references/source-registry.md`](references/source-registry.md) (fast-changing data, 2026-09-29 snapshot).
 
 **Signal → inference chains:**
 
@@ -331,6 +282,15 @@ announced budget, an approved budget, committed financing, a tender value, and a
 five different numbers wearing the same headline. Search in local languages; never assume the English
 portal contains every notice.
 
+**Localizing the source tables (e.g., China-market targets):** the discipline and its signal → inference
+chains carry over unchanged; swap in the local equivalents per source type — corporate registries
+(enterprise-credit/registration lookup platforms in the 企查查/天眼查/QCC class), the national
+statistics bureau and its statistical yearbooks in place of Census/Eurostat, local procurement portals
+in place of TED/SAM.gov, local job boards and review/community platforms in place of LinkedIn/G2, and
+local patent offices (CNIPA) alongside USPTO/EPO. The discipline-specific tables above are the US/EU
+baseline; for any other geography, name the local substitute per row before collecting, and apply the
+same published-only sourcing bar.
+
 A copy/paste **collection plan** — instantiation variables, discipline-selection table, cadence,
 and fusion table — lives in [`template.md`](template.md).
 
@@ -375,6 +335,36 @@ customs, registries, permits — and an absence enters the fusion table as a Fac
 - **Running every discipline on every question.** The artifact-mapping table exists so you run the two
   or three disciplines that feed your [DECISION], on the cadence that matches how fast that evidence
   actually changes.
+
+## When to invoke (trigger summary)
+
+Reach for this skill when **one** of these holds, and it is safe to run with nothing but the six
+instantiation variables (all optional, `[DECISION]` strongly recommended):
+
+- One-source research has already produced a claim you cannot act on confidently (a press release, a
+  rumor, one review cluster) and you need independent corroboration before spending roadmap or sales
+  capital.
+- You are about to build a TAM/SAM/SOM, ICP, battle card, or threat assessment and want the
+  source-discipline mapping and confidence-stacking rule behind it.
+- You are setting up a recurring competitive cadence (weekly/monthly/quarterly) and need the
+  discipline-to-cadence schedule.
+
+Not needed when a single well-sourced answer suffices — that is ordinary research; the disciplines pay
+for themselves only when being wrong is expensive.
+
+## Failure Exits & Edge Cases
+
+- **`[DECISION]` blank:** do not run the sweep — ask for the decision once ("research without a
+  decision is a hobby — what will this change?"); if the user declines, stop after the tradecraft
+  walkthrough. No discipline table is produced without it.
+- **No network / paywalled sources only:** run the free tiers and public records, mark each
+  unsubstantiated row as Assumption, and state in the fusion verdict which disciplines were starved —
+  a 1-discipline finding stays a watch item, never a strategy brief.
+- **Sources in the wrong region (e.g., US tables, China target):** apply the localization note above
+  and name the local substitute per row; do not present US-portal absence as evidence of absence.
+- **Empty-handed invocation:** the skill walks the instantiation block one variable at a time; if the
+  user answers none, it stays a teaching artifact — say so, and do not fabricate a filled collection
+  plan.
 
 ## References
 

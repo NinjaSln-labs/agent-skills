@@ -4,7 +4,7 @@ description: >-
   Facilitate workshop sessions in a one-step, multi-turn flow. Use when an interactive
   skill needs consistent pacing, options, and progress tracking.
 slug: workshop-facilitation
-version: 1.0.1
+version: 1.1.1
 displayName: workshop-facilitation
 ---
 
@@ -89,6 +89,42 @@ Anything supplied with the invocation itself — text after the skill name, a pa
 - Hiding progress, so users don't know how much remains.
 - Ignoring the user's chosen option or custom direction.
 - Failing to label assumptions when running in best-guess mode.
+
+## Failure & Edge-Case Handling (observable exits)
+
+Each case below has a visible facilitator behavior — never silently improvise:
+
+- **Unparseable answer** (user input matches no option and reads as off-topic, e.g. "banana" or a paste of unrelated logs): restate the pending question, quote what you received, and ask whether it was meant as an answer to this question or context for later. Observable exit: the same question is re-asked with the received text quoted — never skip or guess an option mapping for it.
+- **Multi-select ambiguity** (`1 and 3` where options are mutually exclusive): name the conflict in one sentence, ask the user to pick one or confirm combining.
+- **Empty / no input at invocation**: fall back to the entry-mode offer (Guided / Context dump / Best guess). Do not stall waiting for input that was never required.
+- **Stop / pause**: halt immediately, print `Paused at <label> Qx/N`, and wait for explicit resume. On resume, restate that label and the pending question before continuing.
+- **User wants to skip a question**: record it as skipped, show `Context Qx/N (1 skipped)`, and carry it into the `Assumptions to Validate` list if best-guess fills it.
+- **Session exceeds the announced question count**: say so before continuing ("this needs 2 more questions than announced — continue?"), never just keep going.
+
+## Boundary / NOT for
+
+- **Single-shot deliverables** (user says "just give me the result") → use the Fast path; multi-turn facilitation is wrong here.
+- **Pure execution tasks** with no user decisions (run tests, fix a build) → this protocol adds drag, don't apply it.
+- **Not a knowledge source**: this skill defines *how* to facilitate; it contributes no domain questions. If invoked standalone without a session named, ask what to facilitate — that request is the exit for an empty invocation.
+- **Backend/automated pipelines**: no human is answering turns; the protocol does not apply.
+
+## FAQ / Wrong Way → Fix
+
+| Wrong way | Fix |
+|-----------|-----|
+| Re-asking something the user already put in the invocation text | Inline input counts as answers given — skip covered questions and keep progress labels honest (start at `Context Q2/6` if Q1 was covered) |
+| Asking 2-3 questions in one turn "to save time" | One targeted question per turn, always |
+| Offering numbered recommendations after every answer | Recommendations only at decision points (after synthesis, at priority selection) |
+| Interpreting a vague answer as option "1" because it's close enough | Quote the input back, ask the user to confirm or correct — never map silently |
+| Continuing the queue after "stop" with "just one more quick one" | Halt immediately; resume only on explicit request |
+| Best-guess mode without labeling | Every inferred answer goes into the closing `Assumptions to Validate` list |
+
+## 中文速览（Quick Guide）
+
+- **做什么**：定义交互式技能的引导协议：一次只问一步、显示进度标签、仅在决策点给枚举选项、可被打断且支持单次快速输出。
+- **何时用**：需要多轮交互、稳定节奏与进度跟踪的技能或工作坊会话（可独立调用，也常作为其它交互技能的协议底座）。
+- **核心步骤**：①开场预告时长与问题数 ②选入口模式（Guided / Context dump / Best guess） ③逐步提问并给编号快捷选项 ④回答元问题后复述进度再继续 ⑤结束给出待验证假设清单。
+- **国内可达性**：主流程离线可完成，无境外服务依赖。
 
 ## References
 - Use as the source of truth for interactive facilitation behavior.

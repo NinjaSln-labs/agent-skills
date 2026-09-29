@@ -7,7 +7,7 @@ description: >-
   code signing, notarization, playwright, desktop app. Use when building secure Electron
   apps with React/TypeScript (IPC, packaging, testing).
 slug: electron-best-practices
-version: 1.0.0
+version: 1.1.1
 displayName: electron-best-practices
 ---
 
@@ -300,3 +300,77 @@ Examples:
 ### Complete Examples
 - `assets/examples/typed-ipc-example.md` - End-to-end typed IPC walkthrough
 - `assets/examples/multi-window-example.md` - Multi-window state management
+
+## Minimal Worked Example
+
+**Precondition:** an Electron + React app with the secure defaults above (`contextIsolation: true`, `sandbox: true`, preload via contextBridge).
+
+**Invocation:** "Wire up saving a file from the renderer, with errors shown to the user instead of swallowed."
+
+**Outcome excerpt (main process registers → preload exposes → renderer invokes and surfaces the error state):**
+
+```typescript
+// src/main/ipc/save-file.ts — main process registers the handler
+ipcMain.handle('save-file', async (_event, content: string) => {
+  try {
+    await fs.writeFile(filePath, content);
+    return { success: true, data: filePath };
+  } catch (err) {
+    return { success: false, error: (err as Error).message };
+  }
+});
+```
+
+```typescript
+// src/preload/index.ts — preload exposes exactly this one function
+contextBridge.exposeInMainWorld('electronAPI', {
+  saveFile: (content: string) => ipcRenderer.invoke('save-file', content),
+});
+```
+
+```tsx
+// renderer — invoke, then map the Result type to a user-visible state
+async function handleSave(content: string) {
+  const result = await window.electronAPI.saveFile(content);
+  if (!result.success) {
+    setStatus({ kind: 'error', message: `Couldn't save file: ${result.error}` });
+    return;
+  }
+  setStatus({ kind: 'saved', path: result.data });
+}
+```
+
+The handler never lets a rejection escape as a raw `Error` — the Result type crosses the boundary, and the renderer maps `error` to a visible state per Surfacing Errors to Users below.
+
+## Surfacing Errors to Users
+
+The Result type pattern is for the IPC boundary; the renderer still has to show something a human can act on. When generating code:
+
+- Map every IPC failure to a user-visible state: inline message near the triggering control (forms), toast or banner (background operations), error boundary (render crashes) — never swallow the rejected promise.
+- Show cause plus next step, not just "an error occurred": e.g. `Couldn't save file: disk is full. Free up space or choose another location.` Include the error `message` from the Result type (it crossed the boundary for this purpose), but never raw stack traces.
+- Distinguish retryable from fatal: network/offline failures get a Retry action; permission and validation failures get instructions instead of a retry button.
+- Log full context (channel name, args shape) to the main process log; show only the summarized message in the UI.
+
+## Script Failure Exits
+
+All three bundled scripts run under Deno. Each failure has an observable symptom and an exit:
+
+| Symptom | Cause | Action |
+|---------|-------|--------|
+| `command not found: deno` | Deno not installed | Install Deno (see deno.com), or proceed manually: apply the patterns in `references/` and `assets/templates/` by hand — the scripts are conveniences, not prerequisites. Do not silently skip a requested scaffold/analysis; tell the user which step was not run. |
+| `PermissionDenied` reading a path | Missing `--allow-read` (or `--allow-write` for scaffold/type-gen) | Re-run with the flags shown in Scripts Reference above — they are the documented minimum. |
+| `analyze-security.ts` exits non-zero on `--strict --json` | Checks failed (that is the report, not a crash) | Treat the JSON output as findings to fix, not an environment error. A crash prints a stack trace instead of the JSON report. |
+| `generate-ipc-types.ts --validate` exits non-zero | Existing type definitions no longer match handlers | Regenerate types, then re-run `--validate` to confirm exit 0. |
+| `scaffold-electron-app.ts` refuses to write | Target directory not empty or missing `--name` | Supply the required `--name`, or point `--path` at an empty directory; the script does not overwrite existing files. |
+| Runtime: a network request from the app fails (timeout/offline, visible in main-process log) | Transient outage or unreachable host | Retry a bounded number of times (e.g. 2-3 with backoff), then degrade to a user-visible error state with a Retry action per Surfacing Errors to Users — never retry in an unbounded silent loop. |
+
+## Wrong Way → Fix (FAQ)
+
+| Wrong way | Observable symptom | Fix |
+|-----------|--------------------|-----|
+| Enabling `nodeIntegration` "just for one window" | Renderer can `require()` — security checklist flags it | Keep it disabled; expose exactly the needed functions via contextBridge. |
+| `send/on` for a request-response call | Race-prone replies, no awaited result | Use `invoke/handle`. |
+| Passing an `Error` object across IPC | Renderer receives `{}`-like object with no message | Return the Result type `{ success, data, error }`. |
+| Loading a remote URL in a `BrowserWindow` without CSP | Content Security Policy checklist item fails | Set strict CSP via HTTP headers, `'self'` only for local content. |
+| Testing with Spectron | Deprecated, stops at Electron 13 | Use Playwright (`references/testing/playwright-e2e.md`). |
+| Using this skill for a Tauri or pure-web app | Guidance does not apply to the runtime | Stop; the When NOT to Apply boundaries above name these runtimes. |

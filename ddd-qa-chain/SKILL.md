@@ -10,7 +10,7 @@ description: >-
   or when asked to run full self-tests / quality checks. NOT for: aggregating DoD across
   a delivery stage, or verifying one completion claim in isolation.
 slug: ddd-qa-chain
-version: 1.0.1
+version: 1.1.1
 displayName: ddd-qa-chain
 ---
 
@@ -29,24 +29,13 @@ displayName: ddd-qa-chain
 
 ## 五层验证链 + 金字塔梯度
 
-| 层 | 质量维度 | 验证对象 | 典型工具族 | 数量/速度/频次（金字塔） | 门禁触发 |
-|----|---------|---------|-----------|------------------------|---------|
-| **L1 领域/单元逻辑** | 逻辑 | 纯函数、业务规则、值对象不变量、状态机 | 单测框架（Vitest/Jest/…） | **多**·快·每次提交 | 逻辑变更必跑 |
-| **L2 契约** | 功能 | 模块/进程间接口、API/通道完整性、schema | 类型检查器（tsc/…）+ 契约测试（Pact/…） | 中·中·CI 必跑 | 接口/契约变更必跑 |
-| **L3 组件交互** | 功能 | 组件/模块交互逻辑、授权/状态机流程 | 组件测试（Playwright/Testing Library/…） | 中·中·CI 必跑 | 交互逻辑变更必跑 |
-| **L4 端到端** | 体验 | 真实用户旅程（入口→操作→结果→交付） | E2E 框架（Playwright/Cypress/…）+ 真实依赖 | **少**·慢·合并/交付前 | 任何功能改动必跑 |
-| **L5 视觉回归** | 视觉 | 界面渲染像素基线 | 视觉回归（toHaveScreenshot/Chromatic/…） | 少·慢·UI 改动时 | UI 改动必跑 |
-
-**金字塔纪律**：底层多而快、顶层少而慢。若某层用例数量倒挂（E2E 比单测多）→ 失衡信号：
-把能下沉的断言沉到底层，顶层只留真正需要真实环境的旅程。层可裁剪：无 UI 项目去 L5，
-无 IPC/RPC 的去 L2 契约子项（保留类型检查）。
+L1 单元逻辑 → L2 契约 → L3 组件交互 → L4 端到端 → L5 视觉回归；底层多而快、顶层少而慢，
+各层有门禁触发条件（全表见 [references/qa-chain-tables.md](references/qa-chain-tables.md)）。
 
 ## 验证与确认（V&V——两个不同的问题）
 
-- **验证（Verification）**：实现是否正确（building it right）——L1-L5 各层断言。
-- **确认（Validation）**：实现的是否是要的（building the right thing）——功能 AC 全过 +
-  实现可追溯到最初定义（tickets/spec ↔ 文档）。
-- 两者缺一不可：全链绿但 AC 没实现 = 验证过、确认失败——不交付。
+验证（实现正确）与确认（实现的是要的）缺一不可；全链绿但 AC 未实现 = 确认失败——不交付
+（详见 [references/qa-chain-tables.md](references/qa-chain-tables.md)）。
 
 ## 项目映射（探测 → 适配）
 
@@ -82,16 +71,8 @@ displayName: ddd-qa-chain
 
 ## DoD 质量门禁（功能「Done」判定）
 
-| DoD 项 | 检查 | 对应层 |
-|--------|------|--------|
-| 功能完成 | 该功能所有 AC 全部通过（predicates/场景断言） | 确认（tickets/规格回填） |
-| 确定性验证 | 逻辑/契约/交互等**确定性部分**——断言必过（非概率） | L1-L3 |
-| 概率性验证 | **模型驱动行为**（LLM 回复质量/agent 行为）——阈值 + 样本验证（如 5 次试跑 ≥4 通过），防 drift | L4（若适用） |
-| 质量链通过 | 受影响层 + 全链 run-all 全绿 | L1-L5 |
-| 定义对齐 | 实现可追溯到最初定义（tickets AC ↔ 文档） | 确认 |
-
-**铁律（AI 应用特化）**：确定性部分绝不用「模型应该会」糊弄——必须断言；
-概率部分绝不用「一次通过」冒充——要样本/阈值证据（样本数与阈值由项目约定，可参数化）。
+五项判定：功能 AC 全过 / 确定性断言 / 概率性样本阈值 / 质量链全绿 / 定义对齐——
+确定性必须断言、概率性要样本/阈值证据（全表见 [references/qa-chain-tables.md](references/qa-chain-tables.md)）。
 
 ## 工作流
 
@@ -103,6 +84,55 @@ displayName: ddd-qa-chain
 - [ ] 4. 确认层：tickets AC 回填 + 定义对齐（product-doc-audit 如需）
 - [ ] 5. 报告：每层结果 + 实际命令 + 证据（输出尾部）——未通过/未确认不交付
 ```
+
+## 最短真实示例（前置 → 调用 → 产出摘录）
+
+**前置**：一个有 `package.json` 的 TS 项目，`scripts` 里有 `test`（Vitest）、`typecheck`（tsc）、`test:e2e`（Playwright）；用户刚改完订单折扣逻辑。
+
+**调用句**（用户对 agent 说）：
+
+```text
+「帮我跑一遍质量链，全绿了再交付这个折扣功能。」
+```
+
+**产出摘录**（报告应长这样）：
+
+```text
+## 质量链报告（功能：订单折扣）
+| 层 | 映射命令 | 结果 |
+|----|---------|------|
+| L1 领域/单元 | npx vitest run tests/unit/discount | 42/42 ✓ |
+| L2 契约 | npx tsc --noEmit | 0 errors ✓ |
+| L3 交互 | npx playwright test --project=components | 8/8 ✓ |
+| L4 端到端 | npx playwright test tests/e2e/checkout | 3/3 ✓ |
+| L5 视觉 | —（项目无视觉基线） | 未覆盖（显式标注，不算通过） |
+确认层：TICKET-117 AC1-AC4 全部回填 ✓
+结论：L5 未覆盖，其余全绿 → 可交付（视觉改动需补 L5）
+```
+
+反例对照：只贴「测试都过了」一行、无命令无证据 → 不合格（违反 verification-before-completion）。
+
+## 失败出口与边界处置（可观察）
+
+| 情形 | 可观察出口 |
+|------|-----------|
+| 探测不到测试基建（无 scripts/无 CI 配置） | 报告写「映射失败：未找到 <层> 的命令」并**停下问用户**；禁止猜命令继续跑 |
+| 某层命令非零退出 | 报告该层 ✗ + 附最后 20 行输出 + 指向 systematic-debugging；**不**修复后假装全绿 |
+| 命令不存在（`command not found`） | 该层标「命令失效，映射需更新」，重跑项目映射步 1-2；不静默跳过 |
+| 无 UI 项目 | L5 直接裁剪并在报告写「L5 裁剪（无 UI）」——写明原因，不是漏跑 |
+| 概率性验证（LLM 行为）无约定阈值 | 报告写「未度量：项目未约定样本数/阈值」，列进待办；不编数字 |
+| 全链 run-all 中断（超时/环境崩） | 报告停在失败层，标注「全链未跑完」；禁止只报已过层就算完成 |
+
+## 错法 → 改法
+
+| 错法 | 改法 |
+|------|------|
+| 没探测项目就直接跑 `npm test` | 先跑项目映射步 1-2，命令以映射表为准 |
+| L1 绿了就说「交付完成」 | 交付前必须全链 run-all + 确认层 AC 回填 |
+| 项目没有某层测试 → 该层写「通过」 | 写「未覆盖」并显式标注；未覆盖 ≠ 通过 |
+| E2E 偶发失败 → 重跑两次过了就算绿 | 定性为 flaky，记入待办，报告写明「重跑 N 次后通过」 |
+| 概率行为一次跑通即宣称达标 | 给样本/阈值证据（如 5 试跑 ≥4 过），样本数从项目约定取 |
+| 失败后自己顺手改业务代码再重跑 | 失败交给 systematic-debugging 定根因；本技能只编排 |
 
 ## 边界（分工）
 

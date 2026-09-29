@@ -8,7 +8,7 @@ description: >-
   sessions or tools, or resuming or continuing prior work on a project. Initializing a
   new project's store or migrating an old HANDOFF.md model is done only when the user
   explicitly asks. NOT for: ephemeral scratch notes, or work outside a project.
-version: 4.2.1
+version: 4.3.0
 slug: project-handoff
 displayName: project-handoff
 ---
@@ -83,3 +83,37 @@ prev/<slot>                                     # 单文件槽覆写前快照（
 - 手填日期 / 自选 id。
 - 把未决写在 `.handoff/` 之外（→ 走 `unconfirmed`，**不假装覆盖**）。
 - 手写第二份「视图 / 摘要」当交接件（→ 双源必漂）。
+
+## 最短真实样例（初始化 → 交接一轮）
+
+前置：项目根目录、`python3` 可用、已获用户显式授权建存储。
+
+```bash
+python3 scripts/handoff.py init                 # 建 .handoff/，自动生成 index
+python3 scripts/handoff.py add action --summary "[高] 修复登录重定向循环" --domain auth --src src/auth/login.ts:42
+python3 scripts/handoff.py add pitfall --summary "测试库必须先 seed，否则 check 全红" --domain test
+printf '已完成认证重构；测试待补\n' | python3 scripts/handoff.py set status --file -
+python3 scripts/handoff.py check                # 门禁：非零退出 = 不得收尾
+python3 scripts/handoff.py confirm --seed 1     # 出题（两次须同 --seed）
+python3 scripts/handoff.py confirm --seed 1 --answers "<按 view 行原样逐行>"   # 判卷，PASS 才算交接完成
+```
+
+产出（摘录）：`handoff check` 打印 `handoff check: OK` 并落一条 `log` 快照；`confirm` 判卷通过打 `PASS`——**不 PASS ＝ 交接未完成**。接收方恢复上下文只读 `references/resume.md` 相位（`view` + `next` 即可接上）。
+
+## 失败出口
+
+- **`check` 非零退出**：按输出行修——列出的即不满足的判据（槽缺失 / index 计数不一致 / id 冲突 / 日期违规 / `next` 无效）。修法只经 CLI：缺条目 `add`，多出条目 `rm`/`close`，**不手改文件**。修完重跑，`OK` 为唯一通过判据。
+- **`set` 被拒（空内容 / 骤降守卫）**：输出已说明是哪道守卫。确属要写空 → `--allow-empty`；确属大幅精简 → `--force`。两守卫之前的旧内容都已快照到 `.handoff/prev/<slot>`，可回读核对后再定。
+- **`add` 报「参数面不符」**：你用的是旧 `add --slot <槽>` 并集形——按报错打印的新形重输（`add action|pitfall|command|decision --…`，每型只收本型字段）。
+- **`confirm` 不 PASS**：答案按 `handoff view` 行文本原样抄（去行首 `- `，含末尾 `(status)`）；若两次调用 `--seed` 不同，题已换，重取题再答。
+- **无 `python3`**：询问用户安装；不可安装时降级最小 `sh` 约定（写入口纪律照守，门禁缺失须在交接里明示）。
+
+## FAQ
+
+**常见问题从哪查？** 本文「硬约束 / 反模式 / 失败出口」三节覆盖高频误用；相位细节读 `references/` 对应文件（见「何时读哪个相位」表）。
+
+**为什么不能直接编辑 `.handoff/` 里的文件？** 单一写入口是门禁的前提：日期、id、index 全由脚本管理，手改会绕过校验且 `check` 兜不住（见反模式）。
+
+**commands 槽老是空的，坏了吗？** 不是——S7 只收 AGENTS/README 里没有的非显然命令，常空正常（见「S7 `commands` 先薄」）。
+
+**MFA/多工具协作也一样吗？** 是——不假设 git/语言/工具；跨工具交接同一存储，`confirm` 的双向 read-back 就是给跨工具场景设计的。
