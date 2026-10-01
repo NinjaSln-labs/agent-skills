@@ -6,14 +6,14 @@
 
 > 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
 
-共 **89 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
+共 **90 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
 
 技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
 ## 快速开始
 
 ```bash
-npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 89 个技能
+npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 90 个技能
 ```
 
 ```bash
@@ -30,7 +30,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 
 ## 技能清单
 
-### 工程实践（22）
+### 工程实践（23）
 
 | 技能 | 说明 |
 |------|------|
@@ -44,6 +44,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作/磁盘 inode/端口占用/依赖完整性；判据钉进脚本，修复只给命令） |
 | frontend-design | 前端设计（组件/页面——两遍法+自评） |
 | git-workflow | Git 工作流（分支策略/Conventional Commits/CI 集成——37★） |
+| perf-check | 开发机只读性能体检（内存压力/CPU 负载/WSL2 资源配置；USE 骨架·判据带 basis 标注·修复只给命令） |
 | react-vite-best-practices | React + Vite 最佳实践（组件/性能/工程） |
 | systematic-debugging | 系统化调试（假设/二分/证据——代码缺陷路径） |
 | problem-handling | 问题处理单链（诊断→严重度分级→workaround/永久修复→TDD 修复→验证→无责收尾+known-error… |
