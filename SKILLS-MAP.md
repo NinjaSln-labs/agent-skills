@@ -372,7 +372,7 @@
 | `executing-plans` | 1.1.0 | `frontend-design` | 1.1.0 |  |  |
 | `git-workflow` | 1.1.1 | `grill-me` | 1.1.0 | `intelligence-collection-disciplines` | 1.1.0 |
 | `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.1.0 | `market-landscape-scan` | 1.1.1 |
-| `marketing-copywriting` | 1.1.0 | `perf-check` | 1.1.0 | `pixel-perfect` | 1.1.0 |
+| `marketing-copywriting` | 1.1.0 | `perf-check` | 1.1.1 | `pixel-perfect` | 1.1.0 |
 | `plan-grilling` | 1.1.0 | `playwright-best-practices` | 1.1.1 | `positioning-statement` | 1.1.0 |
 | `positioning-workshop` | 1.1.0 |  |  |  |  |
 | `press-release` | 1.1.1 | `prd-development` | 1.1.0 | `prd-driven-ddd` | 4.6.1 |

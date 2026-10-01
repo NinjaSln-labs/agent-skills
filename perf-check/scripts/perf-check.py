@@ -98,8 +98,9 @@ def swap_rates_kb_s(v1, v2, page_bytes=4096, interval_s=1.0):
 
 
 def swap_level(pin_kb_s, pout_kb_s):
-    """Pinned (heuristic): both directions >200 KB/s = FAIL (thrash); >100 = WARN;
-    one-directional paging of idle pages is healthy and does not fire on its own."""
+    """Pinned (heuristic): both directions >200 KB/s = FAIL (thrash); any single
+    direction >100 KB/s = WARN (including one-way bursts); rates at or below 100
+    everywhere = PASS — light paging of idle pages is normal and healthy."""
     if pin_kb_s > 200 and pout_kb_s > 200:
         return "FAIL"
     if pin_kb_s > 100 or pout_kb_s > 100:

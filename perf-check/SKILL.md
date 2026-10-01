@@ -12,7 +12,7 @@ description: >-
   CPU/memory, disk latency is suspect, or WSL2 vmmem/VM sizing needs review. NOT for:
   runnability checks (env-check), application load testing, or AI session health.
 slug: perf-check
-version: 1.1.0
+version: 1.1.1
 displayName: perf-check
 ---
 # Perf Check
