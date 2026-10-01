@@ -150,7 +150,7 @@
 | accessibility-auditor | 可及性审计（WCAG 2.1 AA——axe + 键盘/焦点）|
 | api-contract-validator | API 契约验证（OpenAPI/JSON Schema/GraphQL/消费者契约）|
 | k6-performance | 性能测试（k6——阈值/场景/自定义指标）|
-| perf-check | 开发机只读性能体检（内存压力/CPU 负载/WSL2 资源配置；USE 骨架·判据带 basis 标注·修复只给命令）|
+| perf-check | 开发机只读性能体检（内存/CPU/WSL2 资源/磁盘 IO/TOP 进程/macOS 压力；USE 骨架·basis 标注·修复只给命令）|
 | test-data-generation | 测试数据生成（Faker/工厂/构建器/种子）|
 | cicd-pipeline | CI/CD 配置（GitHub Actions/Jenkins/GitLab CI）|
 
@@ -372,7 +372,7 @@
 | `executing-plans` | 1.1.0 | `frontend-design` | 1.1.0 |  |  |
 | `git-workflow` | 1.1.1 | `grill-me` | 1.1.0 | `intelligence-collection-disciplines` | 1.1.0 |
 | `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.1.0 | `market-landscape-scan` | 1.1.1 |
-| `marketing-copywriting` | 1.1.0 | `perf-check` | 1.0.0 | `pixel-perfect` | 1.1.0 |
+| `marketing-copywriting` | 1.1.0 | `perf-check` | 1.1.0 | `pixel-perfect` | 1.1.0 |
 | `plan-grilling` | 1.1.0 | `playwright-best-practices` | 1.1.1 | `positioning-statement` | 1.1.0 |
 | `positioning-workshop` | 1.1.0 |  |  |  |  |
 | `press-release` | 1.1.1 | `prd-development` | 1.1.0 | `prd-driven-ddd` | 4.6.1 |

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""perf-check — read-only development machine performance check (v1.0: memory / CPU / WSL2).
+"""perf-check — read-only development machine performance check (memory / CPU / WSL2 /
+disk await / top processes / macOS pressure).
 
 Judgement skeleton: Brendan Gregg's USE method (Utilization / Saturation / Errors) per resource.
 Every finding carries a basis tag: "consensus" (authoritative threshold) or "heuristic"
@@ -98,7 +99,7 @@ def swap_rates_kb_s(v1, v2, page_bytes=4096, interval_s=1.0):
 
 def swap_level(pin_kb_s, pout_kb_s):
     """Pinned (heuristic): both directions >200 KB/s = FAIL (thrash); >100 = WARN;
-    one-directional paging is healthy (does not fire)."""
+    one-directional paging of idle pages is healthy and does not fire on its own."""
     if pin_kb_s > 200 and pout_kb_s > 200:
         return "FAIL"
     if pin_kb_s > 100 or pout_kb_s > 100:
@@ -107,9 +108,10 @@ def swap_level(pin_kb_s, pout_kb_s):
 
 
 def load_level(load1, cores):
-    """Pinned (consensus): load/cores >1.0 = WARN (saturated), >0.7 = INFO (watch)."""
+    """Pinned (consensus): load/cores >1.0 = WARN (saturated), >0.7 = INFO (watch).
+    Degenerate input -> None (caller emits SKIP)."""
     if not cores or load1 is None:
-        return "INFO"
+        return None
     r = load1 / cores
     if r > 1.0:
         return "WARN"
@@ -178,6 +180,17 @@ def wslconfig_findings(conf: dict):
 
 # ---------------------------------------------------------------- runtime probes
 
+def run_cmd(argv, timeout=10):
+    try:
+        import subprocess
+        r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
+        return r.returncode, (r.stdout or "") + (r.stderr or "")
+    except FileNotFoundError:
+        return None, ""
+    except subprocess.TimeoutExpired:
+        return None, "timeout"
+
+
 def read_text(path):
     try:
         return open(path, encoding="utf-8", errors="replace").read()
@@ -227,14 +240,19 @@ def probe_cpu(env, timeout, sample_s):
     try:
         l1, _, l15 = os.getloadavg()
         lvl = load_level(l1, cores)
-        out.append(fnd("cpu.load", lvl if lvl != "INFO" else "INFO",
-                       f"load1={l1:.2f} load15={l15:.2f} over {cores} cores → {lvl}",
-                       [f"ratio(load1/cores)={l1 / cores:.2f}"],
-                       ("Linux load includes D-state (IO) tasks: load high + CPU% low ≈ storage "
-                        "bottleneck, cross-check disk/IO before blaming CPU.") if lvl == "WARN" else None,
-                       "consensus"))
+        if lvl is None:
+            out.append(fnd("cpu.load", "SKIP", "load gauge unavailable (no cores/loadavg)",
+                           [], None, "n/a"))
+        else:
+            out.append(fnd("cpu.load", lvl,
+                           f"load1={l1:.2f} load15={l15:.2f} over {cores} cores → {lvl}",
+                           [f"ratio(load1/cores)={l1 / cores:.2f}"],
+                           ("Linux load includes D-state (IO) tasks: load high + CPU% low ≈ storage "
+                            "bottleneck, cross-check disk/IO before blaming CPU.") if lvl == "WARN" else None,
+                           "consensus"))
     except OSError:
-        pass
+        out.append(fnd("cpu.load", "SKIP", "loadavg unavailable on this platform",
+                     [], None, "n/a"))
     return out
 
 
@@ -310,9 +328,8 @@ def probe_wsl2(timeout):
             break
     if not cfg_path:
         out.append(fnd("wsl2.no-wslconfig", "INFO",
-                       ".wslconfig not found — defaults in effect "
-                       "(memory=min(50% host RAM, 8GB), swap=25% of memory)",
-                       ["source: Microsoft WSL docs, learn.microsoft.com/windows/wsl/wsl-config"],
+                       ".wslconfig not found — official defaults in effect (see references/checks-linux-wsl.md)",
+                       ["single source: learn.microsoft.com/windows/wsl/wsl-config via references"],
                        "Set memory=/processors= in %UserProfile%\\.wslconfig to bound the VM "
                        "(apply via `wsl --shutdown` from Windows — user action).", "consensus"))
     else:
@@ -325,6 +342,166 @@ def probe_wsl2(timeout):
         for fid, level, title, hint in wslconfig_findings(conf):
             out.append(fnd(fid, level, title, [], hint, "heuristic"))
     return out
+
+
+
+
+# ---------------------------------------------------------------- 1.1: disk await / top processes / macOS vm_stat (pure helpers)
+
+def parse_diskstats(text: str) -> dict:
+    """/proc/diskstats -> {device: (reads, read_ms, writes, write_ms)} for whole-disk names
+    (loop/ram/dm– devices filtered out)."""
+    out = {}
+    for line in (text or "").splitlines():
+        parts = line.split()
+        if len(parts) < 14:
+            continue
+        dev = parts[2]
+        if not re.match(r"^(sd[a-z]+|nvme\d+n\d+|vd[a-z]+|hd[a-z]+|xvd[a-z]+)$", dev):
+            continue
+        out[dev] = (int(parts[3]), int(parts[6]), int(parts[7]), int(parts[10]))
+    return out
+
+
+def device_await(d1, d2, interval_s):
+    """Two samples -> {dev: (await_ms, iops)}; devices without completed IO in window dropped."""
+    out = {}
+    if interval_s <= 0:
+        return out
+    for dev, (r1, rt1, w1, wt1) in d1.items():
+        if dev not in d2:
+            continue
+        r2, rt2, w2, wt2 = d2[dev]
+        ops = (r2 - r1) + (w2 - w1)
+        ms = (rt2 - rt1) + (wt2 - wt1)
+        if ops <= 0:
+            continue
+        out[dev] = (round(ms / ops, 1), round(ops / interval_s, 1))
+    return out
+
+
+def await_level(await_ms):
+    """Pinned (heuristic): >10ms = WARN, >50ms = FAIL; below silent (PASS)."""
+    if await_ms is None or await_ms <= 0:
+        return "PASS"
+    if await_ms > 50:
+        return "FAIL"
+    if await_ms > 10:
+        return "WARN"
+    return "PASS"
+
+
+def parse_vm_stat(text: str):
+    """macOS vm_stat output -> {"free": n, "compressor": n, "swapins": n, "swapouts": n, "page_size": 4096}."""
+    d = {"page_size": 4096}
+    m = re.search(r"page size of (\d+) bytes", text or "")
+    if m:
+        d["page_size"] = int(m.group(1))
+
+    def pages(label):
+        m = re.search(re.escape(label) + r":\s+(\d+)", text or "")
+        return int(m.group(1)) if m else None
+    d["free"] = pages("Pages free")
+    d["compressor"] = pages("Pages occupied by compressor")
+    d["swapins"] = pages("Swapins")
+    d["swapouts"] = pages("Swapouts")
+    return d
+
+
+def macos_mem_level(free, compressor, total_pages):
+    """macOS pressure heuristic: compressor >20% of physical pages = WARN (free-low is normal,
+    never a finding by itself). None inputs -> None (caller SKIPs)."""
+    if free is None or compressor is None or not total_pages:
+        return None
+    return "WARN" if compressor / total_pages > 0.20 else "PASS"
+
+
+
+def probe_disk_await(sample_s):
+    if not os.path.exists("/proc/diskstats"):
+        return [fnd("disk-await.not-linux", "SKIP",
+                    "Disk await gauge needs /proc/diskstats — skipped on this platform",
+                    [], "macOS reading (BSD iostat) is deferred; see references/checks-macos.md", "n/a")]
+    d1 = parse_diskstats(read_text("/proc/diskstats"))
+    time.sleep(sample_s)
+    d2 = parse_diskstats(read_text("/proc/diskstats"))
+    await_map = device_await(d1, d2, sample_s)
+    if not await_map:
+        return [fnd("disk-await.idle", "PASS", "No completed disk IO in the sampling window — await gauge quiet",
+                     [], None, "heuristic")]
+    out = []
+    for dev, (await_ms, iops) in sorted(await_map.items(), key=lambda kv: -kv[1][0])[:3]:
+        lvl = await_level(await_ms)
+        out.append(fnd(f"disk-await.{dev}", lvl,
+                       f"{dev}: await {await_ms}ms @ {iops} IOPS → {lvl}",
+                       [f"ops-based await over {sample_s}s sample (queue time included)"],
+                       ("Per-device await high with low CPU load points at storage; move heavy IO off "
+                        "this device or check for competing jobs.") if lvl in ("WARN", "FAIL") else None,
+                       "heuristic"))
+    return out
+
+
+def probe_top_processes(timeout):
+    rc, outp = run_cmd(["ps", "-eo", "pcpu,pmem,comm", "--sort=-pcpu"], timeout=timeout)
+    if rc != 0 or not outp.strip():
+        rc, outp = run_cmd(["ps", "-eo", "pcpu,pmem,comm"], timeout=timeout)
+        if rc != 0 or not outp.strip():
+            return [fnd("top-proc.unavailable", "SKIP", "ps snapshot unavailable",
+                        [], None, "n/a")]
+    rows = []
+    for line in outp.strip().splitlines()[1:]:
+        parts = line.split(None, 2)
+        if len(parts) == 3:
+            try:
+                rows.append((float(parts[0]), float(parts[1]), parts[2]))
+            except ValueError:
+                continue
+    if not rows:
+        return [fnd("top-proc.unavailable", "SKIP", "ps snapshot unparseable", [], None, "n/a")]
+    top_cpu = sorted(rows, key=lambda r: -r[0])[:3]
+    top_mem = sorted(rows, key=lambda r: -r[1])[:3]
+    ev = ["top cpu: " + "; ".join(f"{c}% {n}" for c, m, n in top_cpu),
+          "top mem: " + "; ".join(f"{m}% {n}" for c, m, n in top_mem)]
+    heavy = [r for r in rows if r[1] > 70]
+    return [fnd("top-proc.snapshot", "WARN" if heavy else "INFO",
+                ("A process holds >70% of memory: " + ", ".join(sorted({n for _, m, n in heavy})))
+                if heavy else f"process snapshot ({len(rows)} tasks)",
+                ev,
+                "Consider restarting/trimming the heavy process (your call — never killed here)."
+                if heavy else None,
+                "n/a")]
+
+
+def probe_macos_mem(sample_s):
+    rc_sys, sysctl_out = run_cmd(["sysctl", "-n", "hw.memsize"], timeout=5)
+    if rc_sys != 0 or not sysctl_out.strip():
+        return [fnd("macos-mem.not-macos", "SKIP",
+                    "macOS memory gauge needs sysctl — skipped", [], None, "n/a")]
+    v1 = parse_vm_stat(run_cmd(["vm_stat"], timeout=5)[1])
+    time.sleep(sample_s)
+    v2 = parse_vm_stat(run_cmd(["vm_stat"], timeout=5)[1])
+    page = v1.get("page_size") or 4096
+    free, comp = v1.get("free"), v1.get("compressor")
+    try:
+        total_pages = int(sysctl_out.strip()) // page
+    except ValueError:
+        total_pages = None
+    lvl = macos_mem_level(free, comp, total_pages)
+    if lvl is None:
+        return [fnd("macos-mem.unparseable", "SKIP", "vm_stat output unparseable", [], None, "n/a")]
+    comp_pct = 100.0 * comp / total_pages if comp is not None and total_pages else None
+    d_in = (v2.get("swapins") or 0) - (v1.get("swapins") or 0)
+    d_out = (v2.get("swapouts") or 0) - (v1.get("swapouts") or 0)
+    ev = [f"free={free}p compressor={comp}p ({comp_pct:.0f}% of physical)" if comp_pct is not None else "vm_stat partial",
+          f"swap delta in/out over {sample_s}s: {d_in}p/{d_out}p"]
+    return [fnd("macos-mem.pressure", lvl,
+                f"macOS memory pressure → {lvl} (compressor {comp_pct:.0f}%)" if comp_pct is not None
+                else f"macOS memory pressure → {lvl}",
+                ev,
+                ("Pressure is compiler/jetsam territory: trim memory-heavy apps "
+                 "(free-low is normal on macOS, only compressor/swap speed convict).")
+                if lvl == "WARN" else None,
+                "heuristic")]
 
 
 # ---------------------------------------------------------------- selftest
@@ -368,7 +545,7 @@ def selftest():
 
     # load
     ok.append(load_level(8.0, 4) == "WARN" and load_level(2.9, 4) == "INFO"
-              and load_level(1.0, 4) == "PASS" and load_level(None, None) == "INFO")
+              and load_level(1.0, 4) == "PASS" and load_level(None, None) is None)
 
     # cgroup cpu.max
     ok.append(parse_cpu_max("max 100000\n") is None)         # decoy: unlimited
@@ -377,6 +554,23 @@ def selftest():
     # .wslconfig
     conf = parse_wslconfig("[wsl2]\nmemory=8GB # cap\nprocessors=4\n[experimental]\nautoMemoryReclaim=gradual\n")
     ok.append(conf["wsl2"]["memory"] == "8GB" and conf["wsl2"]["processors"] == "4")
+    # diskstats await (field indices 3/6/7/10 per proc(5); true positive + decoys)
+    ds1 = parse_diskstats("  8       0 sda 100 0 2000 80 50 0 1000 40 0 200 500 0 0 0 0\n"
+                          "   7       0 loop0 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n")
+    ok.append(set(ds1) == {"sda"} and ds1["sda"] == (100, 80, 50, 40))   # loop filtered, indices right
+    ds2 = parse_diskstats("  8       0 sda 200 0 4000 160 150 0 3000 240 0 400 900 0 0 0 0\n")
+    am = device_await(ds1, ds2, 2.0)
+    ok.append(am["sda"] == (1.4, 100.0))                                 # 280ms/200ops, 200ops/2s
+    ok.append(await_level(7.5) == "PASS" and await_level(15.0) == "WARN"
+              and await_level(60.0) == "FAIL" and await_level(0.0) == "PASS")
+    # macOS vm_stat
+    vs = parse_vm_stat("Mammary page size of 4096 bytes\nPages free: 99.\n"
+                       "Pages occupied by compressor: 500.\nSwapins: 10.\nSwapouts: 20.\n")
+    ok.append(vs["page_size"] == 4096 and vs["free"] == 99 and vs["compressor"] == 500
+              and vs["swapins"] == 10)
+    ok.append(macos_mem_level(99, 500, 20000) == "PASS")                 # decoy: 2.5% compressor is quiet
+    ok.append(macos_mem_level(99, 5000, 20000) == "WARN" and macos_mem_level(99, 1000, 20000) == "PASS")
+    ok.append(macos_mem_level(None, 5000, 20000) is None)                # decoy: unparseable -> SKIP
     ok.append(parse_size_gb("8GB") == 8.0 and parse_size_gb("512MB") == 0.5
               and parse_size_gb("1TB") == 1024.0 and parse_size_gb("bogus") is None)
     fired = {f[0] for f in wslconfig_findings(conf)}
@@ -412,6 +606,10 @@ def main(argv=None):
     findings.extend(probe_memory(env, args.sample, args.sample))
     findings.extend(probe_cpu(env, args.sample, args.sample))
     findings.extend(probe_wsl2(args.sample))
+    findings.extend(probe_disk_await(args.sample))
+    findings.extend(probe_top_processes(args.sample))
+    if sys.platform == "darwin":
+        findings.extend(probe_macos_mem(args.sample))
 
     for f in findings:
         f.setdefault("evidence", [])
