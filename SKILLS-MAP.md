@@ -374,7 +374,7 @@
 | `positioning-workshop` | 1.1.0 | `prd-development` | 1.1.0 | `prd-driven-ddd` | 4.6.1 |
 | `press-release` | 1.1.1 | `problem-handling` | 1.1.0 |  |  |
 | `problem-statement` | 1.1.0 | `product-doc-audit` | 1.1.1 | `product-launch` | 1.1.1 |
-| `product-marketing` | 1.1.0 | `project-handoff` | 4.3.0 |  |  |
+| `product-marketing` | 1.1.0 | `project-handoff` | 4.3.1 |  |  |
 | `proto-persona` | 1.1.1 | `react-vite-best-practices` | 1.1.1 | `roadmap-planning` | 1.1.1 |
 | `secrets-scan` | 1.1.1 | `security-scan` | 1.1.0 | `session-health` | 1.0.3 |
 | `skill-description-audit` | 1.12.0 | `skill-eval` | 1.2.0 | `stage-gate` | 1.1.1 |

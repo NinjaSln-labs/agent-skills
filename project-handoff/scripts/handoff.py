@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import fnmatch
 import glob
+import io
 import json
 import os
 import random
@@ -48,17 +49,33 @@ SCOPE_HEADER = ("# 对账范围（P3）：未决项可能落在哪（一行一�
 # 实得 dest，任一侧被单独改动即当场报错（不做"看起来能用"的沉默）。
 ADD_KINDS: dict[str, dict] = {
     "action":   {"slot": "actions",   "part": "domain",
-                 "fields": ["summary", "domain", "status", "blockedBy", "topic", "src", "detail"]},
+                 "fields": ["summary", "domain", "status", "blockedBy", "topic", "src", "detail"],
+                 "live_status": {"open", "blocked"}},
     "pitfall":  {"slot": "pitfalls",  "part": "domain",
-                 "fields": ["summary", "domain", "status", "blockedBy", "topic", "src", "detail"]},
+                 "fields": ["summary", "domain", "status", "blockedBy", "topic", "src", "detail"],
+                 "live_status": {"open", "fixed", "blocked"}},
     "command":  {"slot": "commands",  "part": "purpose",
-                 "fields": ["summary", "purpose", "status", "blockedBy", "topic", "src", "detail"]},
+                 "fields": ["summary", "purpose", "status", "blockedBy", "topic", "src", "detail"],
+                 "live_status": {"open", "blocked"}},
     "decision": {"slot": "decisions", "part": None,
                  "fields": ["title", "body", "status", "supersedes", "domain", "topic"]},
 }
 KIND2SLOT = {k: v["slot"] for k, v in ADD_KINDS.items()}
 SLOT2KIND = {v: k for k, v in KIND2SLOT.items()}
 SLOT_FIELDS = {v["slot"]: set(v["fields"]) for v in ADD_KINDS.values()}
+
+
+def live_status_of(kind: str) -> set[str]:
+    """该型条目在 live 区的 status 值闭集（缺省视为 open）。closed 不在其中：
+    关闭唯一入口＝`close --outcome`（edit/add 拒收，t000138——否则旁路写入会造出
+    无 closed/outcome、不迁 closed/ 的半关行，并混进补位池）。"""
+    return ADD_KINDS[kind].get("live_status", set())
+
+
+def guard_status(kind: str, val) -> None:
+    if val is not None and val != "" and val not in live_status_of(kind):
+        die(f"status {val!r} 非法（该型合法：{sorted(live_status_of(kind))}，缺省=open）；"
+            f"关闭唯一入口＝close --outcome")
 
 
 UNCONF_FIELDS = {"summary", "src", "detail"}      # 候选行落盘面（`--ref` 存成 src）
@@ -386,6 +403,10 @@ def cmd_check(st: Store, no_log: bool = False) -> int:
             stem = Path(str(r.get("_file"))).stem
             if re.fullmatch(r"[tpducq]", stem) and typ != stem:
                 errs.append(f"{loc}: closed 文件 {stem}.jsonl 与 id 前缀 {typ} 不符")
+        knd = SLOT2KIND.get(r.get("_slot")) if r.get("_slot") in ENTRY_SLOTS else None
+        if knd and (r.get("status") or "open") not in live_status_of(knd):
+            errs.append(f"{loc}: status 非法 {r.get('status')!r}"
+                        f"（该型合法 {sorted(live_status_of(knd))}；closed 须经 close 流程）")
         for k in r:
             if k in ("_slot", "_file"):
                 continue
@@ -504,6 +525,7 @@ def cmd_add(st: Store, kind: str, f: dict) -> int:
     else:
         if not f.get("summary"):
             die(f"add {kind}: 需要 --summary")
+        guard_status(kind, f.get("status"))
         e = {"id": st.allocate(ENTRY_SLOTS[slot]["type"]), "created": today(),
              "summary": norm(f["summary"])}
         for k in ("status", "blockedBy", "topic", "src", "detail"):
@@ -541,16 +563,18 @@ def _age_days(created: str) -> int:
 
 
 def refill_pool(st: Store):
-    """补位池 = live actions（排除 blocked）。返回 (有序候选, 池大小, blocked 数)。
+    """补位池 = live actions（status 非 live 闭集者一律排除）。返回 (有序候选, 池大小, 排除数)。
 
     排序键全序确定：(有效档, created↑, id↑)。有效档 = 基础档 − 超期升档数（下限 0）；
     基础档取 summary 前缀 [高]=0 / [中]·无前缀=1 / [低]=2；超期每满 REFILL_STEP_DAYS 天升一档。
     """
     rows, blocked = [], 0
+    ls = live_status_of("action")
     for r in st.load_live():
         if r.get("_slot") != "actions":
             continue
-        if r.get("status") == "blocked":
+        if (r.get("status") or "open") != "open":
+            # 仅 open 入池（t000138：只精确排 blocked 会放进 status=closed 的半关行；blocked＝等待中也不补位）
             blocked += 1
             continue
         m = PRIO_RE.match(r.get("summary", ""))
@@ -566,7 +590,7 @@ def refill_pool(st: Store):
 def refill_pick(st: Store):
     """按策略给出补位目标：返回 (id, 解释)。池空 → ('', 解释)。"""
     rows, n, blocked = refill_pool(st)
-    why = f"池 {n} 条" + (f"（排除 blocked {blocked}）" if blocked else "")
+    why = f"池 {n} 条" + (f"（排除非 open {blocked}）" if blocked else "")
     if not rows:
         return "", why + "·无可补"
     _, r, base, steps, age = rows[0]
@@ -601,7 +625,7 @@ def cmd_close(st: Store, a) -> int:
             if nid:
                 st.set_next(nid)
                 print(f"handoff next: 自动补位 → {nid}｜{why}")
-                print(f"  策略：actions 池 · 排除 blocked · 键(有效档, created↑, id↑) · "
+                print(f"  策略：actions 池 · 排除非 open · 键(有效档, created↑, id↑) · "
                       f"基础档 [高]0/[中]·无1/[低]2 · 每满 {REFILL_STEP_DAYS} 天升一档")
             else:
                 print(f"handoff next: 已清空（{why}）")
@@ -1130,6 +1154,10 @@ def cmd_edit(st: Store, a) -> int:
     allowed = editable_fields(slot)
     if bad := set(upd) - allowed:
         die(f"edit: {slot} 条目不接受 {sorted(bad)}（该型可改＝{sorted(allowed)}）")
+    if "status" in upd:                                 # t000138：closed 只能走 close 流程
+        kind = SLOT2KIND.get(slot)
+        if kind:
+            guard_status(kind, upd["status"])
     pkey = ENTRY_SLOTS[slot]["part"] if slot in ENTRY_SLOTS else None
     if pkey in upd:                                     # domain/purpose → 换分区文件
         newpart = upd.pop(pkey)
@@ -1396,6 +1424,82 @@ def _reject_legacy_form(argv: list[str]) -> None:
     die(f"add --slot {val or '<槽>'} 已废（该面按型不消费的字段会静默丢弃）：{tip}", 2)
 
 
+def cmd_selftest(st: Store, a) -> int:
+    """双向夹具（t000138）：闭集守卫的判据全部落在**退出码＋落盘行**上，不留给现场抉择。
+
+    在临时 store 里跑真 CLI（main 递归、--store 指向 tmp），七步覆盖：
+    edit/add 对 closed 及表外值的拒收（负向）、pitfall fixed 与 blocked 的放行（正向）、
+    脏行混入后 refill 出池＋check FAIL（机检兜底）、close 两步修复后 check 复绿。
+    """
+    import tempfile
+    fails: list[str] = []
+
+    cur_store = [""]          # run() 的目标 store（--store 须置于子命令前，全局 flag）
+    def run(*argv):
+        buf = io.StringIO()
+        err = io.StringIO()
+        so, se = sys.stdout, sys.stderr
+        rc = 0
+        sys.stdout, sys.stderr = buf, err
+        try:
+            rc = main(["--store", cur_store[0], *argv]) or 0
+        except SystemExit as e:
+            rc = e.code if isinstance(e.code, int) else 1
+        finally:
+            sys.stdout, sys.stderr = so, se
+        return rc, buf.getvalue() + err.getvalue()
+
+    def rows(slot: str) -> list[dict]:
+        return [r for r in Store(Path(cur_store[0])).load_live() if r.get("_slot") == slot]
+
+    def expect(name: str, cond: bool, detail: str = ""):
+        print(f"  {'ok' if cond else 'FAIL'}  {name}" + (f"（{detail}）" if detail and not cond else ""))
+        if not cond:
+            fails.append(name)
+
+    with tempfile.TemporaryDirectory(prefix="handoff-selftest-") as tmp:
+        cur_store[0] = str(Path(tmp) / "h")
+        run("init")
+        rc, _ = run("add", "action", "--summary", "s1")
+        expect("add action 退出 0", rc == 0)
+        aid = rows("actions")[0]["id"] if rows("actions") else ""
+        rc, out = run("edit", aid, "--status", "closed")
+        expect("edit --status closed 拒收", rc != 0 and "close --outcome" in out)
+        rc, _ = run("edit", aid, "--status", "blocked")
+        expect("edit --status blocked 放行", rc == 0 and rows("actions")[0].get("status") == "blocked")
+        rc, _ = run("add", "pitfall", "--summary", "p1", "--status", "fixed")
+        expect("add pitfall --status fixed 放行", rc == 0)
+        rc, _ = run("add", "action", "--summary", "s2", "--status", "done")
+        expect("add action --status done 拒收", rc != 0)
+
+        # 脏行（status=closed）直写 live：refill 不选 + check FAIL
+        dirty = rows("actions")[0]
+        f = Path(dirty["_file"])
+        lines = [ln for ln in f.read_text(encoding="utf-8").splitlines() if ln.strip()]
+        kept = [ln for ln in lines if json.loads(ln).get("id") != dirty["id"]]
+        kept.append(json.dumps({**{k: v for k, v in dirty.items() if not k.startswith("_")},
+                                "status": "closed"}, ensure_ascii=False))
+        f.write_text("\n".join(kept) + "\n", encoding="utf-8")
+        nid, _ = refill_pick(Store(Path(cur_store[0])))
+        expect("refill_pick 不选 status=closed 行", nid != dirty["id"])
+        rc, out = run("check", "--no-log")
+        expect("check 对 status=closed FAIL", rc != 0 and "status 非法" in out and "'closed'" in out)
+
+        # 两步修复：edit 回 open → close，check 复绿
+        run("edit", dirty["id"], "--status", "open")
+        run("close", dirty["id"], "--outcome", "fixed")
+        rc, _ = run("check", "--no-log")
+        expect("两步修复后 check 复绿", rc == 0)
+        closed_rows = read_jsonl(Path(cur_store[0]) / "closed" / "t.jsonl")
+        expect("close 行带 closed+outcome", any(r.get("id") == dirty["id"] and r.get("closed") and r.get("outcome") for r in closed_rows))
+
+    if fails:
+        print(f"handoff selftest: FAIL（{len(fails)} 项：{', '.join(fails)}）")
+        return 1
+    print("handoff selftest: PASS")
+    return 0
+
+
 def main(argv=None) -> int:
     _reject_legacy_form(list(sys.argv[1:] if argv is None else argv))
     ap = argparse.ArgumentParser(prog="handoff", description="项目交接存储 CLI")
@@ -1404,6 +1508,7 @@ def main(argv=None) -> int:
 
     sub.add_parser("index")
     p = sub.add_parser("check"); p.add_argument("--no-log", action="store_true")
+    p = sub.add_parser("selftest", help="双向夹具：status 闭集守卫自证（t000138）")
     p = sub.add_parser("log"); p.add_argument("--stats", action="store_true"); p.add_argument("--tail", type=int, default=0)
     p = sub.add_parser("init"); p.add_argument("--force", action="store_true")
 
@@ -1464,6 +1569,7 @@ def main(argv=None) -> int:
         "index": lambda: (st.write_index(), print(f"handoff index: ok（生成 {st.d / 'index'}）"), 0)[2],
         "init": lambda: cmd_init(st, a),
         "check": lambda: cmd_check(st, a.no_log),
+        "selftest": lambda: cmd_selftest(st, a),
         "log": lambda: cmd_log(st, a),
         "add": lambda: cmd_add(st, a.kind, {k: getattr(a, k) for k in ADD_KINDS[a.kind]["fields"]}),
         "set": lambda: cmd_set(st, a),

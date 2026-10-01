@@ -8,7 +8,7 @@ description: >-
   sessions or tools, or resuming or continuing prior work on a project. Initializing a
   new project's store or migrating an old HANDOFF.md model is done only when the user
   explicitly asks. NOT for: ephemeral scratch notes, or work outside a project.
-version: 4.3.0
+version: 4.3.1
 slug: project-handoff
 displayName: project-handoff
 ---
@@ -49,14 +49,15 @@ prev/<slot>                                     # 单文件槽覆写前快照（
 
 ## CLI（`scripts/handoff.py`，python3）
 
-`init` · `index` · `check` · `log` · `add` · `set` · `edit` · `rm` · `close` · `next` · `unconfirmed` · `scope` · `confirm` · `filter` · `view` · `export` · `import`。
+`init` · `index` · `check` · `selftest` · `log` · `add` · `set` · `edit` · `rm` · `close` · `next` · `unconfirmed` · `scope` · `confirm` · `filter` · `view` · `export` · `import`。
 
 - **`check` ＝ 相位门禁**：9 槽齐 / `index` ↔ 文件计数一致 / id 全局唯一 / 日期规则（`created ≤ closed ≤ today`、禁未来日）/ `next` 有效；**不过即非零退出，相位不得前进**。
 - **`add` / `close` ＝ 唯一写入口**；**日期脚本盖、id 脚本分配**（LLM 无从编造）。**`add` 参数面按型分列**：`handoff add action|pitfall|command|decision --…`，每型只收本型字段——旧 `add --slot <槽>` 的**并集面**会静默丢弃本型不消费的键，现**硬报错并印新形**；`edit` 亦按条目型校验可改面（不符即报错）。
-- **`next` 自动补位**：`close`（含 `unconfirmed resolve` 的内部关闭）关掉的**正是当前 `next`** → 按策略补下一条（`--no-refill` 关；`handoff next --auto` 人工触发同一策略；`next <id>` 随时覆盖补位结果）。策略**确定性可复算**：候选池＝live `actions`（排除 `status=blocked`）；排序键 `(有效档, created↑, id↑)`；基础档 `[高]`0 / `[中]`·无前缀1 / `[低]`2（前缀亦认全角 `【高】` 与 `high`/`med`/`mid`/`medium`/`low`，大小写不敏感）；**时间维**＝超期每满 30 天升一档（下限 0，故陈年 `[低]` 会越过新鲜 `[高]`）。补位/留空均**打印依据**（P3 不静默）。空池或全 blocked：`close` 留空并说明，`next --auto` **拒绝且不写指针**。
+- **`next` 自动补位**：`close`（含 `unconfirmed resolve` 的内部关闭）关掉的**正是当前 `next`** → 按策略补下一条（`--no-refill` 关；`handoff next --auto` 人工触发同一策略；`next <id>` 随时覆盖补位结果）。策略**确定性可复算**：候选池＝live `actions`（**仅 `status=open`／缺省入池**；blocked＝等待中、其余值非法均排除）；排序键 `(有效档, created↑, id↑)`；基础档 `[高]`0 / `[中]`·无前缀1 / `[低]`2（前缀亦认全角 `【高】` 与 `high`/`med`/`mid`/`medium`/`low`，大小写不敏感）；**时间维**＝超期每满 30 天升一档（下限 0，故陈年 `[低]` 会越过新鲜 `[高]`）。补位/留空均**打印依据**（P3 不静默）。空池或全 blocked：`close` 留空并说明，`next --auto` **拒绝且不写指针**。
 - **S7 `commands` 先薄**：只收 `AGENTS` / `README` 里**没有**的非显然命令 ＋ 环境例外（可推导的**不重复记**）→ **常空正常**。每次门禁落一条 `log` 快照（`handoff log --stats`），供日后据数据决定是否保留该槽。
 - **`set <status|summary|exit>`**：单文件槽写入口（`add` 只覆盖条目槽 + `decisions`）；**单文件槽唯一写路径**。**整槽覆写、无追加语义**——想改一行也必须先读回全量再写。两道守卫：空内容拒写（`--allow-empty` 才放行）；旧内容 >200 字符且新内容 <60% 亦拒写（`--force` 才放行，防「把整槽覆写当局部编辑」清空槽位）。**快照先于全部守卫**：只要旧槽非空，无论这次写被放行、被骤降守卫拒、还是被空内容守卫拒，旧内容都已落到 `.handoff/prev/<slot>` 可回读。
 - **纠错入口**：`edit <id>`（改安全字段；`id`/`created`/`closed` 不可改）与 `rm <id>`（→ `.handoff/trash/` + 记 `void` 防 id 复用 + 引用守卫）——错误**不经手搓**，免 `export→改→import --force` 全量重写。
+- **`status` 值域按型闭集**（`add`/`edit` 同一守卫，t000138）：`action`/`command`＝`open`|`blocked`；`pitfall`＝`open`|`fixed`|`blocked`；缺省（不传或清空）＝`open`。**`closed` 不是可写值**——关闭唯一入口＝`close --outcome`（edit/add 传 `closed` 或表外值即硬报错）；`check` 对 live 行同闭集硬判；补位池**仅 open 入池**（blocked＝等待中、其余＝非法值，均不补位）。`selftest` ＝ 闭集守卫的双向夹具自证（临时 store 内真 CLI 跑通 9 断言）。
 - **`confirm` ＝ 机检 read-back**：脚本出题、脚本判卷；**不 `PASS` ＝ 交接未完成**。题面**每次调用重新随机抽**——「先出题、后作答」必须两次带**同一 `--seed`**，否则题已换而答案错位。抽查题按**视图行文本**判分（`[id] topic summary`，非 open 条目含末尾 `  (status)`），照 `handoff view` 行原样抄（去掉行首 `- `）即可，勿只抄 summary。
 - **`view`**：全局视图（认识整体），默认 stdout；`--save` 存盘（默认 `<项目根>/handoff-view.md`），属**用户所有、非权威、不 `check`**。
 - 无 `python3` → **询问用户安装**，或降级最小 `sh`。
@@ -105,6 +106,7 @@ python3 scripts/handoff.py confirm --seed 1 --answers "<按 view 行原样逐行
 - **`check` 非零退出**：按输出行修——列出的即不满足的判据（槽缺失 / index 计数不一致 / id 冲突 / 日期违规 / `next` 无效）。修法只经 CLI：缺条目 `add`，多出条目 `rm`/`close`，**不手改文件**。修完重跑，`OK` 为唯一通过判据。
 - **`set` 被拒（空内容 / 骤降守卫）**：输出已说明是哪道守卫。确属要写空 → `--allow-empty`；确属大幅精简 → `--force`。两守卫之前的旧内容都已快照到 `.handoff/prev/<slot>`，可回读核对后再定。
 - **`add` 报「参数面不符」**：你用的是旧 `add --slot <槽>` 并集形——按报错打印的新形重输（`add action|pitfall|command|decision --…`，每型只收本型字段）。
+- **`add`/`edit` 报「status 非法」**：值域按型闭集（`action`/`command`＝`open|blocked`，`pitfall`＝`open|fixed|blocked`）；要关闭条目走 `close --outcome`，不要把 `closed` 当状态写。
 - **`confirm` 不 PASS**：答案按 `handoff view` 行文本原样抄（去行首 `- `，含末尾 `(status)`）；若两次调用 `--seed` 不同，题已换，重取题再答。
 - **无 `python3`**：询问用户安装；不可安装时降级最小 `sh` 约定（写入口纪律照守，门禁缺失须在交接里明示）。
 
