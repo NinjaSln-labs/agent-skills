@@ -6,14 +6,14 @@
 
 > 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
 
-共 **88 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
+共 **89 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
 
 技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
 ## 快速开始
 
 ```bash
-npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 88 个技能
+npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 89 个技能
 ```
 
 ```bash
@@ -30,7 +30,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 
 ## 技能清单
 
-### 工程实践（21）
+### 工程实践（22）
 
 | 技能 | 说明 |
 |------|------|
@@ -41,6 +41,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | codebase-design | 深度模块设计（接口/接缝/可测试性——mattpocock） |
 | deep-codebase-analysis | 代码库全面分析（架构/通信/模式/约定/业务流/状态/错误处理 7 维） |
 | electron-best-practices | Electron 最佳实践（主/渲染进程/安全/打包） |
+| env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作；判据钉进脚本，修复只给命令） |
 | frontend-design | 前端设计（组件/页面——两遍法+自评） |
 | git-workflow | Git 工作流（分支策略/Conventional Commits/CI 集成——37★） |
 | react-vite-best-practices | React + Vite 最佳实践（组件/性能/工程） |

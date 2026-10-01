@@ -1,7 +1,7 @@
-# 技能库全景图（88 技能——产品 0-1 全阶段模式）
+# 技能库全景图（89 技能——产品 0-1 全阶段模式）
 
 - 日期：2026-08-16 · **新增 6 技能（spec-kit 阶段门禁族：stage-gate / stage-spec / decision-log / coverage-matrix / audit-item / skill-eval——需求规格 `.scratch/neonforge-v1/skill-requirements-20260816.md`）** · 2026-08-13 全量审计 81/81 合规（新技能接入后按审计流程补 DESCRIPTION-AUDIT）
-- 覆盖：本仓库 `agent-skills` 的 88 个技能（可安装到 `~/.agents/skills/<name>`）
+- 覆盖：本仓库 `agent-skills` 的 89 个技能（可安装到 `~/.agents/skills/<name>`）
 - 模式：**产品 0-1 全生命周期**（发现 → 定义 → 设计 → 交付 → 上线 → 运营）+ 贯穿层（质量/工程/协作/技能基建）
 
 ---
@@ -108,6 +108,7 @@
 | typescript-best-practices | TS 最佳实践（类型/模式/工程规范）|
 | react-vite-best-practices | React + Vite 最佳实践（组件/性能/工程）|
 | electron-best-practices | Electron 最佳实践（主/渲染进程/安全/打包）|
+| env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作；判据钉进脚本，修复只给命令）|
 
 #### 3.5 视觉设计（6）
 
@@ -233,14 +234,14 @@
 | ⑤ 上线 | 1 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
 | 贯穿层 | 16 | 审计 4 + 安全 4 + 规则 2 + 协作 6 |
-| **合计** | **88** ✓ | 全部唯一分类（已核对无重复/无遗漏）|
+| **合计** | **89** ✓ | 全部唯一分类（已核对无重复/无遗漏）|
 
 ---
 
 ## 三、一图流（子类级）
 
 ```text
-产品 0-1 全生命周期（21 子类 · 88 技能）
+产品 0-1 全生命周期（21 子类 · 89 技能）
 ┌──────────────────────────────────────────────────────────────┐
 │ ① 发现     1.1 用户研究(3)  1.2 问题定义(4)                  │
 │            1.3 市场竞品(7)×8编排  1.4 调研纪律(2)             │
@@ -366,15 +367,15 @@
 | `ddd-qa-chain` | 1.1.1 | `ddd-scope` | 1.1.0 | `ddd-subdomains` | 1.1.0 |
 | `ddd-tactical-review` | 1.1.0 | `decision-log` | 1.1.0 | `deep-codebase-analysis` | 1.1.1 |
 | `delegated-research` | 1.1.0 | `dependency-scan` | 1.1.1 | `discovery-interview-prep` | 1.1.1 |
-| `electron-best-practices` | 1.1.1 | `event-storming` | 1.1.0 | `executing-plans` | 1.1.0 |
-| `frontend-design` | 1.1.0 | `git-workflow` | 1.1.1 | `grill-me` | 1.1.0 |
-| `intelligence-collection-disciplines` | 1.1.0 | `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.1.0 |
-| `market-landscape-scan` | 1.1.1 | `marketing-copywriting` | 1.1.0 | `pixel-perfect` | 1.1.0 |
-| `plan-grilling` | 1.1.0 | `playwright-best-practices` | 1.1.1 | `positioning-statement` | 1.1.0 |
-| `positioning-workshop` | 1.1.0 | `prd-development` | 1.1.0 | `prd-driven-ddd` | 4.6.1 |
-| `press-release` | 1.1.1 | `problem-handling` | 1.1.0 |  |  |
-| `problem-statement` | 1.1.0 | `product-doc-audit` | 1.1.1 | `product-launch` | 1.1.1 |
-| `product-marketing` | 1.1.0 | `project-handoff` | 4.3.1 |  |  |
+| `electron-best-practices` | 1.1.1 | `env-check` | 1.0.4 | `event-storming` | 1.1.0 |
+| `executing-plans` | 1.1.0 | `frontend-design` | 1.1.0 |  |  |
+| `git-workflow` | 1.1.1 | `grill-me` | 1.1.0 | `intelligence-collection-disciplines` | 1.1.0 |
+| `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.1.0 | `market-landscape-scan` | 1.1.1 |
+| `marketing-copywriting` | 1.1.0 | `pixel-perfect` | 1.1.0 | `plan-grilling` | 1.1.0 |
+| `playwright-best-practices` | 1.1.1 | `positioning-statement` | 1.1.0 | `positioning-workshop` | 1.1.0 |
+| `press-release` | 1.1.1 | `prd-development` | 1.1.0 | `prd-driven-ddd` | 4.6.1 |
+| `problem-handling` | 1.1.0 | `problem-statement` | 1.1.0 | `product-doc-audit` | 1.1.1 |
+| `product-launch` | 1.1.1 | `product-marketing` | 1.1.0 | `project-handoff` | 4.3.1 |
 | `proto-persona` | 1.1.1 | `react-vite-best-practices` | 1.1.1 | `roadmap-planning` | 1.1.1 |
 | `secrets-scan` | 1.1.1 | `security-scan` | 1.1.0 | `session-health` | 1.0.3 |
 | `skill-description-audit` | 1.12.0 | `skill-eval` | 1.2.0 | `stage-gate` | 1.1.1 |
