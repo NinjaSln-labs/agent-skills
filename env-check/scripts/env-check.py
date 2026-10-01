@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""env-check — read-only development environment health check (MVP: toolchain / env vars / WSL interop).
+"""env-check — read-only development environment health check (six dims: toolchain / env vars /
+disk+inodes / port occupancy / dependency integrity / WSL interop).
 
 Read-only by design: every probe is a read (which/--version, env parse, socket connect, file read).
 No repair is ever executed; findings carry fix commands for the user to run themselves.
@@ -147,7 +148,6 @@ def probe_tool(name, timeout):
         f["title"] = f"{name}: {first}"
         f["level"] = "PASS"
     else:
-        f["update"] = None
         f.update(level="WARN", title=f"{name}: on PATH but --version failed (rc={rc})",
                  hint="Binary exists but does not run — possibly broken install or wrong arch.")
     rc2, out2 = run_cmd(["which", "-a", name], timeout=timeout)
@@ -254,6 +254,167 @@ def probe_wsl(timeout, proc_version=None, env=None, run_wsl_exists=None):
     return out, True
 
 
+# ---------------------------------------------------------------- 1.1: disk / ports / dependency integrity (pure helpers)
+
+MB = 1024 * 1024
+
+
+def disk_level(free_bytes, total_bytes):
+    """Pinned thresholds: FAIL <512MB or <1% free; WARN <2GB or <5% free; else PASS."""
+    if total_bytes <= 0:
+        return "PASS"
+    frac = free_bytes / total_bytes
+    if free_bytes < 512 * MB or frac < 0.01:
+        return "FAIL"
+    if free_bytes < 2 * 1024 * MB or frac < 0.05:
+        return "WARN"
+    return "PASS"
+
+
+def inode_level(free_inodes, total_inodes):
+    """Pinned thresholds: FAIL <1% free; WARN <5% free. Non-computing (total=0) → PASS."""
+    if total_inodes <= 0:
+        return "PASS"
+    frac = free_inodes / total_inodes
+    if frac < 0.01:
+        return "FAIL"
+    if frac < 0.05:
+        return "WARN"
+    return "PASS"
+
+
+def parse_port_list(value):
+    """'3000, 8080' → [3000, 8080]; dedup, drop junk. Empty/None → []."""
+    if not value:
+        return []
+    out = []
+    for tok in value.split(","):
+        tok = tok.strip()
+        if tok.isdigit() and 0 < int(tok) < 65536 and int(tok) not in out:
+            out.append(int(tok))
+    return out
+
+
+def parse_pyvenv_home(text):
+    """pyvenv.cfg → home= value (absolute path of the base interpreter dir), or None."""
+    for raw in (text or "").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if line.lower().startswith("home") and "=" in line:
+            _, _, v = line.partition("=")
+            return v.strip() or None
+    return None
+
+
+# ---------------------------------------------------------------- runtime probes: 1.1 dims
+
+
+def probe_disk(targets):
+    out = []
+    checked = set()
+    for label, path in targets:
+        try:
+            real = os.path.realpath(path)
+            st = os.statvfs(real)
+        except OSError as exc:
+            out.append({"id": f"disk.{label}.unreadable", "level": "INFO",
+                        "title": f"filesystem for {path} unreadable ({exc.__class__.__name__})",
+                        "evidence": [str(exc)], "hint": None})
+            continue
+        key = (st.f_bsize, st.f_blocks, st.f_bavail)
+        if key in checked:
+            continue
+        checked.add(key)
+        total = st.f_blocks * st.f_frsize
+        free = st.f_bavail * st.f_frsize
+        level = disk_level(free, total)
+        gb = lambda b: f"{b / 1024 ** 3:.1f}GB"
+        hint = ("Free space critically low — installs/builds will fail mid-write. "
+                "Fix: free space (docker system prune, package caches) as you see fit.") if level == "FAIL" else None
+        out.append({"id": f"disk.{label}", "level": level,
+                    "title": f"disk {path}: {gb(free)} free of {gb(total)} ({level})",
+                    "evidence": [f"free={free}B total={total}B"], "hint": hint})
+        if st.f_files:
+            ifree, itotal = st.f_ffree, st.f_files
+            ilevel = inode_level(ifree, itotal)
+            if ilevel != "PASS":
+                out.append({"id": f"disk.{label}.inodes", "level": ilevel,
+                            "title": f"inodes {path}: {ifree} free of {itotal} ({ilevel})",
+                            "evidence": [f"ffree={ifree} files={itotal}"],
+                            "hint": "Inode exhaustion blocks file creation even with space free. Fix: delete small-file trees (node_modules, caches)."})
+    return out
+
+
+def probe_port(port, timeout):
+    s = socket.socket()
+    s.settimeout(timeout)
+    in_use = (s.connect_ex(("127.0.0.1", port)) == 0)
+    s.close()
+    if not in_use:
+        return {"id": f"port.{port}.free", "level": "PASS",
+                "title": f"port {port}: free", "evidence": [f"connect 127.0.0.1:{port} refused"],
+                "hint": None}
+    owner = None
+    rc, outp = run_cmd(["lsof", "-nP", "-iTCP:%d" % port, "-sTCP:LISTEN"], timeout=timeout)
+    if rc == 0 and outp.strip():
+        owner = [l for l in outp.strip().splitlines() if l and not l.startswith("COMMAND")]
+    else:
+        rc2, outp2 = run_cmd(["ss", "-tlnp", "sport", "=", ":%d" % port], timeout=timeout)
+        if rc2 == 0 and outp2.strip():
+            owner = outp2.strip().splitlines()[1:]
+    return {"id": f"port.{port}.busy", "level": "WARN",
+            "title": f"port {port}: in use" + (f" by: {' | '.join(l.strip() for l in owner[:2])}" if owner else ""),
+            "evidence": owner or [f"connect 127.0.0.1:{port} accepted"],
+            "hint": "Kill the occupying process or pick another port (your call — never killed by this tool)."}
+
+
+def probe_dep_integrity(cwd):
+    out = []
+    nm = os.path.join(cwd, "node_modules")
+    if os.path.isdir(nm):
+        if not os.path.isfile(os.path.join(cwd, "package.json")):
+            out.append({"id": "dep.node_modules-orphan", "level": "WARN",
+                        "title": "node_modules present without package.json (orphan install)",
+                        "evidence": [nm],
+                        "hint": "Leftover from a removed/renamed project. Fix: rm -rf node_modules (your call)."})
+        else:
+            broken = []
+            bindir = os.path.join(nm, ".bin")
+            if os.path.isdir(bindir):
+                for name in sorted(os.listdir(bindir)):
+                    p = os.path.join(bindir, name)
+                    if os.path.islink(p) and not os.path.exists(p):
+                        broken.append(name)
+                        if len(broken) >= 5:
+                            break
+            if broken:
+                out.append({"id": "dep.broken-bins", "level": "WARN",
+                            "title": f"node_modules/.bin has {len(broken)}+ broken symlinks: {', '.join(broken)}",
+                            "evidence": broken,
+                            "hint": "Install tree is inconsistent. Fix: rm -rf node_modules && <your installer> ci."})
+            elif not any(os.path.isfile(os.path.join(cwd, lf)) for lf in
+                         ("package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "pnpm-lock.yaml")):
+                out.append({"id": "dep.no-lockfile", "level": "INFO",
+                            "title": "package.json without any lockfile", "evidence": [], "hint": None})
+    for vdir in (".venv", "venv"):
+        cfg = os.path.join(cwd, vdir, "pyvenv.cfg")
+        if not os.path.isfile(cfg):
+            continue
+        home = parse_pyvenv_home(open(cfg, encoding="utf-8", errors="replace").read())
+        binpy = os.path.join(cwd, vdir, "bin", "python3")
+        ok_py = os.path.exists(binpy)
+        ok_home = bool(home) and os.path.isdir(home)
+        if ok_py and ok_home:
+            out.append({"id": f"dep.venv-{vdir}.ok", "level": "PASS",
+                        "title": f"{vdir}: venv intact (base={home})", "evidence": [cfg], "hint": None})
+        else:
+            out.append({"id": f"dep.venv-{vdir}.broken", "level": "WARN",
+                        "title": f"{vdir}: venv broken (base interpreter {'missing' if not ok_home else 'present'}, "
+                                 f"bin/python3 {'missing' if not ok_py else 'present'})",
+                        "evidence": [cfg, f"home={home}"],
+                        "hint": "Venv points at a removed interpreter (base env upgraded/deleted?). Fix: recreate the venv."})
+    return out
+
+
 # ---------------------------------------------------------------- selftest
 
 def selftest():
@@ -309,6 +470,23 @@ def selftest():
                                       env={}, run_wsl_exists=True)
     ok.append(on_wsl2 is True and any(f["id"] == "wsl.detected" for f in wsl_findings))
 
+    # disk: thresholds (dual-direction: FAIL line, WARN band, PASS, degenerate)
+    ok.append(disk_level(500 * MB, 100 * 1024 * MB) == "FAIL")                   # <512MB
+    ok.append(disk_level(600 * MB, 100 * 1024 * MB) == "FAIL")                   # 0.57% <1%
+    ok.append(disk_level(3 * 1024 * MB, 100 * 1024 * MB) == "WARN")              # 3% <5%
+    ok.append(disk_level(10 * 1024 * MB, 100 * 1024 * MB) == "PASS")             # decoy: healthy
+    ok.append(disk_level(0, 0) == "PASS")                                        # degenerate
+    # inodes
+    ok.append(inode_level(5, 1000) == "FAIL" and inode_level(30, 1000) == "WARN"
+              and inode_level(60, 1000) == "PASS" and inode_level(0, 0) == "PASS")
+    # ports parse
+    ok.append(parse_port_list("3000, 8080,3000,abc,0,99999,70000") == [3000, 8080])
+    ok.append(parse_port_list(None) == [] and parse_port_list("") == [])         # decoy: no request
+    # pyvenv.cfg
+    ok.append(parse_pyvenv_home("home = /usr/bin\ninclude-system = true") == "/usr/bin")
+    ok.append(parse_pyvenv_home("# home = /gone") is None)                       # decoy: commented
+    ok.append(parse_pyvenv_home("") is None)                                     # decoy: empty
+
     bad = [i for i, v in enumerate(ok) if not v]
     print(f"env-check selftest: {len(ok) - len(bad)}/{len(ok)} assertions pass")
     if bad:
@@ -324,6 +502,8 @@ def main(argv=None):
     ap.add_argument("--tools", default=",".join(DEFAULT_TOOLS),
                     help=f"comma-separated tools to probe (default: {','.join(DEFAULT_TOOLS)})")
     ap.add_argument("--timeout", type=int, default=5, help="per-probe timeout seconds (default 5)")
+    ap.add_argument("--ports", default="",
+                    help="comma-separated TCP ports to check for occupancy (e.g. 3000,8080); empty = skip")
     ap.add_argument("--json", action="store_true", help="machine-readable JSON report")
     ap.add_argument("--selftest", action="store_true", help="run fixture assertions and exit")
     args = ap.parse_args(argv)
@@ -337,6 +517,15 @@ def main(argv=None):
     findings.extend(probe_env_vars(args.timeout))
     wsl_findings, _ = probe_wsl(args.timeout)
     findings.extend(wsl_findings)
+    findings.extend(probe_disk([("cwd-fs", os.getcwd()), ("root", "/")]))
+    ports = parse_port_list(args.ports)
+    if not ports:
+        findings.append({"id": "port.none-requested", "level": "SKIP",
+                         "title": "No --ports given — occupancy check skipped", "evidence": [], "hint": None})
+    else:
+        for p in ports:
+            findings.append(probe_port(p, args.timeout))
+    findings.extend(probe_dep_integrity(os.getcwd()))
 
     for f in findings:
         f.setdefault("evidence", [])

@@ -108,7 +108,7 @@
 | typescript-best-practices | TS 最佳实践（类型/模式/工程规范）|
 | react-vite-best-practices | React + Vite 最佳实践（组件/性能/工程）|
 | electron-best-practices | Electron 最佳实践（主/渲染进程/安全/打包）|
-| env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作；判据钉进脚本，修复只给命令）|
+| env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作/磁盘 inode/端口占用/依赖完整性；判据钉进脚本，修复只给命令）|
 
 #### 3.5 视觉设计（6）
 
@@ -367,7 +367,7 @@
 | `ddd-qa-chain` | 1.1.1 | `ddd-scope` | 1.1.0 | `ddd-subdomains` | 1.1.0 |
 | `ddd-tactical-review` | 1.1.0 | `decision-log` | 1.1.0 | `deep-codebase-analysis` | 1.1.1 |
 | `delegated-research` | 1.1.0 | `dependency-scan` | 1.1.1 | `discovery-interview-prep` | 1.1.1 |
-| `electron-best-practices` | 1.1.1 | `env-check` | 1.0.4 | `event-storming` | 1.1.0 |
+| `electron-best-practices` | 1.1.1 | `env-check` | 1.1.0 | `event-storming` | 1.1.0 |
 | `executing-plans` | 1.1.0 | `frontend-design` | 1.1.0 |  |  |
 | `git-workflow` | 1.1.1 | `grill-me` | 1.1.0 | `intelligence-collection-disciplines` | 1.1.0 |
 | `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.1.0 | `market-landscape-scan` | 1.1.1 |

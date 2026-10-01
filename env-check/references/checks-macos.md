@@ -19,4 +19,4 @@ macOS is a **supported platform** for env-check (user ruling 2026-10-01), with t
 ## Platform differences that matter for judgement
 
 - `python3` may be missing entirely on clean macOS (CLT provides it only after Xcode CLT install) — reported as WARN with install hint (`xcode-select --install`), same as any missing tool.
-- Proxy settings configured in System Settings are **not** env vars; env-check only sees shell env. If the user says "proxy works in browser but installs fail", check whether the shell env lacks proxy vars entirely (no finding will fire — absence is not probed in MVP).
+- Proxy settings configured in System Settings are **not** env vars; env-check only sees shell env. If the user says "proxy works in browser but installs fail", check whether the shell env lacks proxy vars entirely (no finding will fire — absence is not probed at baseline scope).

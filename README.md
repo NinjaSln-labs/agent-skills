@@ -41,7 +41,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | codebase-design | 深度模块设计（接口/接缝/可测试性——mattpocock） |
 | deep-codebase-analysis | 代码库全面分析（架构/通信/模式/约定/业务流/状态/错误处理 7 维） |
 | electron-best-practices | Electron 最佳实践（主/渲染进程/安全/打包） |
-| env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作；判据钉进脚本，修复只给命令） |
+| env-check | 开发环境只读体检（工具链/环境变量/WSL 互操作/磁盘 inode/端口占用/依赖完整性；判据钉进脚本，修复只给命令） |
 | frontend-design | 前端设计（组件/页面——两遍法+自评） |
 | git-workflow | Git 工作流（分支策略/Conventional Commits/CI 集成——37★） |
 | react-vite-best-practices | React + Vite 最佳实践（组件/性能/工程） |
