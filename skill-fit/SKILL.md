@@ -3,18 +3,17 @@ name: skill-fit
 description: >-
   Skill fit (v2): derives a project's skill needs — tier T0–T4, evidence-backed requirement table
   against a versioned lexicon (count bounded by tier), coverage four-ways (served /
-  in-catalog-unmounted / poor-fit / gap), and mount-tier advice with a two-value budget. From 2.1.0,
-  mount/move-tier may run via confirm gate (ask-user; scripts/sf-gate.py apply/verify/rollback);
-  unmount is 2.2.0. Judges fit from skill bodies, not descriptions; catalog.yaml＝supply,
-  lexicon＝demand. Writes feedback (and applied log when executing); optional privacy-stripped
-  upstream issue. USER-INVOKED ONLY (/skill:skill-fit; no auto-invoke). Use to audit skill needs and,
-  on confirm, apply reversible mount/move. NOT for: authoring skills; deleting skill source files.
+  in-catalog-unmounted / poor-fit / gap), and mount-tier advice with a two-value budget. Confirm gate
+  (ask-user; scripts/sf-gate.py apply/verify/rollback): mount/move from 2.1.0, unmount from 2.2.0.
+  Judges fit from skill bodies, not descriptions; catalog.yaml＝supply, lexicon＝demand. Writes
+  feedback (and applied log when executing); optional privacy-stripped upstream issue. USER-INVOKED
+  ONLY (/skill:skill-fit; no auto-invoke). Use to audit skill needs and, on confirm, apply reversible
+  mount/move/unmount. NOT for: authoring skills; deleting skill source files.
 slug: skill-fit
-version: 2.1.3
+version: 2.2.0
 displayName: skill-fit
 disable-model-invocation: true
 ---
-
 # 技能需求管家（Skill Fit · v2）
 
 ## 角色
@@ -23,10 +22,10 @@ disable-model-invocation: true
 
 - **E1 需求表**（核心）：从本仓工件推出需求陈述，每条带词条＋强度＋证据串；
 - **E2 层级与预算**：每条需求给挂载层级建议（宿主／项目／用户／不挂）＋预算两值＋"为何不是另一层"；
-- **E4 确认门**（2.1.0）：挂／移层级经提案→确认→应用→校验→回滚（`scripts/sf-gate.py`；权限档见下）；
+- **E4 确认门**（2.1.0 挂／移；**2.2.0 反挂载**）：挂／移／反挂载经提案→确认→应用→校验→回滚（`scripts/sf-gate.py`；权限档见下）；
 - **E5 周期化**：重入时与上轮对表，只报差集与原因。
 
-覆盖判定（需求 × 已装载 × 可供给 → 四落点）是需求表的下游视图。需求表与覆盖判定仍**只读写反馈记录**；挂／移须用户确认口令后才改挂载点（反挂载＝2.2.0）。**权限档**：现行恒 `ask-user`（白名单空，见 `references/auto-approve-whitelist.md`／Q-05）；凭据·删除·外写永不进 auto-approve（INV-11）。
+覆盖判定（需求 × 已装载 × 可供给 → 四落点）是需求表的下游视图。需求表与覆盖判定仍**只读写反馈记录**；挂／移／反挂载须用户确认口令后才改挂载点。**权限档**：现行恒 `ask-user`（白名单空，见 `references/auto-approve-whitelist.md`／Q-05）；凭据·删除·外写永不进 auto-approve（INV-11）。
 
 **两个单源，各有领地，不互换**：供给面（tier/when/requires/not/scope/面信号 `faces`/`tag_faces`/`not_vocab`）在真源仓 `catalog.yaml`＋`retired.txt`；需求面（词条·证据形·档位适用性）在真源仓**需求词表**（版本化文件，定位见下）。registry 占用状态不落表，实时查（`scripts/skill-name-check.{sh,ps1}`，端点见 `references/registry-endpoints.md`）。
 
@@ -34,13 +33,12 @@ disable-model-invocation: true
 
 本技能已挂载，但 **agent 不得自主触发**（frontmatter `disable-model-invocation: true`）——只有用户显式调用时才执行：
 - 用户键入 `/skill:skill-fit`（可带项目路径参数，默认当前目录）
-- 用途：给项目做**需求侧**体检——需求表 / 覆盖四落点 / 层级与预算提案 / 与上轮的变化报告；用户确认后可经确认门挂／移层级
+- 用途：给项目做**需求侧**体检——需求表 / 覆盖四落点 / 层级与预算提案 / 与上轮的变化报告；用户确认后可经确认门挂／移／反挂载
 - **其余全自动**：画像探测、定档、词条对表、覆盖判定、变化对表、写反馈记录（应用挂载须确认口令，不自动执行）
 - 周期调度属**宿主**（loop/cron/CI）；技能只提供**幂等重入**，不自我触发
-
 ## 硬约束（逐条挂 INV 编号＝审计检查点）
 
-1. **写出口闭集**——默认只写被画像项目根的反馈记录 `.skill-fit/feedback/…`。挂／移层级（2.1.0）另写 `.skill-fit/proposals/`＋`applied.jsonl`，且**仅**经 `scripts/sf-gate.py`、确认口令闭集（`yes-this-one`／`no-and-why`／`later`；INV-08）后改符号链接；**禁止**手搓 `ln`/`rm` 绕过门禁。提案进报告须含前态/后态/校验法/回滚法四字段。**反挂载永远只移除挂载点、绝不删改真源**（INV-07；动作开闸＝2.2.0）。不改技能正文、不改 catalog／词表（除非用户另令走其技能）。
+1. **写出口闭集**——默认只写被画像项目根的反馈记录 `.skill-fit/feedback/…`。挂／移／反挂载另写 `.skill-fit/proposals/`＋`applied.jsonl`，且**仅**经 `scripts/sf-gate.py`、确认口令闭集（`yes-this-one`／`no-and-why`／`later`；INV-08）后改符号链接；**禁止**手搓 `ln`/`rm` 绕过门禁。提案进报告须含前态/后态/校验法/回滚法四字段。**反挂载永远只移除挂载点、绝不删改真源**（INV-07）。不改技能正文、不改 catalog／词表（除非用户另令走其技能）。
 2. **双单源**（INV-04）——推荐依据只来自 `catalog.yaml`＋`retired.txt`（供给）与**词表**（需求）；正文与本技能目录**不得存副本**（副本必然漂移）。**新增词条＝提「新增待审」申请进报告，不自造规范名**；新增面/反触发条件＝改 catalog，不改本正文。**形扩展纪律（A-3②，t000114⑤）**：词条证据形的现场扩展（未裁入词表的替代形／意图谓词）**不得**作立条依据——只可用在册形，或走「新增待审」草案；未裁先用＝立条无效。词表版本戳必须写进报告头；**词表版本变了，旧轮结果作废、须整批重跑**（防跨轮静默漂移）。
 3. **`requires` 先判且须实测·分两栏**（HC-4 取证的前提；实测纪律同源于 INV-01/02）——**机器级**（本机运行时/工具：实跑 `node --version` 等并记命令与取值）与**仓级**（本仓工件/依赖）**分开记、互不可推**（本机有某运行时 ≠ 本仓用它；本仓有锁文件 ≠ 本机装了包管理器）；**禁止凭印象判缺失**。不满足 → 落点判"不适配"并给否因；未证 → **不得记"已承载"**，否因＝requires 未证。
 4. **证据纪律**（INV-01/02）——每条需求必带 ≥1 条**证据串**：`<仓内工件路径>@<本轮实测在位>`；**引证须现探**（禁止沿用上一轮记录、别仓记录或注释里的文件名）。**通件不作唯一证据**，名单为**闭集**：`.git/` · `README*` · `AGENTS.md` · `CLAUDE.md` · 锁文件 · `.gitignore` · `.editorconfig`；理由对任何仓成立 ⇒ 对任何仓不含信息。`.handoff/` 属**半通件**：存在性零信息；作为**需求本体**（账本封口、未决项治理）时按**内容**豁免——须载仓专属内容串且与本仓工件双撑。**内容句按句不按文件**：警示/事故/坑位类内容句落通件文件（CLAUDE.md 等）者按内容豁免、该文件不得独撑（与词表头注通则同步）。**证据资格（d000032-③）**：工作树或版本库**任一在位**即有效证据，未追踪件可作证据但须标「未追踪」；**git 历史零命中既不能证有也不能证无**（p000042 对称面）；T0"无源码面"看工作树现状、不看 tracked 面。**名称字面不算证据**：目录/文件名含 ARCHIVE、legacy、test 等词不构成证据，须开内容验语义；产物面按构建配置的 outDir/dist 判定，证据形一律指源侧工件。**分发件不得独撑（C1，d000048）**：脚手架／pack 分发件——跨同源族逐字节同形者（`diff` 零差异／同 md5）——不得独撑一条需求的证据；须本仓专属件双撑，或按 06 §六 同源折算。**出口链（A-2，t000114⑤）**：无本仓专属双撑 **且** 不适用 §六 折算 ⇒ **不得立该条**；禁以未在位路径、他仓路径或「理应有」叙述作幻影引用凑证据。**缺失形必须配对**："本仓无 X"须同时给出"该有 X 的位置存在且为空"，否则"搜错了目录"与"真的没有"不可分。
@@ -132,7 +130,7 @@ disable-model-invocation: true
 - **解决态需求（d000028-②／d000031／d000032-② 全链口径）——落点与戳正交**：落点**只看候选维**——catalog 有候选且被正文否 → "不适配"（否因照写），无候选 → "缺口"；解决态戳**只挂词条列、只管消费通道**：带戳行不喂立项通道（账本 actions）、计入 AC-03 剔除、**禁止**写"可后补"（读者会误推新技能）。两维竞合时不再二选一：一条需求可以同时是"不适配＋解决态戳"。需求表侧与覆盖表侧的戳是同一个 M-2 戳，写法一致。**戳域＝轮级实例判定（d000033-丁①）**：戳不预存于词表簇级、不沿用上轮——本轮现探见「仓内工件已解决该需求」即**当轮必带戳**（漏戳＝违例，等同缺失形漏配对）；「仓内已解决」却写成无戳"缺口·可后补"是最重违例形态（伪立项入口）。
 - **缺口与提案名单互查**：所列缺口若其能力已被本轮任一提案覆盖（读正文核实）→ 改标"已由 `<name>` 承载"。
 - **缺口 0 是自然结果**：画像无需要信号时该段即空——不新开桶、不升格仓型为独立裁决，只作说明性括注。
-- 反挂载候选（2.2.0 才有动作资格）：**判据从现源推导，不以 catalog `serves` 列为裁决替代**（已入册对＝机检加速器；未入册／存疑对不阻下列两条件，仍走 INV-05 正文复核）——挂载中技能满足两条才入列：① 未出现在本轮覆盖表任何"已承载"载体栏；② 读其正文，其声称的能力域在本仓**无任何需求命中其证据形**（一次正文核读，不凭 description 臆判）。全量常驻机上此段登记范围＝该过滤器筛余，**不逐名列无关项**（整层常驻清单＝违 INV-14 精神的噪音）；存疑对双签与补录属 2.2.0 前置。
+- 反挂载候选：**判据从现源推导，不以 catalog `serves` 列为裁决替代**（已入册对＝机检加速器；未入册／存疑对不阻下列两条件，仍走 INV-05 正文复核）——挂载中技能满足两条才入列：① 未出现在本轮覆盖表任何"已承载"载体栏；② 读其正文，其声称的能力域在本仓**无任何需求命中其证据形**（一次正文核读，不凭 description 臆判）。全量常驻机上此段登记范围＝该过滤器筛余，**不逐名列无关项**（整层常驻清单＝违 INV-14 精神的噪音）。
 
 ## 层级与预算（BC-4 之 E2 · 提案；E4 确认后可执行）
 
@@ -149,7 +147,7 @@ disable-model-invocation: true
 - **预算两值并报**：目录体积 ＋ 正文字节（实测），供层级成本比较；无实测不得编数。**量级写法**（AC-05／Q-04）：`~4 KB / ~40 KB / ~400 KB` 为**口语示例，非闭集枚举**——报就近十进制 KB（或其它便于比较的量级），**须过 ≤2×**；不得因「未命中三档字面」拒报或硬贴远离实测的档。
 - 目标层级默认按 catalog `tier` 初判（project→项目级；universal/on-demand→用户级），**但 INV-12 要求独立给因**——与初判不同时必须写明理由。
 - 提案字段集：`动作(挂/移层级) · 目标层级 · 前态(实测) · 后态 · 校验法 · 回滚法 · 风险档 · 权限档(恒 ask-user，直至 Q-05 白名单非空)`。一条提案一个原子变更（无"部分成功"态）。回滚法按 04 §五 表：挂＝移除该挂载点、校验＝路径解析到预期真源且技能清单可见。
-- **执行（E4 · 2.1.0）**：用户对报告中某条提案表态后，用本技能目录下 `scripts/sf-gate.py`：`draft` → `confirm --token <口令>` → `apply` → `verify`；失败或演练后 `rollback`。层级目录：项目＝`<仓根>/.agents/skills/`；用户＝`~/.agents/skills/`；宿主须显式 `--host-root`（无默认，防误伤）。每次执行追加 `applied.jsonl`（含 `prev`，INV-09）。反挂载命令本波拒收。
+- **执行（E4 · 2.2.0）**：用户对报告中某条提案表态后，用本技能目录下 `scripts/sf-gate.py`：`draft` → `confirm --token <口令>` → `apply` → `verify`；失败或演练后 `rollback`。动作＝`mount`／`move`／`unmount`。层级目录：项目＝`<仓根>/.agents/skills/`；用户＝`~/.agents/skills/`；宿主须显式 `--host-root`（无默认，防误伤）。每次执行追加 `applied.jsonl`（含 `prev`，INV-09）。
 - **去重不改条数**：历史已裁定"不执行/刻意保留"的条目照列并标"历史已裁定·不重复推动"，另给未裁定计数。
 
 ## 周期化与反馈（BC-7 · E5）
@@ -191,7 +189,7 @@ disable-model-invocation: true
 ### 仓内技能（非 catalog）（n）
 - <name> — 位置=<路径>；<重名 → 双源漂移风险>
 
-### 反挂载候选（登记 · 2.2.0 才有动作资格）
+### 反挂载候选（登记 · 动作经 sf-gate `unmount`）
 - <name> — 未出现于任何"已承载"载体栏，且正文能力域在本仓无需求命中其证据形：<一句>
 
 ### 变化报告（重入时；首检写"全量＝首检"）
@@ -218,17 +216,17 @@ disable-model-invocation: true
 - 缺口与提案名单自相矛盾；仓内技能承载误报缺口；重名不标双源漂移；"缺口 0"写成特例判据
 - 提案缺四字段（前态/后态/校验/回滚）就进报告；一条提案多动作；"删除/摘除"混进动作词表（动作闭集：挂/移层级/反挂载/保持；删除类须用户显式授权且违反 INV-07 即停）
 - registry 措辞自造（"占用已核验"指本地真源即违例）；未经确认投递 Issue / 报告未脱敏；反馈记录写进 cwd 落错仓、美化或漏记否决
-- agent 自主触发本技能；2.0.0 里擅自动文件系统（越版执行——执行自 2.1.0 且逐条确认）
+- agent 自主触发本技能；未确认口令擅自动挂载点（越权——执行自 2.1.0／反挂载自 2.2.0，且逐条确认）
 
 ## 完成标准（自检＝AC 清单；机检项尽量脚本化，未脚本化前人工对表）
 
-- [ ] 由用户显式触发；全程未动文件系统（唯一写出口＝反馈记录）（HC-1）
+- [ ] 由用户显式触发；默认只写反馈记录；挂／移／反挂载仅经 sf-gate＋确认口令（HC-1）
 - [ ] 报告头自印：档位＋四信号取值＋词表版本戳（实取值，非写死）＋机器形态输入声明（INV-04/12）
 - [ ] 画像：证据口径四条已守；面判定与 not 判据全部取自 catalog 单源、本轮现探（INV-15/02）
 - [ ] 需求表：每条带证据串且实测在位、通件不独撑、缺失形配对（AC-01 违例 0，INV-01/02）；条数在档内（AC-10，INV-03）；词条名与词表对齐或标"新增待审＋证据形草案"；强度三值闭集
 - [ ] 覆盖表：每条恰一落点、Σ四落点=条数由名单数出（INV-06）；"已承载/不适配"判定引用**技能正文**证据（INV-05）；"不适配"以候选真实存在且被否为前提（无候选者为缺口，未涉者不得写"不适配"）；解决态需求按候选维落点（无候选→缺口／有候选被否→不适配）＋词条列带 M-2 戳，均不写"可后补"、不入立项通道（d000032-②）
 - [ ] 层级提案：每条带预算两值＋"为何不是另一层"＋四字段（前态/后态/校验/回滚）（AC-05）
-- [ ] 若执行挂／移：口令闭集确认 → sf-gate apply/verify；回滚演练或校验失败已 rollback；真源未删（INV-07/08/09）
+- [ ] 若执行挂／移／反挂载：口令闭集确认 → sf-gate apply/verify；回滚演练或校验失败已 rollback；真源未删（INV-07/08/09）
 - [ ] 缺口与提案名单互查无矛盾；仓内技能已扫、承载不误报、重名已标
 - [ ] 重入：变化报告五类齐、未变项只计数（INV-14）；历史比较按生成时点取快照
 - [ ] 批量（≥3 仓）：`仓数·distinct` 与"独立性＝1"已自报（AC-06）；跨仓引用逐名
@@ -240,7 +238,8 @@ disable-model-invocation: true
 - Agent Skills 规范可选字段（`compatibility`/`disable-model-invocation`）、Progressive disclosure——见 agentskills.io 与宿主字段表；运维口径：catalog 单源＋registry 实时查
 - **v1 沿革（摘要，全文见 git 与 `audits/`）**：2026-09-19 定位/渠道收口 → 09-20 匹配契约化·动作基准·边界裁决·catalog v2 数据驱动（B14–B21）→ 09-21 反馈语料双层审计（现探/现算/裁决表/四态）→ 09-22 画像信号数据驱动（faces/tag_faces/not_vocab 迁 catalog）与正文卫生 → 09-22 **实效审计**（50 仓语料：算术与纪律属实、**区分度不成立**——通用标签＋布尔面判据与仓型无关）→ 09-23 **v1.8.0 契约收口**（证据分档/两栏/现探/名单计数/自报，作为退役前最后补丁）
 - **2026-09-23 · 2.0.0 定位重构**：从"供给端标签匹配"改为"需求侧生命周期管家"（E1 需求表＋E2 层级预算＋E5 周期化，全程只读）。设计包见真源仓 `design/skill-fit-v2/`（00 追踪表 · 01 统一语言 · 02 领域模型 · 03 聚合与 INV · 04 交互与回滚 · 05 事件风暴 · 06 验收判据 · 07 v1 处置表 · 08 路线图）；需求词表 `lexicon=v0.0` 经五仓样本＋S-3 同模板双审计（决策 d000028/d000030）生效；档位判据含 P-01…P-07 七处实测定档修补。三档权限（ask-user/auto-approve/yolo）为终版契约，**实装自 2.1.0 起、逐版开闸**（08 前置：需求侧达标才允许动作提案）。
-- **2026-09-28 · 2.1.0 E4 开闸**：`scripts/sf-gate.py` 实装挂／移层级确认门（ask-user）；Q-05 白名单空表成文；本仓（agent-skills）原点挂＋移回滚演练 PASS（`audits/2026-09-28-skill-fit-e4-gate-pilot.md`）。反挂载仍 2.2.0。
+- **2026-09-28 · 2.1.0 E4 开闸**：`scripts/sf-gate.py` 实装挂／移层级确认门（ask-user）；Q-05 白名单空表成文；本仓（agent-skills）原点挂＋移回滚演练 PASS（`audits/2026-09-28-skill-fit-e4-gate-pilot.md`）。
+- **2026-09-28 · 2.2.0 反挂载开闸**：`sf-gate.py` 增 `unmount`（只卸符号链接，INV-07 真源不动）；selfcheck 含挂→卸→回滚；候选登记判据仍走现源两条件（serves＝加速器）。
 - **2026-09-28 · 2.1.1 A1–A3／C2**：serves 双签设计内收口（从严 L-14／按形 L-26／正文证据不含 frontmatter 机键）；catalog 出 delegated-research×L-26、在册三对；INV-05 钉 C2 句。方案 `audits/2026-09-28-serves-design-faithful.md`。
 - **2026-09-28 · 2.1.2 t000114②⑤**：frozen 指名者闭集枚举（`AGENTS.md`·`CLAUDE.md`·`CONTRIBUTING.md`）；C1 出口链＋C′ 择配披露；形扩展须已裁入表；调度载体「驱动脚本」＝ExecStart／command 路径字面量。HC-5「全」字已于 2.0.7 在位，本版不重开。
 - **2026-09-28 · 2.1.3 设计债清理**：AC-05 量级三档钉「示例非闭集」；C′ 输出模板加「件→行#」范例；`auto-approve-whitelist.md` 补 §5 表头机制。maintenance「serves L-26」散文按 S1 不追史。

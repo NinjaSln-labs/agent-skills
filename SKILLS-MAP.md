@@ -384,6 +384,6 @@
 | `user-research` | 1.1.0 | `ux-heuristics` | 1.1.1 | `verification-before-completion` | 1.1.0 |
 | `visual-regression-tester` | 1.1.1 | `voice-of-customer-miner` | 1.1.0 | `web-design-guidelines` | 1.0.1 |
 | `workshop-facilitation` | 1.1.1 | `write-spec` | 1.1.0 | `writing-plans` | 1.1.1 |
-| `experiment-handoff` | 1.1.0 | `skill-fit` | 2.1.3 | `version-management` | 1.3.1 |
+| `experiment-handoff` | 1.1.0 | `skill-fit` | 2.2.0 | `version-management` | 1.3.1 |
 
 

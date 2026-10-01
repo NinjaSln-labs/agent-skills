@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""sf-gate — skill-fit E4 确认门（挂／移层级 · 2.1.0）。
+"""sf-gate — skill-fit E4 确认门（挂／移／反挂载 · 2.2.0）。
 
 五步：提案 → 确认 → 应用 → 校验 → 回滚。权限档恒 ask-user（Q-05 白名单空＝全问）。
-动作闭集：mount（挂）／move（移层级）。反挂载拒（2.2.0）。INV-07：只动挂载点，永不碰真源。
+动作闭集：mount／move／unmount。INV-07：只动挂载点，永不碰真源。
 
 用法：
-  python3 sf-gate.py draft  --root <仓> --skill <名> --action mount|move --tier project|user|host \\
+  python3 sf-gate.py draft  --root <仓> --skill <名> --action mount|move|unmount --tier project|user|host \\
                             --source <真源绝对路径> [--from-tier <原层级>] [--risk 低|中|高]
   python3 sf-gate.py confirm --root <仓> --id <P…> --token yes-this-one|no-and-why|later|all-in-this-class [--why …]
   python3 sf-gate.py apply   --root <仓> --id <P…>
@@ -24,11 +24,10 @@ import tempfile
 import time
 from pathlib import Path
 
-ACTIONS = ("mount", "move")
+ACTIONS = ("mount", "move", "unmount")
 TIERS = ("project", "user", "host")
 TOKENS = ("yes-this-one", "no-and-why", "later", "all-in-this-class")
 RISKS = ("低", "中", "高")
-
 
 def die(msg: str, code: int = 2) -> None:
     print(f"sf-gate: {msg}", file=sys.stderr)
@@ -111,7 +110,7 @@ def cmd_draft(args: argparse.Namespace) -> None:
     root = Path(args.root).resolve()
     action = args.action
     if action not in ACTIONS:
-        die(f"动作须为 {ACTIONS}（反挂载＝2.2.0）")
+        die(f"动作须为 {ACTIONS}")
     if args.tier not in TIERS:
         die(f"层级须为 {TIERS}")
     if args.risk not in RISKS:
@@ -124,8 +123,8 @@ def cmd_draft(args: argparse.Namespace) -> None:
         die(f"技能名 {skill!r} 与真源目录名 {source.name!r} 不一致（防错挂）")
     if action == "move" and not args.from_tier:
         die("move 须 --from-tier")
-    if action == "mount" and args.from_tier:
-        die("mount 不要 --from-tier")
+    if action in ("mount", "unmount") and args.from_tier:
+        die(f"{action} 不要 --from-tier")
 
     host = args.host_root
     dest_parent = tier_dir(root, args.tier, host)
@@ -143,7 +142,14 @@ def cmd_draft(args: argparse.Namespace) -> None:
             die(f"移层级前置失败：原链接解析 {from_snap['resolved']} ≠ 真源 {source}")
         if prev["kind"] != "absent":
             die(f"移层级前置失败：目标层已存在 {dest}")
-
+    if action == "unmount":
+        if prev["kind"] != "symlink":
+            die(f"反挂载前置失败：目标非符号链接 {dest} → {prev}")
+        if Path(prev["resolved"] or "") != source:
+            die(f"反挂载前置失败：链接解析 {prev['resolved']} ≠ 真源 {source}")
+        # 真源必须仍在位（INV-07：卸的是挂载点，不是目录）
+        if not source.is_dir():
+            die(f"反挂载前置失败：真源已不在 {source}")
     n = len(list(proposals_dir(root).glob("P*.json"))) + 1
     pid = f"P{n:04d}"
     prop = {
@@ -233,6 +239,10 @@ def cmd_apply(args: argparse.Namespace) -> None:
                 die(f"应用失败：原链接消失 {src_link}", 1)
             _link(dest, source)
             _unlink_only(src_link, source)
+        elif prop["action"] == "unmount":
+            if not source.is_dir():
+                die(f"应用失败：真源已不在（INV-07 拒继续）{source}", 1)
+            _unlink_only(dest, source)
         else:
             die(f"拒动作 {prop['action']}")
     except SystemExit:
@@ -244,7 +254,6 @@ def cmd_apply(args: argparse.Namespace) -> None:
     append_log(root, {"event": "applied", "id": prop["id"], "dest": str(dest), "prev": prop["prev"]})
     print(json.dumps({"id": prop["id"], "state": "applied", "dest": str(dest)}, ensure_ascii=False))
 
-
 def cmd_verify(args: argparse.Namespace) -> None:
     root = Path(args.root).resolve()
     prop = load_prop(root, args.id)
@@ -254,18 +263,32 @@ def cmd_verify(args: argparse.Namespace) -> None:
     dest = Path(prop["dest"])
     host = prop.get("host_root")
     detail: list[str] = []
-    err = check_symlink_to(dest, source)
-    if err:
-        detail.append(err)
-    else:
-        detail.append(f"dest→{source.resolve()}")
-    if prop["action"] == "move":
-        old = tier_dir(root, prop["from_tier"], host) / prop["skill"]
-        if old.exists() or old.is_symlink():
-            detail.append(f"原层级残留 {old}")
-            err = err or detail[-1]
+    err: str | None = None
+    if prop["action"] == "unmount":
+        snap = snapshot(dest)
+        if snap["kind"] != "absent":
+            err = f"挂载点仍在 {dest} → {snap}"
+            detail.append(err)
         else:
-            detail.append("原层级已清")
+            detail.append("挂载点已清")
+        if not source.is_dir():
+            err = err or f"真源消失（INV-07 违）{source}"
+            detail.append(err)
+        else:
+            detail.append(f"真源仍在 {source.resolve()}")
+    else:
+        err = check_symlink_to(dest, source)
+        if err:
+            detail.append(err)
+        else:
+            detail.append(f"dest→{source.resolve()}")
+        if prop["action"] == "move":
+            old = tier_dir(root, prop["from_tier"], host) / prop["skill"]
+            if old.exists() or old.is_symlink():
+                detail.append(f"原层级残留 {old}")
+                err = err or detail[-1]
+            else:
+                detail.append("原层级已清")
     ok = err is None
     prop["state"] = "verified" if ok else "verification_failed"
     prop["verify"] = {"ok": ok, "detail": detail}
@@ -299,6 +322,18 @@ def cmd_rollback(args: argparse.Namespace) -> None:
         err = check_symlink_to(old, source)
         if err:
             die(f"回滚后校验失败：{err}", 1)
+    elif prop["action"] == "unmount":
+        # 恢复挂载点；真源须仍在
+        if not source.is_dir():
+            die(f"回滚失败：真源已不在 {source}", 1)
+        if snapshot(dest)["kind"] != "absent":
+            die(f"回滚失败：目标位已被占用 {dest}", 1)
+        _link(dest, source)
+        err = check_symlink_to(dest, source)
+        if err:
+            die(f"回滚后校验失败：{err}", 1)
+    else:
+        die(f"拒动作 {prop['action']}")
     prop["state"] = "rolled_back"
     save_prop(root, prop)
     append_log(root, {"event": "rolled_back", "id": prop["id"], "action": prop["action"]})
@@ -312,7 +347,7 @@ def cmd_status(args: argparse.Namespace) -> None:
 
 
 def cmd_selfcheck(_: argparse.Namespace) -> None:
-    """临时目录：挂→校验→回滚；挂→移层级→校验→回滚；拒未确认 apply。"""
+    """临时目录：挂→校验→回滚；挂→移层级→校验→回滚；挂→反挂载→校验→回滚；拒未确认 apply。"""
     with tempfile.TemporaryDirectory(prefix="sf-gate-") as tmp:
         root = Path(tmp) / "repo"
         root.mkdir()
@@ -376,6 +411,28 @@ def cmd_selfcheck(_: argparse.Namespace) -> None:
             raise AssertionError("应拒空 why")
         except SystemExit:
             pass
+
+        # --- mount → unmount → verify → rollback unmount（真源仍在）---
+        cmd_draft(NS(
+            root=str(root), skill="demo-skill", action="mount", tier="project",
+            source=str(skill), from_tier=None, risk="低", host_root=None,
+        ))
+        cmd_confirm(NS(root=str(root), id="P0005", token="yes-this-one", why=None))
+        cmd_apply(NS(root=str(root), id="P0005"))
+        cmd_verify(NS(root=str(root), id="P0005"))
+        cmd_draft(NS(
+            root=str(root), skill="demo-skill", action="unmount", tier="project",
+            source=str(skill), from_tier=None, risk="中", host_root=None,
+        ))
+        cmd_confirm(NS(root=str(root), id="P0006", token="yes-this-one", why=None))
+        cmd_apply(NS(root=str(root), id="P0006"))
+        cmd_verify(NS(root=str(root), id="P0006"))
+        assert not link.exists() and not link.is_symlink()
+        assert skill.is_dir()
+        cmd_rollback(NS(root=str(root), id="P0006"))
+        assert link.is_symlink() and link.resolve() == skill.resolve()
+        cmd_rollback(NS(root=str(root), id="P0005"))
+        assert skill.is_dir() and not link.exists()
 
     print("sf-gate selfcheck PASS")
 
