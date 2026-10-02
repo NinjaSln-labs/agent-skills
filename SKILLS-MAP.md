@@ -382,7 +382,7 @@
 | `product-marketing` | 1.1.0 | `project-handoff` | 4.4.0 | `proto-persona` | 1.1.1 |
 | `react-vite-best-practices` | 1.1.1 | `release-pipeline` | 1.0.1 | `roadmap-planning` | 1.1.1 |
 | `secrets-scan` | 1.1.1 | `security-scan` | 1.2.0 | `session-health` | 1.0.3 |
-| `skill-description-audit` | 1.14.0 | `skill-eval` | 1.2.0 | `skill-fit` | 2.2.0 |
+| `skill-description-audit` | 1.14.1 | `skill-eval` | 1.2.0 | `skill-fit` | 2.2.0 |
 | `stage-gate` | 1.1.1 | `stage-spec` | 1.1.0 | `systematic-debugging` | 1.1.1 |
 | `task-loop-progress` | 1.0.1 | `test-data-generation` | 1.2.0 | `to-tickets` | 1.1.0 |
 | `typescript-best-practices` | 1.1.1 | `ui-animation` | 1.2.0 | `ui-typography` | 1.1.1 |

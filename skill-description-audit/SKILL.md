@@ -34,10 +34,10 @@ metadata:
     - "v1.10.0：报告与内容绑定（治「先落笔后修正」）——报告头新增 `审计指纹` 字段，取值 `python3 skill-audit-fp.py <技能>`（description+正文 12 位哈希，版本号变更不计）；确立「报告＝该版最后一次写入」顺序：改正文 → 取指纹 → 出报告 → 只读校验 → 提交，出报告后再动正文即本次作废须重跑；门禁 `skill-executability-smoke.py` 按工作树内容比对，失配升为**硬失败**（原按日期比对看不出来，只留软告警）"
     - "v1.11.0：新增 §7.6「前向引用视野（consumer scope）」——description 点名他技能按**接收方是否一定持有**判，不按本机是否实存判：悬空/退役/与本库名编辑距离≤2 的拼写漂移与客户端专有名（本地实存≠消费者可得）→ [中]；点名本库其它技能（同库分发≠同装）→ [低] 建议改能力表述；机器侧半壁入门禁（点名退役件·近似名硬失败，点名本库他件软警告）；源于 skill-fit `NOT for` 三次收敛（真源仓 pitfall p000018）"
     - "v1.12.0：追加式补强（不改任何既有判据）——新增「最短实测样例」（一次完整审计的输入/动作/产出摘录）、「失败出口与边界处置」（目标不存在 / frontmatter 不可解析 / 路径非 SKILL.md / 独立方缺席 的可观察出口）、「FAQ（错法→改法）」表；均只在既有工作流之上解释，不新增检查维度"
-    - "v1.14.0：NOT for 补库级指令文件（AGENTS.md 等）与单技能自审的划界——两件相邻审计技能（skill-description-audit 审单技能 / agents-md-audit 审指令文件）分工由单向点名改为双向可读"
+    - "v1.14.0：NOT for 补库级指令文件（AGENTS.md 等）与单技能自审的划界——「审单个技能」与「审库级指令文件」两件相邻审计技能的分工由单向点名改为双向可读"
     - "v1.13.0：判据增删治理（停手线）移入本技能——硬约束 7 ＋ references/criteria-governance.md（停手条件三条 / 新增判据三缺一不可 / 判据分层 L1 机检-L2 软告警-L3 措辞 / 五类反模式 / 回滚判据 a(D)==0 即删）"
 slug: skill-description-audit
-version: 1.14.0
+version: 1.14.1
 displayName: skill-description-audit
 disable-model-invocation: true
 ---
