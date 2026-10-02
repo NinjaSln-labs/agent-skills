@@ -7,11 +7,19 @@ description: >-
   Fact/Inference/Assumption labels, confidence stacking, diffable outputs. NOT for
   answering a one-off research question or producing a single research report.
 slug: autonomous-investigation
-version: 1.1.0
+version: 1.2.0
 displayName: autonomous-investigation
 ---
 
 # Autonomous Investigation Protocol
+
+
+## 中文速览（Quick Guide）
+
+- **做什么**：为市场/竞品调查类技能定义证据协议——问题预算、Fact/Inference/Assumption 标注、置信度累加与可 diff 的产出；它本身不是研究执行器。
+- **何时用**：当调查需要在你不在场时继续（作为 agent 任务、循环或定时任务跑），而不是回答一次性研究问题或产单份报告。
+- **核心步骤**：①划定问题预算（通常 3 个澄清问题）并给出检索计划 → ②采集证据并给每条结论打标签 → ③按置信度累加规则逐级升级 → ④按稳定格式产出可与上期对比的结论。
+- **国内可达性**：正文规定源不可达时**记入 gaps 列表并写明失败原因，不得以无出处的断言替代**；全部源都不可达则输出空节 ＋「no sources reachable」注记 ＋ Final Step 块——一次可 diff 的空跑胜过卡住或编造。
 
 ## Purpose
 

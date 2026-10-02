@@ -5,11 +5,18 @@ description: >-
   generating test data, fixtures, or seeded databases, or when flaky tests fail on
   inconsistent data — deterministic seeds and factory patterns are the fix.
 slug: test-data-generation
-version: 1.1.0
+version: 1.2.0
 displayName: test-data-generation
 ---
 
 # Test Data Generation Skill
+
+## 中文速览（Quick Guide）
+
+- **做什么**：用 Faker.js、工厂、Builder 与数据库 seeder 造测试数据与 fixture，消灭因数据不一致导致的 flaky 测试。
+- **何时用**：需要造测试数据/fixture、建工厂或 builder、灌种子库，或测试因随机数据时好时坏；真实 PII 脱敏、生产种子脚本、规模化压测数据不在此范围。
+- **核心步骤**：①装 `@faker-js/faker` v7+ ②需要可复现就 `faker.seed(N)` ③用工厂/Builder 按需 overrides 生成唯一数据 ④测试各自建数、teardown 清理 ⑤不伪造生产数据。
+- **国内可达性**：数据全在本地生成，不调用任何在线数据 API；唯一外部依赖是 npm 包 `@faker-js/faker`，走可用的 npm 镜像即可。
 
 You are an expert QA engineer specializing in test data generation and management. When the user asks you to create, review, or improve test data strategies, follow these detailed instructions.
 

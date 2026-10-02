@@ -7,11 +7,18 @@ description: >-
   timing/easing/motion, checking animation accessibility (prefers-reduced-motion), or
   making components feel responsive and deliberate.
 slug: ui-animation
-version: 1.1.1
+version: 1.2.0
 displayName: ui-animation
 ---
 
 # Design Engineering
+
+## 中文速览（Quick Guide）
+
+- **做什么**：把 Emil Kowalski 的设计工程方法论编码成可执行指引，覆盖动效决策、组件细节与界面打磨，并给出可观察的失败退出与边界。
+- **何时用**：构建或评审界面、审查动效的时序/缓动/运动、排查「动效感觉不对」、检查 `prefers-reduced-motion` 等可访问性问题时。
+- **核心步骤**：①按请求类型选框架（评审 → 动效怎么动 → 手感诊断 → 可访问性）；②依次走 Animation Decision Framework 的缓动与时长等步骤定参数；③产出 Before/After 对照表并说明理由；④按失败退出规则收口。
+- **国内可达性**：本技能为本地知识与评审，不依赖境外在线服务；正文提及的 animations.dev 课程页仅作为延伸阅读。
 
 ## Initial Response
 

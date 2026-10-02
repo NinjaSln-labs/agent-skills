@@ -9,11 +9,18 @@ description: >-
   accessibility, animation, or data visualization — including design system and
   stack-guideline steps.
 slug: ui-ux-pro-max
-version: 1.1.0
+version: 1.2.0
 displayName: ui-ux-pro-max
 ---
 
 # UI/UX Pro Max - Design Intelligence
+
+## 中文速览（Quick Guide）
+
+- **做什么**：以本地可检索数据库（样式、配色、字体搭配、产品类型、UX 规则、图标、GSAP 动效、图表类型）提供带优先级的设计建议。
+- **何时用**：做页面、组件、配色、排版、布局、无障碍、动效或数据可视化设计与评审时；纯后端、API/数据库、非视觉性能与基础设施任务不适用。
+- **核心步骤**：①定位 `<skill-root>` 并确认 Python 3.x 可用；②按任务用 `search.py "<query>" --domain <domain>` 检索；③按优先级 1→10 从可访问性、触控交互、性能等规则类别定位重点；④按需读 `references/quick-reference.md` 与 `references/pro-rules.md` 取细则并落地。
+- **国内可达性**：全部数据与检索脚本都在技能目录本地（CSV + Python，无外部依赖），无需联网或境外服务。
 
 Searchable database of UI/UX design rules with priority-based recommendations: 84 styles, 192 color palettes, 74 font pairings, 192 product types with reasoning rules, 98 UX guidelines, 104 icon entries, 16 GSAP motion presets, and 25 chart types across 22 technology stacks.
 

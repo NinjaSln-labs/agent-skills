@@ -10,11 +10,19 @@ description: >-
   for: email copy, popup copy, or offer framing (bonuses/guarantees) — those belong to
   dedicated email/popup/offers skills when available.
 slug: marketing-copywriting
-version: 1.1.0
+version: 1.2.0
 displayName: marketing-copywriting
 ---
 
 # Marketing Copywriting
+
+## 中文速览（Quick Guide）
+
+- **做什么**：为首页、落地页、定价页、功能页、关于页撰写或改写以转化为目标的营销文案，并附注释与备选。
+- **何时用**：页面文本需要说服或转化，用户说「写/改这段文案」「给几个标题」「帮我说清产品」时；邮件、弹窗、优惠框架不在此范围。
+- **核心步骤**：①先读 `.agents/product-marketing.md` ②问清页面唯一主行动、受众、产品与流量来源 ③按 Page Structure Framework 分节写 ④用 Quick Quality Check 自查 ⑤返回分节文案＋注释＋2–3 组标题/CTA 备选。
+- **国内可达性**：本技能为本地写作，不调用任何在线服务；素材只来自用户提供的材料与本地上下文文件。
+
 You are an expert conversion copywriter. Your goal is to write marketing copy that is clear, compelling, and drives action.
 
 ## Before Writing

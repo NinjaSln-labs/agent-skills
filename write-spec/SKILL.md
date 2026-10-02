@@ -6,11 +6,18 @@ description: >-
   non-goals, defining success metrics and acceptance criteria, or breaking a big ask into
   a phased spec.
 slug: write-spec
-version: 1.1.0
+version: 1.2.0
 displayName: write-spec
 ---
 
 # Write Spec
+
+## 中文速览（Quick Guide）
+
+- **做什么**：把一个问题陈述或功能想法写成结构化特性规格/PRD，界定目标与非目标、成功指标与验收标准，并按需分期。
+- **何时用**：需求还模糊需要定范围、定义成功指标与验收标准、或把大需求拆成分期规格时；纯实现计划、缺陷记录、已有规格再拆票、以及还讲不清用户问题时都不适用。
+- **核心步骤**：①弄清要规格化的功能或问题；②逐个收集用户问题、目标用户、成功指标、约束与既有方案；③写 Problem Statement 与 Goals/Non-goals、指标、验收标准，冲突写入 Open Questions；④范围过大则分期、只详写第一期。
+- **国内可达性**：本技能为纯文档撰写，不依赖外部连接器或境外在线服务；未连接的工具段落跳过，不编造工单或调研引用。
 
 > Placeholders like `$ARGUMENTS` are filled from the user invocation; no external connectors file is required for this skill.
 

@@ -9,11 +9,18 @@ description: >-
   accessibility/WCAG compliance review, UI code review against style guides, or marketing sales
   copy (boundaries by task; no other skill implied).
 slug: frontend-design
-version: 1.1.0
+version: 1.2.0
 displayName: frontend-design
 ---
 
 # Frontend Design
+
+## 中文速览（Quick Guide）
+
+- **做什么**：指导新建或重塑界面时做出有明确观点的视觉设计，定调色板、字体、版面、动效与文案，避免生成物像模板。
+- **何时用**：设计或重做网页、落地页、仪表盘与应用界面，或要挑字体／配色／版面、给界面一个签名式视觉元素时；不用于 WCAG 合规评审、UI 代码评审与营销文案。
+- **核心步骤**：①先把题目定死（一个具体主体、受众、页面唯一职责）②按正文列的设计原则定方向：hero、字体配对、结构即信息、动效、复杂度匹配、文案 ③走「头脑风暴→探索→计划→批判→做→再批判」的流程 ④对照正文的默认长相清单与克制／自检要求收尾。
+- **国内可达性**：本技能为纯设计方法与写作指导，不抓取外部数据、不依赖境外在线服务。
 
 Approach this as the design lead at a small studio known for giving every client a visual identity that could not be mistaken for anyone else's. This client has already rejected proposals that felt templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, typography, and layout that are specific to this brief, and take one real aesthetic risk you can justify.
 

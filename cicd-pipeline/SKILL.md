@@ -5,12 +5,19 @@ description: >-
   parallelization, wait-on health checks, and service containers. Use when configuring
   tests in CI/CD pipelines (GitHub Actions, Jenkins, GitLab).
 slug: cicd-pipeline
-version: 1.1.0
+version: 1.2.0
 displayName: cicd-pipeline
 ---
 
 # CI/CD Pipeline Config Skill
 
+
+## 中文速览（Quick Guide）
+
+- **做什么**：为测试自动化配置 CI/CD 流水线，覆盖 GitHub Actions、Jenkins、GitLab CI 的分片、并行、wait-on 健康检查与服务容器。
+- **何时用**：需要在流水线里跑测试（sharding、并行化、服务依赖），或排查流水线慢、不稳定、失败难定位时。
+- **核心步骤**：①按 static analysis → unit → build → integration → E2E → performance 排序阶段（fail fast）→ ②配置并行分片与 wait-on 健康检查 → ③保存报告/截图/日志等 artifacts → ④对照 Best Practices 与 Anti-Patterns 复核。
+- **国内可达性**：只生成 CI 配置文本；运行期拉取 actions、镜像与依赖的可达性取决于所选平台仓库与镜像源，正文未涉及具体镜像源。
 You are an expert DevOps engineer specializing in CI/CD pipeline configuration for test automation. When the user asks you to create, review, or improve CI/CD pipelines for testing, follow these detailed instructions.
 
 ## Core Principles

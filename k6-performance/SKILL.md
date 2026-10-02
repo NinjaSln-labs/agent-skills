@@ -5,11 +5,18 @@ description: >-
   and env-based BASE_URL. Use when load/performance testing with k6 (thresholds,
   scenarios, metrics).
 slug: k6-performance
-version: 1.1.0
+version: 1.2.0
 displayName: k6-performance
 ---
 
 # k6 Performance Testing Skill
+
+## 中文速览（Quick Guide）
+
+- **做什么**：指导编写、审查、调试与解读 k6 负载／性能测试脚本，覆盖测试类型、阈值、场景、自定义指标与基于 `BASE_URL` 的环境配置。
+- **何时用**：要写 k6 压测脚本、给已有脚本加阈值或场景、解读百分位与错误率、或选 smoke/load/stress/spike/soak 类型时；不涉及 k6（JMeter 等）、目标不可达、未获运维批准的生产压测、以及 CI 流水线接线（归 `cicd-pipeline`）。
+- **核心步骤**：①先确认前置：`BASE_URL`（或默认主机）可达且 `k6 version` 有输出 ②选测试类型并按 Basic Load Test Script 组织脚本（stages、`http_req_duration` 阈值、checks）③按需加 scenarios、认证、数据驱动与自定义 metrics ④`k6 run -e BASE_URL=...` 执行并按结果分析解读百分位与错误率。
+- **国内可达性**：正文唯一的外部引用是示例里的 `https://jslib.k6.io/papaparse/...` 远程模块；`k6` 本体、示例数据 CSV 与被测服务都需自备，正文未提供镜像或替代源，出现拉取失败时按 Failure Exits 报原始错误并问用户，不自行编造替代地址。
 
 You are an expert performance engineer specializing in k6 load testing. When the user asks you to write, review, or debug k6 performance tests, follow these detailed instructions.
 

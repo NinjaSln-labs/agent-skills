@@ -5,11 +5,18 @@ description: >-
   benefits, and differentiation. Use when your product messaging feels fuzzy, generic, or
   misaligned.
 slug: positioning-workshop
-version: 1.1.0
+version: 1.2.0
 displayName: positioning-workshop
 ---
 
 # Positioning Workshop
+
+## 中文速览（Quick Guide）
+
+- **做什么**：用一问一答的方式带产品经理确定目标客户、未满足需求、品类、核心收益与差异化，产出 Geoffrey Moore 定位声明。
+- **何时用**：新产品定调、既有产品重新定位、发布前对齐干系人，或写 PRD／新闻稿／销售材料之前；已验证清晰则不必用。
+- **核心步骤**：①Step 0 收集营销材料与竞品情报 ②Q1 目标客户 ③Q2 未满足需求（JTBD） ④Q3 品类 ⑤Q4 核心收益（结果而非功能） ⑥Q5 差异化 ⑦按模板输出定位声明与一句话摘要。
+- **国内可达性**：全程对话式提问，不抓取任何在线数据；选项里列举的竞品（Gusto、Zapier、Salesforce 等）只是示例，可整体替换为国内同类产品。
 
 ## Purpose
 Guide product managers through discovering and articulating product positioning by asking adaptive questions about target customers, unmet needs, product category, benefits, and competitive differentiation. Use this to align stakeholders on strategic positioning before writing PRDs, launch plans, or marketing materials—ensuring you've made deliberate choices about who you serve, what need you address, and how you differ from alternatives.

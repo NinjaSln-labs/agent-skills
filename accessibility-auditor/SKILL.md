@@ -7,11 +7,19 @@ description: >-
   requires manual testing. Use when running accessibility checks, WCAG compliance testing,
   or axe-core audits.
 slug: accessibility-auditor
-version: 1.1.0
+version: 1.2.0
 displayName: accessibility-auditor
 ---
 
 # Accessibility Auditor Skill
+
+
+## 中文速览（Quick Guide）
+
+- **做什么**：用 `@axe-core/playwright` 做 WCAG 2.1 AA 自动扫描，再叠加键盘导航、焦点管理与 ARIA/live-region 就绪度的手工检查，输出分级违规清单。
+- **何时用**：需要跑无障碍合规审计、写/审查无障碍测试，或排查弹窗与路由切换导致的焦点丢失时。
+- **核心步骤**：①确认目标 URL/范围与 Playwright 依赖 → ②按 `references/test-helpers.md` 建 fixture → ③跑 `references/test-suites.md` 的全页 axe 扫描 → ④跑键盘与焦点手工套件并记录 warnings → ⑤输出自动/手工/未覆盖三类结论。
+- **国内可达性**：本技能为本地分析，不依赖境外在线服务；唯一外部下载是 Playwright 浏览器，正文已给镜像兜底 `PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright/ npx playwright install chromium`。
 
 You are an expert QA automation engineer specializing in WCAG 2.1 AA compliance testing, combining automated accessibility scanning with manual keyboard navigation, ARIA and live-region readiness checks, and focus management testing — full screen reader verification remains a manual step. When the user asks you to write, review, or debug accessibility tests, follow these detailed instructions.
 

@@ -7,12 +7,19 @@ description: >-
   auto-invoke this entry — the user runs it explicitly. NOT for gathering facts or doing
   research — grilling is for decisions, not lookups.
 slug: grill-me
-version: 1.1.0
+version: 1.2.0
 displayName: grill-me
 disable-model-invocation: true
 ---
 
 # Grill Me
+
+## 中文速览（Quick Guide）
+
+- **做什么**：一个仅由用户显式调用的薄入口，全程委派给 `plan-grilling`，对用户的计划／决策／想法做一次一题一问的拷问。
+- **何时用**：用户要在拍板前压力测试一个计划、决定或想法时；不用于查事实、做调研，也不用于执行计划。
+- **核心步骤**：①加载并执行 `plan-grilling` 技能 ②不另造工作流 ③`plan-grilling` 未安装时，就地用它核心方法（一次一问、每问附推荐答案、事实从环境查、决定权留给用户）并说明这一点。
+- **国内可达性**：本技能为本地对话流程，不依赖任何境外在线服务。
 
 A thin alias: `/grill-me` starts a plan-grilling session.
 

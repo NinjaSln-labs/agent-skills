@@ -7,12 +7,19 @@ description: >-
   refactoring a monolith to bounded contexts, implementing hexagonal or onion
   architecture, or debugging dependency cycles between application layers.
 slug: architecture-patterns
-version: 1.1.0
+version: 1.2.0
 displayName: architecture-patterns
 ---
 
 # Architecture Patterns
 
+
+## 中文速览（Quick Guide）
+
+- **做什么**：按 Clean Architecture、六边形架构与 DDD 战术模式，落地分层结构、依赖规则、接口定义与测试边界。
+- **何时用**：设计新后端服务、把逻辑与 ORM/HTTP 纠缠的单体拆出边界上下文，或排查层间循环依赖、框架装饰器侵入领域实体等问题。
+- **核心步骤**：①确认目标服务/模块（无则先问、模块不存在就报 not found）→ ②按 Clean/Hexagonal/DDD 组织 domain、application、ports、adapters 并守住依赖规则 → ③用内存适配器写无需数据库的用例测试 → ④对照 Troubleshooting 里的可观察症状排查。
+- **国内可达性**：本技能为本地代码结构分析与改写，不依赖境外在线服务。
 Master proven backend architecture patterns including Clean Architecture, Hexagonal Architecture, and Domain-Driven Design to build maintainable, testable, and scalable systems.
 
 **Given:** a service boundary or module to architect.

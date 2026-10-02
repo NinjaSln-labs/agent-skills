@@ -14,12 +14,19 @@ description: >-
   USER-INVOKED ONLY: run only when the user asks for a security scan; never
   auto-trigger from any code-writing task.
 slug: security-scan
-version: 1.1.0
+version: 1.2.0
 displayName: security-scan
 disable-model-invocation: true
 ---
 
 # Security Scan
+
+## 中文速览（Quick Guide）
+
+- **做什么**：对整个代码库做一次模式化安全扫描（OWASP Top 10、硬编码凭据、注入、弱加密、错误配置），出带严重度与修复建议的报告。
+- **何时用**：发布或 PR 前的全量安全评审、需要给安全问题排优先级；仅由用户显式调用，不随日常写码自动触发。
+- **核心步骤**：①发现项目类型与文件 ②静态模式匹配＋逐处 source-to-sink 阅读 ③凭据扫描（值必须掩码） ④读 lockfile/manifest 查陈旧版本 ⑤去重、定级、出报告。
+- **国内可达性**：完全离线，不需网络；阿里云、微信、字节系等平台密钥格式在 `references/patterns/secret-formats.md` 中缺失属设计内覆盖缺口，需在 `.security-scan.yaml` 自定义 pattern 补齐。
 
 Comprehensive security vulnerability detection for codebases.
 

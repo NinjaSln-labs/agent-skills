@@ -11,11 +11,18 @@ description: >-
   DDD context mapping, or code outside the domain layer (DTOs, controllers, infrastructure
   adapters).
 slug: ddd-tactical-review
-version: 1.1.0
+version: 1.2.0
 displayName: ddd-tactical-review
 ---
 
 # Tactical DDD — Rich Domain Modeling
+
+## 中文速览（Quick Guide）
+
+- **做什么**：扫描领域层代码，识别贫血模型，并按实体／值对象／聚合／领域服务／领域事件判定正确构件，重构为充血模型。
+- **何时用**：用户要校验、重构领域模型或 DDD 代码时；不用于模块边界、架构拆分或上下文映射。
+- **核心步骤**：①先判意图（只校验／要修／要设计）②Phase 1 查 `detection.md` 扫描贫血信号并给严重度 ③Phase 2 逐类判定应变成哪种构件 ④只校验则出报告并征询是否动手，要修才进 Phase 3 按序重构。
+- **国内可达性**：本技能为本地分析，只读仓库内代码与随附的 `detection.md`／`refactoring.md`／`reference.md`，不依赖任何境外在线服务。
 
 ## Workflow
 

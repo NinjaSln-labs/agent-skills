@@ -5,12 +5,19 @@ description: >-
   when reviewing configuration security for containers, Kubernetes, Terraform, or
   application settings.
 slug: config-scan
-version: 1.1.1
+version: 1.2.0
 displayName: config-scan
 ---
 
 # Config Scan
 
+
+## 中文速览（Quick Guide）
+
+- **做什么**：扫描配置文件与基础设施即代码中的安全反模式，按环境变量、Docker、Kubernetes、Terraform/IaC、应用配置五类输出风险与修复示例。
+- **何时用**：需要按 `--docker`、`--k8s`、`--terraform`、`--env` 或全量方式审查容器、K8s、Terraform 与应用设置的安全配置时。
+- **核心步骤**：①选定扫描类别/配置（忽略规则、扫描 profile）→ ②按类别逐项检查（如 root 运行、privileged 容器、公开 S3、缺失资源限额）→ ③按输出格式给出严重度与修复建议 → ④对照 Remediation Examples 落实整改。
+- **国内可达性**：本技能为本地静态扫描，不访问外部网络或在线服务。
 Security review of configuration files and infrastructure as code.
 
 ## Quick Start

@@ -6,11 +6,18 @@ description: >-
   user needs help with any aspect of understanding their users through research. NOT for
   usability of code you cannot observe, or research with no user access.
 slug: user-research
-version: 1.1.0
+version: 1.2.0
 displayName: user-research
 ---
 
 # User Research
+
+## 中文速览（Quick Guide）
+
+- **做什么**：帮助规划、执行并综合用户研究，产出研究计划、访谈提纲、综合报告与高光片段。
+- **何时用**：需要用研究理解用户时——访谈提纲、可用性测试、问卷设计、研究问题等；无法接触真实用户或对不可观察的代码可用性不适用。
+- **核心步骤**：①按研究方法表选方法、样本量与周期；②用「热身—背景—深挖—反应—收尾」结构写访谈提纲；③用亲和图、影响力/投入矩阵、旅程图、JTBD 做综合；④交付计划/提纲/综合报告/高光片段。
+- **国内可达性**：本技能为方法与模板层面的本地指导，不调用境外在线服务；当拿不到真实用户时改用工单挖掘、公开社区讨论、评论等合法替代来源。
 
 Help plan, execute, and synthesize user research studies.
 

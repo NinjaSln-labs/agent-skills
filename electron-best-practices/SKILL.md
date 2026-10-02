@@ -7,11 +7,18 @@ description: >-
   code signing, notarization, playwright, desktop app. Use when building secure Electron
   apps with React/TypeScript (IPC, packaging, testing).
 slug: electron-best-practices
-version: 1.1.1
+version: 1.2.0
 displayName: electron-best-practices
 ---
 
 # Electron + React Best Practices
+
+## 中文速览（Quick Guide）
+
+- **做什么**：给出用 React 开发 Electron 应用的安全、类型安全 IPC、进程集成、打包签名公证与测试模式，并提供分析、生成脚手架与类型的参考件。
+- **何时用**：写主／preload／渲染进程代码、配置 electron-vite 或 Forge、搭 IPC、做 contextBridge／sandbox／CSP 安全、签名公证、或用 Playwright 测 Electron 应用时；不用于 Tauri、纯 Web 应用、Electron 20 以下版本或非 React 渲染框架。
+- **核心步骤**：①先套安全默认（contextIsolation、sandbox、关闭 nodeIntegration，主渲染通信全走 contextBridge）②按 `references/` 取模式：类型化 IPC、进程分离、React 集成 ③用 `electron-vite` 或 Forge 打包并做代码签名／公证 ④用 Playwright 端到端与 Jest／Vitest 单测验证。
+- **国内可达性**：模式、参考文档与模板都在本包内（`references/`、`assets/templates/`），无需联网即可套用；正文里的可选动作需外部环境——GitHub Actions 矩阵构建、以及 `deno run` 跑 `scripts/` 下的便捷脚本，缺失时直接按正文的可观察出口处理并说明哪一步未跑。
 
 Guide AI agents in building secure, production-ready Electron applications with React. This skill provides security patterns, type-safe IPC communication, project setup guidance, packaging and code signing workflows, and tools for analysis, scaffolding, and type generation.
 

@@ -5,11 +5,18 @@ description: >-
   switching triggers — with quoted evidence. Use when you want customer voice without
   waiting on interviews.
 slug: voice-of-customer-miner
-version: 1.1.0
+version: 1.2.0
 displayName: voice-of-customer-miner
 ---
 
 # Voice-of-Customer Miner
+
+## 中文速览（Quick Guide）
+
+- **做什么**：从评论站、应用商店、Reddit 与从业者论坛等公开渠道挖掘客户原声，提炼未满足需求、竞品弱点与切换触发点。
+- **何时用**：想不等访谈周期就拿到客户声音时；对象无公开足迹、需要私有区域自有用户声音、或需要统计置信度时不适用。
+- **核心步骤**：①问最多 3 个问题（谁的声音、支撑什么决策、有无主题）并按假设推进；②过 search-plan 闸后做来源清扫；③逐条带 URL 抓原话；④按需求（而非功能）归主题并标注事实/推断/假设与来源偏差；⑤给 4 个下一步选项。
+- **国内可达性**：正文指定的公开源以境外站点为主，部分（如 Reddit、应用商店评论）在国内不可直接访问；此时可改用国内可访问的公开社区与评论渠道，并保持同样的「原话 + URL + 偏差标注」纪律。
 
 ## Purpose
 

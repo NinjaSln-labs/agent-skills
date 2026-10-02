@@ -9,7 +9,7 @@ description: >-
   skill executes solo). NOT for: verify-only stage completion checks against a spec —
   those only verify and never execute.
 slug: executing-plans
-version: 1.1.0
+version: 1.2.0
 displayName: executing-plans
 ---
 
@@ -45,6 +45,18 @@ For each task:
 After all tasks complete and verified:
 - Announce: "I'm finishing the development branch to complete this work."
 - If your environment happens to include a branch-finishing skill, prefer following it; otherwise complete the work directly: verify the full test suite passes, present the integration options to your human partner (merge, open a PR, keep the branch, or discard), and execute their choice
+
+## How to Invoke
+
+Text invocation — this skill has no script and takes no parameters. Call it by name and point it at
+the plan file:
+
+```text
+executing-plans: implement the plan at docs/plan-2026-10-refund-retry.md
+```
+
+If no plan path is given, the skill asks for one before doing any work (see Step 1). It executes
+plans only — it does not write them, and it does not run stage gates mid-execution.
 
 ## 边界（与 stage-gate 分工）
 
