@@ -5,7 +5,7 @@ description: >-
   users, solution, and success criteria. Use when turning discovery notes into an
   engineering-ready document for a major initiative or feature.
 slug: prd-development
-version: 1.2.0
+version: 1.2.1
 displayName: prd-development
 ---
 
@@ -362,8 +362,6 @@ This workflow orchestrates **8 phases** over **2-4 days**, using multiple compon
 - **Format:** List features/requests explicitly excluded
 - **Rationale:** Why not building now?
 
-**Example:**
-
 **Example:** verbatim in [`references/prd-worked-examples.md`](references/prd-worked-examples.md) (§ Phase 8).
 
 **2. Document Dependencies**
@@ -371,16 +369,12 @@ This workflow orchestrates **8 phases** over **2-4 days**, using multiple compon
 - **External dependencies:** Third-party integrations, partnerships
 - **Team dependencies:** Design handoff, data pipeline work
 
-**Example:**
-
-**Example:** verbatim in [`references/prd-worked-examples.md`](references/prd-worked-examples.md) (§ Phase 9).
+**Example:** verbatim in [`references/prd-worked-examples.md`](references/prd-worked-examples.md) (§ Phase 9 — Dependencies & Risks；该参考件把本 Phase 的子项拆成自己的 Phase 9/10 编号).
 
 **3. Document Open Questions**
 - **Unresolved decisions:** Areas requiring discovery or discussion
 
-**Example:**
-
-**Example:** verbatim in [`references/prd-worked-examples.md`](references/prd-worked-examples.md) (§ Phase 10).
+**Example:** verbatim in [`references/prd-worked-examples.md`](references/prd-worked-examples.md) (§ Phase 10 — Open Questions；同上为参考件的独立编号).
 
 ### Outputs from Phase 8
 
