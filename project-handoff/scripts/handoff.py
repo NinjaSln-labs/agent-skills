@@ -457,9 +457,54 @@ def cmd_check(st: Store, no_log: bool = False) -> int:
         if not ID_RE.match(nid):
             errs.append(f"next: 非法 id {nid!r}")
         else:
-            live_ids = {r["id"] for r in st.load_live()}
-            if nid not in live_ids:
+            live_recs = {r["id"]: r for r in st.load_live() if "id" in r}
+            if nid not in live_recs:
                 errs.append(f"next: {nid} 不存在或已关闭")
+            elif (live_recs[nid].get("status") or "open") != "open":
+                # 存在但不是 open：blocked/等待中的条目当决策点＝空指针。调用方
+                # （接手的人或 agent）照着 next 走会立刻卡住，而结构上看不出问题。
+                errs.append(f"next: {nid} 的 status="
+                            f"{live_recs[nid].get('status') or 'open'!r}，不是 open"
+                            f"（等待中的条目不该当决策点；跑 handoff next 补位）")
+
+    # 文本槽死指针（D1，2026-10-03）：文本槽是纯手写散文，条目删了/改号了它不会
+    # 自己跟着变。结构校验看不出这类漂移——槽文件存在、id 合法、引用闭合，全都对。
+    # id 不随时间失效，所以这一维可**全量**判。**但不是「无假阳性」**——见下面 ②：
+    # `d` 型有一个可复现的碰撞面（7 字符全 hex 的 commit 短 hash）。
+    #
+    # **两个刻意的收窄**（都是被真文本逼出来的，不是预防性设计）：
+    #  ① **已作废 ≠ 不存在**。`rm` 会把条目落进 `trash/` 并记入 `void`；此后文本里
+    #     写「t000105 作废」是**正当的历史陈述**（真源实测共 6 处：`status` 3 ＋ `summary` 1 ＋ `exit` 2），
+    #     判它死指针就是逼着人把正确记录改掉。故作废 id 不计。
+    #  ② **不判 `c` 前缀**。`c` 型是 commands 槽。收窄的真实理由（这里更正过两次，
+    #     前两版都写错了，故把推演写下来，别再凭印象改）：
+    #       · 模式 `\b([tpdqu]\d{6})\b` 长度**恒为 7 字符** ⇒ 6 字符的 git 短 hash
+    #         长度不足，**永不匹配**（实测 `c12345` → 无命中）。
+    #       · `c697750`（7 字符）也不匹配，但原因不是词边界，而是 `c` 根本不在
+    #         字符类里——把它排除之后这一条就恒成立，与边界无关。
+    #       · 字符类 `tpdqu` 里**只有 `d` 是 hex 字符**。所以唯一可达的 commit-hash
+    #         碰撞面是 **`d` 型**（7 字符全 hex 的短 hash，如 `d697750`）——而 `d` 型
+    #         （decisions）**是受判的**。
+    #     即：排除 `c` 的收益是零成本（它本来就够不着），**真正够得着的 `d` 型没排**。
+    #     `d` 型的收窄属**判据增删**，走停手线（见 skill-description-audit），本轮
+    #     **不擅自改**，只登记：若日后出现 d 型假阳（文本里写 commit 短 hash），
+    #     再按停手线决定是加上下文判据还是收窄。
+    voided = set(_void_ids(st))
+    trash = st.d / "trash"
+    if trash.is_dir():
+        for f in sorted(trash.glob("*.jsonl")):
+            for r in read_jsonl(f):
+                if r.get("id"):
+                    voided.add(r["id"])
+    known_ids = set(st.all_ids()) | voided
+    for s in ("status", "summary", "exit"):
+        sp = st.d / s
+        if not sp.is_file():
+            continue
+        for ref in sorted(set(re.findall(r"\b([tpdqu]\d{6})\b", sp.read_text(encoding="utf-8")))):
+            if ref not in known_ids:
+                errs.append(f"{s}: 提到 {ref}，但 live∪closed∪decisions 里没有这个 id"
+                            f"（既不在册、也不在 trash/void——条目被删或改号了，文本不会自己跟着变）")
 
     # 决策文档校验
     if st.decisions_dir().is_dir():
