@@ -5,7 +5,7 @@
 ## 步骤
 
 1. **判定存储态**（看 `.handoff/index` / 槽，**不是**看目录是否存在）：
-   - 有 `.handoff/index` → `python3 <技能>/scripts/handoff.py check` 过 → 继续。
+   - 有 `.handoff/index` → `python3 <技能>/scripts/handoff.py check` 过（Windows 用 `python`）→ 继续。
    - 无，但存在**旧模型**（`HANDOFF.md` / `HANDOFF-ARCHIVE/` / `.handoff/fp.*`）→ **告知用户并请求迁移**（迁移**仅显式调用**，不自主跑）；同意后走 `references/migrate.md`，再回本步。
    - 全无 → 报「尚无工作存储」，**询问**是否新建；同意则 `references/init.md`。
    - **并确保约定**：`AGENTS.md` 缺「未决项只写 `.handoff/`」→ 补 / 新建（防持续偏移）。

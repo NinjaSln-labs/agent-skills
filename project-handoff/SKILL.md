@@ -8,7 +8,12 @@ description: >-
   sessions or tools, or resuming or continuing prior work on a project. Initializing a
   new project's store or migrating an old HANDOFF.md model is done only when the user
   explicitly asks. NOT for: ephemeral scratch notes, or work outside a project.
-version: 4.3.1
+version: 4.4.0
+metadata:
+  patches:
+    - "v4.4.0：`agents-block --install` 改为**整理覆盖**——已有 `## 交接` 整节但无标记区时收敛该节，而不是拒绝（旧行为要求人先手工并入标记区）；交接标题的识别只认标题行本身（不吃提到交接的普通段落，含三级标题 `### 交接`）；标记区只有 begin 或只有 end（残缺）时**拒绝并报错**，不再静默整节替换；仓里有多份标记区/多个交接节时**合并到一份**（`--check` 独立报「多份并存」，不靠 install 才有痕迹）"
+    - "v4.3.2：标准交接块随 `init` 自动装（`agents-block --install`，只动块内、块外内容不变）——写入是使用方自己项目里的动作，库维护者不跨仓代劳；块内去掉写死的 `python3` 与仓内相对路径（技能装在 `~/.agents/skills/`，各仓路径不同、解释器随平台而异），命令准确形式留在正文并补 Windows 用 `python`"
+    - "v4.3.1：退出码纪律 ＋ 门禁退出码只取脚本本身（不判管道末端）"
 slug: project-handoff
 displayName: project-handoff
 ---
@@ -17,7 +22,7 @@ displayName: project-handoff
 
 ## 角色
 
-维护项目**交接存储** `.handoff/`（纯文本）：**9 槽** ＝ 一份「让接收方（agent / LLM）接得上」的**多维交接件**（**不止未决项**）。条目**只经** `scripts/handoff.py` CLI 写（**单一写入口** + **机检门禁**）。
+维护项目**交接存储** `.handoff/`（纯文本）：**9 槽** ＝ 一份「让接收方（agent / LLM）接得上」的**多维交接件**（**不止未决项**）。条目**只经**本技能自带的 CLI 写（准确命令形式见下 `## CLI`；**单一写入口** ＋ **机检门禁**）。
 
 - **维度闭合**：9 槽固定；槽外信息 → `unconfirmed`（未能确认），**不即兴开槽**。
 - **只记不可推导项**：可读的用指针，读不到的才记——交接的意义＝**免重读仓库**。
@@ -47,7 +52,10 @@ prev/<slot>                                     # 单文件槽覆写前快照（
 - **决策**：`decisions/<id>.md` = frontmatter(`id/created/status/domain/topic`) + ADR 正文。
 - **`index` 由脚本重建**；**永不手写**。
 
-## CLI（`scripts/handoff.py`，python3）
+## CLI（技能自带脚本，路径见下方 `$H`；解释器 `python3`，Windows 用 `python`）
+
+> 节标题**不写死仓内相对路径**——各仓装本技能的位置不同，写 `scripts/handoff.py`
+> 会让别的项目的 agent 去执行一个它那儿不存在的文件。
 
 `init` · `index` · `check` · `selftest` · `log` · `add` · `set` · `edit` · `rm` · `close` · `next` · `unconfirmed` · `scope` · `confirm` · `filter` · `view` · `export` · `import`。
 
@@ -75,7 +83,10 @@ prev/<slot>                                     # 单文件槽覆写前快照（
 - **维度闭合**：9 槽固定，槽外→`unconfirmed`。
 - **源登记表闭合**：**只有 `scope` 登记的源被读**；未登记 → **非未决源**（定义使然）。`check` 校每条登记**可解析**（路径存在 / glob 有命中）；`scope scan` **仅提议**（机械候选），漏扫不影响契约成立。
 - **迁移先于交接**：有旧模型时，**告知用户并请求迁移**（`init`/`migrate` **仅显式调用**）；同意后先走 `migrate`（它建存储），勿先建空存储、勿在旧模型上直接交接。
-- **项目约定**：任何**建立或使用存储**的相位（`init`/`migrate`/交接）都要确保 `AGENTS.md` 含「未决项只写 `.handoff/`」一节（**无则新建**）——防持续偏移。
+- **项目约定（标准块，自动装）**：`init` 会把**标准交接块**写进**本项目**的 `AGENTS.md`（`agents-block --install .`，节外内容不动）。三种情形都收敛到**单源**：已有标记区 → 覆写块内；已有 `## 交接`（或 `### 交接`）整节但无标记区 → **整理覆盖该节**（手写副本被标准块接管，节外不动；被替换的非空行数会打印）；都没有 → 新建该节。**标记区残缺**（只有 begin 或只有 end，说明被人手改坏过）→ **拒绝并报错**，不自动修：静默整节替换会把那段人写内容一起吃掉。识别交接标题只认标题行本身，不会误吃「## 交接约定」这类普通章节。唯一源＝`references/agents-handoff-block.md`。**不手工编辑块内条目**——`--check` 字节比对，漂移 rc=1。
+  - **写入是使用方自己的动作**：库维护者不跨仓代劳——每个项目在**自己**启用交接时安装一次。
+  - **防漂移**：`agents-block --check .` 字节比对，块内被手改即 rc=1。要升级条目，改标准源再让各仓重装，**不要在仓里改条目**（复制即漂移，与 catalog 条款同病）。
+  - **档位**：`--profile basic`（通用纪律）／`--profile freshness`（该仓装了交接新鲜度判据时才用，抄了却没装判据＝给 agent 一条无法执行的指令）。`--check` 会按块内标记**自动识别**档位。
 - 崩溃最坏产生重复（按 id 去重，closed 胜）——**绝不丢**。
 
 ## 反模式
@@ -87,16 +98,19 @@ prev/<slot>                                     # 单文件槽覆写前快照（
 
 ## 最短真实样例（初始化 → 交接一轮）
 
-前置：项目根目录、`python3` 可用、已获用户显式授权建存储。
+前置：项目根目录、解释器可用、已获用户显式授权建存储。
+**解释器**：下文示例统一写 `python3`；**Windows 上改用 `python`**（那里通常没有 `python3`）。
+`$H` 指本技能目录（通常在 `~/.agents/skills/project-handoff`，各仓相对路径不同，故用绝对/家目录路径而非仓内相对路径）。
 
 ```bash
-python3 scripts/handoff.py init                 # 建 .handoff/，自动生成 index
-python3 scripts/handoff.py add action --summary "[高] 修复登录重定向循环" --domain auth --src src/auth/login.ts:42
-python3 scripts/handoff.py add pitfall --summary "测试库必须先 seed，否则 check 全红" --domain test
-printf '已完成认证重构；测试待补\n' | python3 scripts/handoff.py set status --file -
-python3 scripts/handoff.py check                # 门禁：非零退出 = 不得收尾
-python3 scripts/handoff.py confirm --seed 1     # 出题（两次须同 --seed）
-python3 scripts/handoff.py confirm --seed 1 --answers "<按 view 行原样逐行>"   # 判卷，PASS 才算交接完成
+python3 "$H/scripts/handoff.py" init             # 建 .handoff/ ＋ 自动装标准交接块；自动生成 index
+python3 "$H/scripts/handoff.py" add action --summary "[高] 修复登录重定向循环" --domain auth --src src/auth/login.ts:42
+python3 "$H/scripts/handoff.py" add pitfall --summary "测试库必须先 seed，否则 check 全红" --domain test
+printf '已完成认证重构；测试待补\n' | python3 "$H/scripts/handoff.py" set status --file -
+python3 "$H/scripts/handoff.py" check               # 门禁：非零退出 = 不得收尾
+python3 "$H/scripts/handoff.py" confirm --seed 1    # 出题（两次须同 --seed）
+python3 "$H/scripts/handoff.py" confirm --seed 1 --answers "<按 view 行原样逐行>"   # 判卷，PASS 才算交接完成
+python3 "$H/scripts/handoff.py" agents-block --check .   # 交接块 vs 唯一源，漂移 rc=1
 ```
 
 产出（摘录）：`handoff check` 打印 `handoff check: OK` 并落一条 `log` 快照；`confirm` 判卷通过打 `PASS`——**不 PASS ＝ 交接未完成**。接收方恢复上下文只读 `references/resume.md` 相位（`view` + `next` 即可接上）。

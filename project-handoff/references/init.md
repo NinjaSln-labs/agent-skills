@@ -12,6 +12,7 @@
 
 1. **建骨架（脚本，勿手搓）**：
    ```sh
+   # **解释器**：下列示例写 `python3`；**Windows 上用 `python`**（那里通常没有 `python3`）。`<技能目录>` 指本技能安装目录（通常 `~/.agents/skills/project-handoff`）——**不要用仓内相对路径**，各仓路径不同。
    python3 <技能目录>/scripts/handoff.py init
    ```
    → 建 `.handoff/` 全部 9 槽 + `index`。

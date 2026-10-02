@@ -305,6 +305,25 @@ def cmd_init(st: Store, a) -> int:
         (st.d / "log.jsonl").write_text("", encoding="utf-8")
     st.write_index()
     print(f"handoff init: 已建骨架 {st.d}/（9 槽 + index）")
+    # 顺手把标准交接块装进**本项目**的 AGENTS.md——写入是使用方自己的动作，不是
+    # 库维护者跨仓代劳。init 是用户显式启用交接的那一刻，也就是最自然的安装时机。
+    # 不阻断 init：AGENTS.md 不存在就跳过（此时无法装块）；存在则一律装上——
+    # 已有 `## 交接` 节的走整理覆盖，不需要人先手工并入标记区。
+    repo = st.d.parent
+    agents = repo / "AGENTS.md"
+    if agents.is_file():
+        class _A:  # 复用 --install 的落盘逻辑，不走 argparse
+            install = str(repo)
+            profile = "basic"
+            print_only = False
+            check = None
+        rc = cmd_agents_block(st, _A())
+        if rc != 0:
+            print("  提示：交接块未自动写入（见上），修好后再跑一次 "
+                  "`handoff.py agents-block --install .` 即可。")
+    else:
+        print(f"  提示：{agents} 不存在，跳过交接块安装；建好 AGENTS.md 后跑 "
+              "`handoff.py agents-block --install .`")
     return 0
 
 
@@ -865,6 +884,181 @@ def cmd_confirm(st: Store, a) -> int:
         return 1
     print(f"handoff confirm: PASS（{len(qs)} 题）")
     return 0
+
+
+BEGIN_MARK = "<!-- handoff:begin -->"
+END_MARK = "<!-- handoff:end -->"
+
+
+def agents_block_text(profile: str = "basic") -> str:
+    """标准交接块正文（两标记之间的内容，逐字节唯一源）。
+
+    唯一源＝`project-handoff/references/agents-handoff-block.md`。别的仓通过
+    `--install` 取同一份，**不要在各自 AGENTS.md 里手改条目**：改了不会同步，
+    而 `--check` 会立刻报漂移——这与「复制 catalog 条款」导致漂移是同一个病。
+    """
+    src = Path(__file__).resolve().parent.parent / "references" / "agents-handoff-block.md"
+    text = src.read_text(encoding="utf-8")
+    if BEGIN_MARK not in text or END_MARK not in text:
+        die(f"agents-block: 标准源缺标记（{BEGIN_MARK} / {END_MARK}）：{src}", 2)
+    body = text.split(BEGIN_MARK, 1)[1].split(END_MARK, 1)[0]
+    if profile == "freshness":
+        fb, fe = "<!-- handoff:freshness:begin -->", "<!-- handoff:freshness:end -->"
+        if fb in text and fe in text:
+            # 连 **begin 标记一起**带上：它就是 --check 的档位识别锚点。
+            # 丢了它，--check 会把增强档误判成 basic（行数不等、且逐行比对打不出差异行，
+            # 症状极难认）。这个 bug 就是被 --check 本身抓出来的。
+            seg = text.split(fb, 1)[1].split(fe, 1)[0].rstrip()
+            body = body.rstrip() + "\n" + fb + "\n" + seg + "\n"
+    elif profile != "basic":
+        die(f"agents-block: 未知档位 {profile!r}（可用：basic / freshness）", 2)
+    return BEGIN_MARK + body.rstrip() + "\n" + END_MARK + "\n"
+
+
+FRESH_BEGIN = "<!-- handoff:freshness:begin -->"
+
+HANDOFF_HEADING = re.compile(r"^#{2,3}\s+交接\s*$")
+
+
+def find_handoff_sections(lines: list) -> list:
+    """定位**所有** `## 交接` / `### 交接` 节，返回按出现顺序的 (起, 止右开) 列表。
+
+    识别只认**标题行本身**（可有尾随空白），不靠正文里的「交接」二字——否则会
+    把提到交接的普通段落整段吃掉。节到下一个同级或更高级标题为止；文末到 EOF。
+    返回全部而非第一个：重复的交接节本身就是「单源」被破坏的现场，只收敛
+    第一个会把第二个留在仓里继续被 agent 读到。
+    """
+    heads = [i for i, ln in enumerate(lines) if HANDOFF_HEADING.match(ln.rstrip())]
+    secs = []
+    for start in heads:
+        level = len(lines[start]) - len(lines[start].lstrip("#"))
+        stop = len(lines)
+        for j in range(start + 1, len(lines)):
+            s = lines[j]
+            if s.startswith("#"):
+                lv = len(s) - len(s.lstrip("#"))
+                if lv <= level:
+                    stop = j
+                    break
+        secs.append((start, stop))
+    return secs
+
+
+def find_handoff_section(lines: list) -> tuple | None:
+    secs = find_handoff_sections(lines)
+    return secs[0] if secs else None
+
+
+def install_block(text: str, block: str) -> tuple:
+    """把标准块装进 AGENTS.md 正文。返回 (新正文, 动作, 被替换的旧行数)。
+
+    三种情形，唯一目标都是**单源**：标记区在 → 原地覆写块内；整节在但标记区
+    不在 → 整理覆盖该节（手写副本被标准块收敛掉，节外不动）；都没有 → 新建
+    `## 交接` 节。旧内容不备份——本工具的判据是「不留第二份」，留备份反而制造
+    第二个可被 agent 读到的来源；需要原文时由 git 负责。
+    """
+    inner = block.split(BEGIN_MARK, 1)[1].split(END_MARK, 1)[0]
+    new_block = BEGIN_MARK + inner + END_MARK
+    if (BEGIN_MARK in text) != (END_MARK in text):
+        # 残缺标记（只有一个端）。此时**不能**继续往下走：静默走整节替换会把
+        # 含残片的那一段连人写的内容一起吃掉。宁可拒绝，让人先看。
+        return text, "残缺标记", -1
+    if text.count(BEGIN_MARK) > 1 or text.count(END_MARK) > 1:
+        # 剥块时**保留空行结构**（别顺手 rstrip/丢空行，那会把整个文件的
+        # 段落间距和章节顺序搅乱——单源达成不等于可以把别人的排版改掉）。
+        text = re.sub(re.escape(BEGIN_MARK) + r".*?" + re.escape(END_MARK),
+                      "", text, flags=re.DOTALL)
+        return install_block(text, block)  # 剥干净后必是「整节」或「都没有」
+    if BEGIN_MARK in text:
+        text = (text.split(BEGIN_MARK, 1)[0] + new_block + text.split(END_MARK, 1)[1])
+        return text, "更新", 0
+    lines = text.splitlines()
+    secs = find_handoff_sections(lines)
+    if secs:
+        start, end = secs[0]
+        old = [ln for ln in lines[start + 1:end] if ln.strip()]
+        # 重复的交接节：全部删掉，只留第一个装标准块。留着就是第二份来源。
+        for s2, e2 in reversed(secs[1:]):
+            old += [ln for ln in lines[s2:e2] if ln.strip()]
+            del lines[s2:e2]
+            # 注意：start/end 是**剥块后旧位置**算出的，secs[1:] 都在它们之后，
+            # 删掉不影响前面的索引——这里绝不能再改 start/end（曾经写成
+            # `start = end = min(start, s2)`，链式赋值把 end 压成 start，
+            # 于是 lines[4:4]=[...] 变成插入而非替换，原标题被顶到块后面）。
+        lines[start:end] = [lines[start], "", new_block.rstrip("\n"), ""]
+        verb = "整理覆盖" if len(secs) == 1 else "整理覆盖+合并重复节"
+        return "\n".join(lines).rstrip("\n") + "\n", verb, len(old)
+    return text.rstrip("\n") + "\n\n## 交接\n\n" + block, "新建", 0
+
+
+def cmd_agents_block(st: Store, a) -> int:
+
+    if a.print_only:
+        sys.stdout.write(agents_block_text(a.profile))
+        return 0
+
+    if a.check is not None:
+        repo = Path(a.check).resolve()
+        f = repo / "AGENTS.md"
+        if not f.is_file():
+            print(f"agents-block: FAIL（{f} 不存在）", file=sys.stderr)
+            return 1
+        text = f.read_text(encoding="utf-8")
+        if BEGIN_MARK not in text or END_MARK not in text:
+            print(f"agents-block: FAIL（{f} 没有 {BEGIN_MARK} / {END_MARK} 标记区）", file=sys.stderr)
+            print(f"  修：python3 <handoff>/scripts/handoff.py agents-block --install {repo}", file=sys.stderr)
+            return 1
+        if text.count(BEGIN_MARK) != 1 or text.count(END_MARK) != 1:
+            print(f"agents-block: FAIL（{f} 有 {text.count(BEGIN_MARK)} 个 {BEGIN_MARK}／"
+                  f"{text.count(END_MARK)} 个 {END_MARK}——多份交接块并存＝单源已破）",
+                  file=sys.stderr)
+            print(f"  修：--install 会收敛到一份（重复的交接节一并合并）。", file=sys.stderr)
+            return 1
+        got = text.split(BEGIN_MARK, 1)[1].split(END_MARK, 1)[0].strip()
+        # 档位**自动识别**（检查方不该被迫记住目标仓属于哪一档）：块内带增强档标记
+        # 就按增强档比对。--profile 只在 --print/--install 时用作期望档位。
+        effective = "freshness" if FRESH_BEGIN in got else "basic"
+        want = agents_block_text(effective).split(BEGIN_MARK, 1)[1].split(END_MARK, 1)[0].strip()
+        if got != want:
+            print(f"agents-block: FAIL（{f} 的交接块与标准源不一致）", file=sys.stderr)
+            for i, (g, w) in enumerate(zip(got.splitlines(), want.splitlines()), 1):
+                if g != w:
+                    print(f"  首个差异 行{i}:", file=sys.stderr)
+                    print(f"    仓里: {g.strip()[:90]}", file=sys.stderr)
+                    print(f"    源里: {w.strip()[:90]}", file=sys.stderr)
+                    break
+            print("  修：--install 覆盖块内内容（块外不动），别手改条目。", file=sys.stderr)
+            return 1
+        print(f"agents-block: OK（{f} 交接块与标准源一致）")
+        return 0
+
+    if a.install is not None:
+        block = agents_block_text(a.profile)
+        repo = Path(a.install).resolve()
+        f = repo / "AGENTS.md"
+        if not f.is_file():
+            print(f"agents-block: FAIL（{f} 不存在——先建仓或给对仓根）", file=sys.stderr)
+            return 1
+        text = f.read_text(encoding="utf-8")
+        text, verb, replaced = install_block(text, block)
+        if verb == "残缺标记":
+            print(f"agents-block: FAIL（{f} 的标记区残缺——只有 "
+                  f"{BEGIN_MARK if BEGIN_MARK in text else END_MARK}，缺另一端）",
+                  file=sys.stderr)
+            print("  这是手改坏过的痕迹。不自动修：静默整节替换会连带吃掉那段的"
+                  "人写内容。修：把残缺的那一行删掉（或补齐另一端），再跑 --install。",
+                  file=sys.stderr)
+            return 1
+        f.write_text(text, encoding="utf-8")
+        if verb == "整理覆盖":
+            print(f"agents-block: 整理覆盖交接块 → {f}（原有 ## 交接 节 "
+                  f"{replaced} 行非空内容已被标准块收敛，节外未动）")
+        else:
+            print(f"agents-block: {verb}交接块 → {f}（块外内容未动）")
+        return 0
+
+    print("用法：agents-block --print | --install <仓根> | --check <仓根>", file=sys.stderr)
+    return 2
 
 
 # ---------------- export / import ----------------
@@ -1553,6 +1747,13 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("view"); p.add_argument("--id"); p.add_argument("--save", action="store_true"); p.add_argument("--out")
 
+    p = sub.add_parser("agents-block",
+                       help="AGENTS.md 交接块：--print / --install <仓根> / --check <仓根>")
+    p.add_argument("--print", dest="print_only", action="store_true")
+    p.add_argument("--install", metavar="REPO", help="写入/更新该仓 AGENTS.md 交接块（块外不动）")
+    p.add_argument("--check", metavar="REPO", help="校验该仓交接块与标准源一致（漂移 rc=1）")
+    p.add_argument("--profile", choices=("basic", "freshness"), default="basic",
+                   help="块档位：basic＝通用交接纪律；freshness＝本仓装了新鲜度判据时用")
     p = sub.add_parser("export"); p.add_argument("--out")
     p = sub.add_parser("import"); p.add_argument("file"); p.add_argument("--force", action="store_true")
 
@@ -1583,6 +1784,7 @@ def main(argv=None) -> int:
         "filter": lambda: cmd_filter(st, a),
         "view": lambda: cmd_view(st, a),
         "export": lambda: cmd_export(st, a),
+        "agents-block": lambda: cmd_agents_block(st, a),
         "import": lambda: cmd_import(st, a),
     }[a.cmd]()
 

@@ -7,7 +7,7 @@
 1. **确保存储就绪**：
    - 有**旧模型**（`HANDOFF.md` / `HANDOFF-ARCHIVE/` / `.handoff/fp.*`）→ **请求迁移**（仅显式调用）；同意后先走 `references/migrate.md`（**迁移先于交接**）。
    - **全无存储** → `references/init.md`（**仅显式调用**）。
-   - 已有 `.handoff/` → `python3 <技能>/scripts/handoff.py check`。
+   - 已有 `.handoff/` → `python3 <技能>/scripts/handoff.py check`（Windows 用 `python`；`<技能>` 指本技能安装目录，非仓内相对路径）。
    - **写入类命令不建库**（`add`/`close`/`set`/`edit`/`rm`/`unconfirmed`/`next`）：无 `.handoff/index` 时非零退出并指路 init / migrate。旧行为会 mkdir 槽目录＋写 index，造出**缺 9 槽的非法半库**、还把 `init`（index 已存在即拒）堵死——建库只发生在显式相位（`import`/`scope add` 的登记先行不受影响）。
    - **并确保项目约定**：`AGENTS.md` 含「未决项只写 `.handoff/`」一节（**无则新建**，机械锚幂等）——防持续偏移。
 2. **写 9 槽**（下表＝本技能的**写槽表**，他件引用命令形时指的就是它；**条目与单文件槽均只经 CLI**）：

@@ -7,13 +7,12 @@ description: >-
   checks, idempotent multi-registry release plans, and recovery from
   half-finished releases. Use when you are about to publish a version, wire a
   release workflow, or resume a release that failed partway across several
-  registries. NOT for: choosing a version number (see version-management for
-  SemVer/CalVer and yank/deprecate semantics), branch and PR sequencing (see
-  git-workflow), configuring CI test stages (see cicd-pipeline), or writing a
-  press release (see press-release). USER-INVOKED ONLY.
+  registries. NOT for: choosing a version number (SemVer/CalVer choices and
+  yank/deprecate semantics), branch and PR sequencing, configuring CI test
+  stages, or writing a press release. USER-INVOKED ONLY.
 disable-model-invocation: true
 slug: release-pipeline
-version: 1.0.0
+version: 1.0.1
 displayName: release-pipeline
 ---
 

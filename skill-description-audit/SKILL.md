@@ -2,16 +2,16 @@
 name: skill-description-audit
 description: >-
   Skill Description Audit. User-level skill; source: agent-skills. Cross-validation of an
-  Agent Skill's SKILL.md description vs body: frontmatter spec compliance
-  (license/compatibility/allowed-tools, reserved words, XML tags, no emoji, name semantics),
-  capability claims vs body, body non-emptiness (thin-allowlist excepted), trigger-word
-  sufficiency, invocation policy (user-invoked-only), old-name residue via renames.yaml
-  (boundary-aware), H1 extraction skipping fenced code, and volatile-data externalization.
-  Writes a Problems/Recommendations/Acceptance-Criteria report beside the skill; never edits the
-  audited SKILL.md. USER-INVOKED ONLY, independent auditor required: run only on the user's
-  explicit request — never auto-trigger. Use when auditing or cross-validating a skill
-  description against its SKILL.md body, or running a skill-library compliance check. NOT
-  for: auditing product doc sets (PRDs/specs/launch docs), which this skill does not cover.
+  Agent Skill's description vs body: frontmatter spec compliance
+  (official fields, reserved words, XML tags, no emoji, name semantics), capability
+  claims vs body, body non-emptiness (thin-allowlist excepted), trigger-word
+  sufficiency, invocation policy (user-invoked-only), old-name residue via renames.yaml, H1 extraction
+  skipping fenced code, and volatile-data externalization.
+  Writes a Problems/Recommendations/Acceptance-Criteria report beside the skill; never edits SKILL.md. USER-INVOKED ONLY, independent auditor required: run only on the user's
+  explicit request — never auto-trigger. Use when auditing a skill description against its SKILL.md body
+  or running a skill-library compliance check, plus criteria-lifecycle governance (the stop-condition line for
+  adding/retiring a criterion). NOT for: auditing one SKILL.md (that is this skill),
+  repository instruction files (AGENTS.md), or product doc sets (PRDs/specs/launch docs).
 metadata:
   standard: agentskills.io
   scope: user
@@ -34,8 +34,10 @@ metadata:
     - "v1.10.0：报告与内容绑定（治「先落笔后修正」）——报告头新增 `审计指纹` 字段，取值 `python3 skill-audit-fp.py <技能>`（description+正文 12 位哈希，版本号变更不计）；确立「报告＝该版最后一次写入」顺序：改正文 → 取指纹 → 出报告 → 只读校验 → 提交，出报告后再动正文即本次作废须重跑；门禁 `skill-executability-smoke.py` 按工作树内容比对，失配升为**硬失败**（原按日期比对看不出来，只留软告警）"
     - "v1.11.0：新增 §7.6「前向引用视野（consumer scope）」——description 点名他技能按**接收方是否一定持有**判，不按本机是否实存判：悬空/退役/与本库名编辑距离≤2 的拼写漂移与客户端专有名（本地实存≠消费者可得）→ [中]；点名本库其它技能（同库分发≠同装）→ [低] 建议改能力表述；机器侧半壁入门禁（点名退役件·近似名硬失败，点名本库他件软警告）；源于 skill-fit `NOT for` 三次收敛（真源仓 pitfall p000018）"
     - "v1.12.0：追加式补强（不改任何既有判据）——新增「最短实测样例」（一次完整审计的输入/动作/产出摘录）、「失败出口与边界处置」（目标不存在 / frontmatter 不可解析 / 路径非 SKILL.md / 独立方缺席 的可观察出口）、「FAQ（错法→改法）」表；均只在既有工作流之上解释，不新增检查维度"
+    - "v1.14.0：NOT for 补库级指令文件（AGENTS.md 等）与单技能自审的划界——两件相邻审计技能（skill-description-audit 审单技能 / agents-md-audit 审指令文件）分工由单向点名改为双向可读"
+    - "v1.13.0：判据增删治理（停手线）移入本技能——硬约束 7 ＋ references/criteria-governance.md（停手条件三条 / 新增判据三缺一不可 / 判据分层 L1 机检-L2 软告警-L3 措辞 / 五类反模式 / 回滚判据 a(D)==0 即删）"
 slug: skill-description-audit
-version: 1.12.0
+version: 1.14.0
 displayName: skill-description-audit
 disable-model-invocation: true
 ---
@@ -56,6 +58,7 @@ disable-model-invocation: true
 4. **建议可写、改动不落地（默认只出报告）** —— 推荐 `description` 文案只写在报告「建议」节。**任何改动都须先出报告、经用户显式授权后才执行**；不得自行写回 `SKILL.md`。唯一例外：专门设计的自动化流程（如发布前自动改写）。技能审计是其它技能质量的根本，从严执行，不得马虎。
 5. **报告结构** —— 落盘报告须含 **问题**、**建议**、**验收标准** 三节（节标题保留）。**允许无问题、无改写建议**：问题写「无」，建议写「无需改动 / 维持现状」即可；禁止为凑内容编造缺陷或强行改写文案。
 6. **独立审计（强制）** —— 审计员必须独立于被审对象：**不得由被审技能的作者或近期改写者自审**；审计其它技能同理（同一轮里既改写又审计 = 不独立）。**无独立方可用时（如只有作者在场）→ 先 `ask user`**，取得明确授权后再继续，并在报告头注明审计独立性状态（独立 / 用户授权自审）。
+7. **判据增删有停手线** —— `description` 面等质量判据的新增／降级／删除按 [判据增删治理（停手线）](references/criteria-governance.md)：三条停手条件同时满足即收口；此后新增判据须「实测闸可复现 FAIL ＋ 落盘证据行号 ＋ 独立方审计通过」三缺一不可；判据报出后全库真实改动数 `a(D)==0` 即删（硬失败优先删）。**审计员只登记候补项，不顺手加判据。**
 
 ## 何时使用
 

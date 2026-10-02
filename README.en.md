@@ -6,14 +6,14 @@
 
 > Portable Agent Skills (following the [Agent Skills](https://agentskills.io) open spec, `SKILL.md`), installable on any AI coding agent that supports the spec (Claude Code / Cursor / Deep Code / Copilot CLI, etc.).
 
-**91 skills** covering the full product 0-1 lifecycle (discovery → definition → design → delivery → launch → operations), plus cross-cutting layers for DDD, engineering, QA, security, and UI/UX. Each skill is one directory with a `SKILL.md` (frontmatter `name`/`description` + body), progressive disclosure (body <500 lines; deeper content lives in `references/`).
+**92 skills** covering the full product 0-1 lifecycle (discovery → definition → design → delivery → launch → operations), plus cross-cutting layers for DDD, engineering, QA, security, and UI/UX. Each skill is one directory with a `SKILL.md` (frontmatter `name`/`description` + body), progressive disclosure (body <500 lines; deeper content lives in `references/`).
 
 The full map (skills classified by product-0-1 stage with orchestration paths — including the "stage-gate chain" and "problem-resolution chain") is in [SKILLS-MAP.md](SKILLS-MAP.md).
 
 ## Quick Start
 
 ```bash
-npx skills add NinjaSln-labs/agent-skills   # one command installs all 91 skills via skills.sh
+npx skills add NinjaSln-labs/agent-skills   # one command installs all 92 skills via skills.sh
 ```
 
 ```bash
@@ -30,7 +30,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 
 ## Skill List
 
-### Engineering Practice (24)
+### Engineering Practice (25)
 
 | Skill | Description |
 |-------|-------------|
@@ -45,6 +45,7 @@ Restart/reload your agent client and the skills will be discovered. User-level d
 | frontend-design | Guidance for distinctive, intentional visual design when building new UI or reshaping an… |
 | git-workflow | Git workflow skill: branching strategies, Conventional Commits, creating or reviewing PRs… |
 | perf-check | Machine performance check: read-only sampling diagnosis of the dev machine's speed — memory… |
+| llm-gateway-ops | Operate the standing configuration of an application's model calls: multi-provider access over… |
 | react-vite-best-practices | React and Vite performance optimization guidelines. |
 | release-pipeline | Release guardrails and multi-target release orchestration for packages and repos: OIDC /… |
 | systematic-debugging | Systematic Debugging: find the root cause before proposing fixes — symptom fixes are failure… |

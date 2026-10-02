@@ -1,7 +1,7 @@
-# 技能库全景图（91 技能——产品 0-1 全阶段模式）
+# 技能库全景图（92 技能——产品 0-1 全阶段模式）
 
 - 日期：2026-08-16 · **新增 6 技能（spec-kit 阶段门禁族：stage-gate / stage-spec / decision-log / coverage-matrix / audit-item / skill-eval——需求规格 `.scratch/neonforge-v1/skill-requirements-20260816.md`）** · 2026-08-13 全量审计 81/81 合规（新技能接入后按审计流程补 DESCRIPTION-AUDIT）
-- 覆盖：本仓库 `agent-skills` 的 91 个技能（可安装到 `~/.agents/skills/<name>`）
+- 覆盖：本仓库 `agent-skills` 的 92 个技能（可安装到 `~/.agents/skills/<name>`）
 - 模式：**产品 0-1 全生命周期**（发现 → 定义 → 设计 → 交付 → 上线 → 运营）+ 贯穿层（质量/工程/协作/技能基建）
 
 ---
@@ -70,7 +70,7 @@
 |------|------|
 | to-tickets | 需求拆解为 ticket（垂直切片 + 阻塞边 + 逐票验收清单，仅用户调用）|
 
-### ③ 设计（23）—— 领域 / 架构 / 规范 / 视觉
+### ③ 设计（24）—— 领域 / 架构 / 规范 / 视觉
 
 #### 3.1 领域建模 DDD（9）
 
@@ -93,15 +93,16 @@
 | ddd-model-review | 模型质量评估（一致性/完整性/耦合——回溯触发）|
 | ddd-tactical-review | 战术 DDD 评审（贫血模型检测/富领域重构）|
 
-#### 3.3 架构设计（3）
+#### 3.3 架构设计（4）
 
 | 技能 | 能力 |
 |------|------|
 | architecture-patterns | Clean/Hexagonal/DDD 实现架构（依赖规则/端口适配器）|
+| llm-gateway-ops | LLM 网关运维（多 provider 接入/能力矩阵/路由与降级链/配额限流/成本归因/七类失败闭集）|
 | codebase-design | 深度模块设计（接口/接缝/可测试性——mattpocock）|
 | deep-codebase-analysis | 代码库全面分析（架构/通信/模式/约定/业务流/状态/错误处理 7 维）|
 
-#### 3.4 编码规范（3）
+#### 3.4 编码规范（4）
 
 | 技能 | 能力 |
 |------|------|
@@ -236,14 +237,14 @@
 | ⑤ 上线 | 1 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
 | 贯穿层 | 16 | 审计 4 + 安全 4 + 规则 2 + 协作 6 |
-| **合计** | **91** ✓ | 全部唯一分类（已核对无重复/无遗漏）|
+| **合计** | **92** ✓ | 全部唯一分类（已核对无重复/无遗漏）|
 
 ---
 
 ## 三、一图流（子类级）
 
 ```text
-产品 0-1 全生命周期（21 子类 · 91 技能）
+产品 0-1 全生命周期（21 子类 · 92 技能）
 ┌──────────────────────────────────────────────────────────────┐
 │ ① 发现     1.1 用户研究(3)  1.2 问题定义(4)                  │
 │            1.3 市场竞品(7)×8编排  1.4 调研纪律(2)             │
@@ -370,25 +371,23 @@
 | `ddd-tactical-review` | 1.2.0 | `decision-log` | 1.1.0 | `deep-codebase-analysis` | 1.1.1 |
 | `delegated-research` | 1.1.0 | `dependency-scan` | 1.1.1 | `discovery-interview-prep` | 1.1.1 |
 | `electron-best-practices` | 1.2.0 | `env-check` | 1.1.0 | `event-storming` | 1.1.0 |
-| `executing-plans` | 1.2.0 | `frontend-design` | 1.2.0 |  |  |
+| `executing-plans` | 1.2.0 | `experiment-handoff` | 1.1.0 | `frontend-design` | 1.2.0 |
 | `git-workflow` | 1.1.1 | `grill-me` | 1.2.0 | `intelligence-collection-disciplines` | 1.1.0 |
-| `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.2.1 | `market-landscape-scan` | 1.1.1 |
-| `marketing-copywriting` | 1.2.0 | `perf-check` | 1.1.1 | `pixel-perfect` | 1.1.0 |
-| `plan-grilling` | 1.1.0 | `playwright-best-practices` | 1.1.1 | `positioning-statement` | 1.1.0 |
-| `positioning-workshop` | 1.2.0 |  |  |  |  |
-| `press-release` | 1.1.1 | `prd-development` | 1.2.1 | `prd-driven-ddd` | 4.6.1 |
-| `problem-handling` | 1.1.0 | `problem-statement` | 1.1.0 | `product-doc-audit` | 1.1.1 |
-| `product-launch` | 1.1.1 | `product-marketing` | 1.1.0 | `project-handoff` | 4.3.1 |
-| `proto-persona` | 1.1.1 | `react-vite-best-practices` | 1.1.1 | `release-pipeline` | 1.0.0 |
-| `roadmap-planning` | 1.1.1 | `secrets-scan` | 1.1.1 | `security-scan` | 1.2.0 |
-| `session-health` | 1.0.3 | `skill-description-audit` | 1.12.0 | `skill-eval` | 1.2.0 |
-| `stage-gate` | 1.1.1 |
-| `stage-spec` | 1.1.0 | `systematic-debugging` | 1.1.1 | `task-loop-progress` | 1.0.1 |
-| `test-data-generation` | 1.2.0 | `to-tickets` | 1.1.0 | `typescript-best-practices` | 1.1.1 |
-| `ui-animation` | 1.2.0 | `ui-typography` | 1.1.1 | `ui-ux-pro-max` | 1.2.0 |
-| `user-research` | 1.2.0 | `ux-heuristics` | 1.1.1 | `verification-before-completion` | 1.1.0 |
-| `visual-regression-tester` | 1.1.1 | `voice-of-customer-miner` | 1.2.0 | `web-design-guidelines` | 1.0.1 |
-| `workshop-facilitation` | 1.1.1 | `write-spec` | 1.2.0 | `writing-plans` | 1.1.1 |
-| `experiment-handoff` | 1.1.0 | `skill-fit` | 2.2.0 | `version-management` | 1.3.1 |
-
+| `jobs-to-be-done` | 1.1.1 | `k6-performance` | 1.2.1 | `llm-gateway-ops` | 0.3.3 |
+| `market-landscape-scan` | 1.1.1 | `marketing-copywriting` | 1.2.0 | `perf-check` | 1.1.1 |
+| `pixel-perfect` | 1.1.0 | `plan-grilling` | 1.1.0 | `playwright-best-practices` | 1.1.1 |
+| `positioning-statement` | 1.1.0 | `positioning-workshop` | 1.2.0 | `prd-development` | 1.2.1 |
+| `prd-driven-ddd` | 4.6.1 | `press-release` | 1.1.1 | `problem-handling` | 1.2.0 |
+| `problem-statement` | 1.1.0 | `product-doc-audit` | 1.1.1 | `product-launch` | 1.1.1 |
+| `product-marketing` | 1.1.0 | `project-handoff` | 4.4.0 | `proto-persona` | 1.1.1 |
+| `react-vite-best-practices` | 1.1.1 | `release-pipeline` | 1.0.1 | `roadmap-planning` | 1.1.1 |
+| `secrets-scan` | 1.1.1 | `security-scan` | 1.2.0 | `session-health` | 1.0.3 |
+| `skill-description-audit` | 1.14.0 | `skill-eval` | 1.2.0 | `skill-fit` | 2.2.0 |
+| `stage-gate` | 1.1.1 | `stage-spec` | 1.1.0 | `systematic-debugging` | 1.1.1 |
+| `task-loop-progress` | 1.0.1 | `test-data-generation` | 1.2.0 | `to-tickets` | 1.1.0 |
+| `typescript-best-practices` | 1.1.1 | `ui-animation` | 1.2.0 | `ui-typography` | 1.1.1 |
+| `ui-ux-pro-max` | 1.2.0 | `user-research` | 1.2.0 | `ux-heuristics` | 1.1.1 |
+| `verification-before-completion` | 1.1.0 | `version-management` | 1.3.1 | `visual-regression-tester` | 1.1.1 |
+| `voice-of-customer-miner` | 1.2.0 | `web-design-guidelines` | 1.0.1 | `workshop-facilitation` | 1.1.1 |
+| `write-spec` | 1.2.0 | `writing-plans` | 1.1.1 |
 

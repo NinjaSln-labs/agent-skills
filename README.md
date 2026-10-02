@@ -6,14 +6,14 @@
 
 > 便携式 Agent Skill 集合（遵循 [Agent Skills](https://agentskills.io) 开放规范，`SKILL.md`），可安装到任何支持该规范的 AI 编码代理（Claude Code / Cursor / Deep Code / Copilot CLI 等）。
 
-共 **91 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
+共 **92 个技能**，覆盖产品 0-1 全生命周期（发现 → 定义 → 设计 → 交付 → 上线 → 运营），以及 DDD、工程、QA、安全、UI/UX 贯穿层。每个技能 = 一个目录 + `SKILL.md`（frontmatter `name`/`description` + 正文），渐进式披露（正文 <500 行，深内容走 `references/`）。
 
 技能全景图（按产品 0-1 阶段分类 + 编排路径，含「阶段门禁链」「问题处理链」等跨技能编排）见 [SKILLS-MAP.md](SKILLS-MAP.md)。
 
 ## 快速开始
 
 ```bash
-npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 91 个技能
+npx skills add NinjaSln-labs/agent-skills   # skills.sh 一键安装全部 92 个技能
 ```
 
 ```bash
@@ -30,7 +30,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 
 ## 技能清单
 
-### 工程实践（24）
+### 工程实践（25）
 
 | 技能 | 说明 |
 |------|------|
@@ -45,6 +45,7 @@ for d in */; do cp -r "$d" ~/.agents/skills/; done
 | frontend-design | 前端设计（组件/页面——两遍法+自评） |
 | git-workflow | Git 工作流（分支策略/Conventional Commits/CI 集成——37★） |
 | perf-check | 开发机只读性能体检（内存/CPU/WSL2 资源/磁盘 IO/TOP 进程/macOS 压力；USE 骨架·basis 标注·修复只给命令） |
+| llm-gateway-ops | LLM 网关运维（多 provider 接入/能力矩阵/路由与降级链/配额限流/成本归因/七类失败闭集） |
 | react-vite-best-practices | React + Vite 最佳实践（组件/性能/工程） |
 | release-pipeline | 发布守卫与多目标编排（OIDC/trusted publishing、provenance 校验、七条守卫 G1–G7、半发布态续发） |
 | systematic-debugging | 系统化调试（假设/二分/证据——代码缺陷路径） |

@@ -7,9 +7,13 @@ description: >-
   path, classify and scope, workaround-vs-permanent-fix decision, TDD fix, verification, and a
   blameless close with known-error capture plus a 3-strikes design escalation. Use when a problem,
   bug, error, UX complaint, or behavior gap is reported, before jumping to a fix. NOT for:
-  a pure code bug whose root cause is all you need — reproduce, isolate, fix.
+  a pure code bug whose root cause is all you need — reproduce, isolate, fix;
+  designing the standing configuration of a system that repeatedly calls an external
+  service (provider choice, routing order, quota and budget, the provider-shaped failure
+  classes) — that is configuration work, not incident triage. No skill name implied:
+  the boundary is the task.
 slug: problem-handling
-version: 1.1.0
+version: 1.2.0
 displayName: problem-handling
 ---
 
