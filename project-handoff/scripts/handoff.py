@@ -26,6 +26,19 @@ from pathlib import Path
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ID_RE = re.compile(r"^([tpducq])(\d{6})$")
 
+# 文本槽里扫条目 id 用（`exit`/`summary` 的交接陈述面）。与死指针判据**刻意同源**——
+# 之前本仓 `handoff-freshness-check.py` 自己抄了一份 `\bt\d{6}\b`，两处模式若各自演进
+# 就会一次判了、另一次没判（双源缺口）。这里单一模式，两条判据共用。
+FIND_ID_RE = re.compile(r"\bt\d{6}\b")
+# 提及已闭条目时，同一行必须带的显式关闭标记。**刻意收窄成显式标记而非推断**：
+# 已闭/closed/完成/毕/已发布/已收口/已落地。措辞变了该改这张表，不是改判据去迁就。
+CLOSED_MARKERS = ("已闭", "closed", "CLOSED", "已完成", "完成", "毕",
+                  "已发布", "已收口", "已落地")
+
+
+def rid_re_match(rid: object) -> bool:
+    return isinstance(rid, str) and bool(ID_RE.match(rid))
+
 # 条目槽（JSONL、按分区落文件）
 ENTRY_SLOTS = {
     "actions": {"type": "t", "part": "domain"},
@@ -716,8 +729,11 @@ def audit_writes(st: Store) -> list[str]:
     return problems
 
 
-def _log(st: Store, event: str):
+def _log(st: Store, event: str, **extra):
     """每次门禁落一条快照（best-effort，不因日志失败中断）。
+
+    `extra` 用来挂事件专属字段（如 `close` 事件带被关 id 与 outcome）——快照的槽位
+    计数部分对所有事件相同，事件本身只多一行语义。
 
     副作用边界：`--store` 指到**不是库**的目录时不落 log——`open(..., "a")` 会凭空建出文件，
     那等于让只读命令在任意路径写脏（实测：`handoff --store . check` 曾在仓库根造出 log.jsonl）。
@@ -734,6 +750,7 @@ def _log(st: Store, event: str):
         rec = {"ts": datetime.now().astimezone().isoformat(timespec="seconds"),
                "event": event, "slots": slots,
                "commands_empty": slots.get("commands", 0) == 0}
+        rec.update(extra)
         with open(_log_path(st), "a", encoding="utf-8") as f:
             f.write(json.dumps(rec, ensure_ascii=False, sort_keys=True) + "\n")
     except Exception:
@@ -788,6 +805,12 @@ CHECK_DIMENSIONS: list[tuple[str, str]] = [
     ("partition-case", "同槽分区文件名**大小写折叠后不得重名**（NTFS 大小写不敏感 ⇒ 仅大小写"
                        "不同的两个 domain 会合并成一个分区文件、计数与现实脱节）"),
     ("index", "`index` 的各槽计数与 `next` 与落盘一致（漂移即红）"),
+    ("fresh-queue", "**交接新鲜度**：仍 open 的 `t` 型条目必须在 `exit`/`summary` 里出现"
+                    "（抓「新条目进队列、exit 沉默」；只取 `t` 型——p/d 进 exit 属背景叙述，"
+                    "逐条要求提及会淹没真信号）"),
+    ("fresh-stale", "**陈旧陈述**：`exit` 里提及**已闭**条目的那一行必须带显式关闭标记"
+                    "（抓「把已闭说成候立」；**只查 exit 不查 summary**——summary 是流水式"
+                    "摘要、逐条列已闭 id 是它的本职，强求标记产出纯噪声）"),
 ]
 CHECK_BEGIN = "<!-- check-dims:begin （由 CHECK_DIMENSIONS 生成，勿手改）-->"
 CHECK_END = "<!-- check-dims:end -->"
@@ -1021,6 +1044,58 @@ def cmd_check(st: Store, no_log: bool = False) -> int:
         except json.JSONDecodeError:
             errs.append("index 非法 JSON")
 
+    # ── 交接陈述新鲜度（2026-10-03 下沉自本仓 scripts/handoff-freshness-check.py）──
+    # 下面两条此前是**库专属脚本**，判的却是每个使用方都需要的交接纪律，形态错了：
+    # 消费方是技能使用者，判据就该随技能分发（AGENTS 规则 16）。下沉后兄弟仓跑
+    # `handoff check` 同样受益。
+    #
+    # 事实面：`closed` 槽给出「哪些已闭、哪天闭的」；`actions` ∪ `closed` 减去已闭
+    # 就是「仍 open 的队列」。**只取 `t` 型**（待办）：p* 是坑、d* 是决定，进 exit 属
+    # 背景叙述，池里常有上百条 open，逐条要求 exit 提及既不现实也会淹没真信号。
+    _closed: dict[str, str] = {}
+    for _f in sorted((st.d / "closed").glob("*.jsonl")):
+        for _r in read_jsonl(_f):
+            if _r.get("id") and _r.get("closed"):
+                _closed[_r["id"]] = str(_r["closed"])
+    _open_ids: set[str] = set()
+    for _slot in ENTRY_SLOTS:
+        for _f in sorted((st.d / _slot).glob("*.jsonl")):
+            for _r in read_jsonl(_f):
+                _rid = _r.get("id")
+                if rid_re_match(_rid) and _rid[0] == "t":
+                    _open_ids.add(_rid)
+    _open_ids -= set(_closed)
+
+    def _slot_text(sl: str) -> str:
+        p = st.d / sl
+        return p.read_text(encoding="utf-8", errors="replace") if p.is_file() else ""
+
+    _exit_txt, _summary_txt = _slot_text("exit"), _slot_text("summary")
+
+    # fresh-queue：仍 open 的条目必须在 exit/summary 里出现（抓「新条目进队列、exit 沉默」）
+    _blob = "\n".join((_exit_txt, _summary_txt))
+    _mentioned = set(FIND_ID_RE.findall(_blob)) if FIND_ID_RE else set()
+    _silent = sorted(_open_ids - _mentioned)
+    if _silent:
+        errs.append(
+            f"fresh-queue：{len(_silent)} 条仍 open 的条目在 exit/summary 里没出现（exit 沉默）："
+            f"{_silent[:8]}{'…' if len(_silent) > 8 else ''}"
+            f"　修：过 `handoff set exit` 回写队列段（整槽覆写，先 --dry-run）")
+
+    # fresh-stale：exit 里提及**已闭**条目时，同一行必须带显式关闭标记
+    # （抓「把已闭条目说成候立/未闭」）。**只查 exit、不查 summary** —— summary 是
+    # 流水式摘要、逐条列已闭 id 是它的本职，强求标记会产出大量纯噪声。
+    _stale: list[str] = []
+    for _i, _line in enumerate(_exit_txt.splitlines(), 1):
+        for _rid in FIND_ID_RE.findall(_line):
+            if _rid in _closed and not any(_mk in _line for _mk in CLOSED_MARKERS):
+                _stale.append(f"exit:{_i} {_rid}（closed={_closed[_rid]}）该行无关闭标记")
+    if _stale:
+        errs.append(
+            f"fresh-stale：{len(_stale)} 处提及已闭条目却无关闭标记（已闭写成未闭/候立）→ "
+            f"{_stale[:6]}{'…' if len(_stale) > 6 else ''}"
+            f"　修：写 `t000095（已闭）` 这类显式标记（见 AGENTS 交接块纪律）")
+
     if errs:
         print(f"handoff check: FAIL（{len(errs)} 处）")
         for e in errs:
@@ -1224,10 +1299,27 @@ def cmd_close(st: Store, id: str, outcome: str | None = None,
 
     两阶段：先 `plan_close` 纯算、再 `apply_close` 纯写（p000069，4.8.1）——可预见的
     失败（找不到条目、引用守卫、补位策略）全部在**零落盘**时发生。
+
+    关账事件入流水（4.9.3）：此前 `log.jsonl` **只有 check 事件**（本仓实测 474 次
+    check:ok / 38 次 check:fail，**0 条 close**）⇒ 条目生命周期根本没进流水，事后查不出
+    「哪一轮闭的、当时 exit 更新没」，`exit` 过期连痕迹都没有。落点选在这里而不是
+    `apply_close`：那里拿不到 `outcome`（它不在 plan 字典里），插那儿会 NameError。
+    `exit` 是否同步更新不在这里判——那是 fresh-stale 的活，这里只保证「闭过」可查。
     """
     st.note_pre_tamper()
-    return apply_close(st, plan_close(st, id, outcome, no_refill))
-
+    plan = plan_close(st, id, outcome, no_refill)
+    apply_close(st, plan)
+    print(f"handoff close: {plan['id']} → closed/{plan['typ']}.jsonl")
+    echo_back(st, plan["id"])
+    _log(st, "close", id=plan["id"], outcome=outcome or "", typ=plan["typ"])
+    if plan["was_next"]:
+        if plan["nid"]:
+            print(f"handoff next: 自动补位 → {plan['nid']}｜{plan['why']}")
+            print(f"  策略：actions 池 · 排除非 open · 键(有效档, created↑, id↑) · "
+                  f"基础档 [高]0/[中]·无1/[低]2 · 每满 {REFILL_STEP_DAYS} 天升一档")
+        else:
+            print(f"handoff next: 已清空（{plan['why']}）")
+    return 0
 
 
 def cmd_next(st: Store, a) -> int:
@@ -2489,6 +2581,17 @@ def cmd_selftest(st: Store, a) -> int:
         rc, _ = run("add", "action", "--summary", "s2", "--status", "done")
         expect("add action --status done 拒收", rc != 0)
 
+        # 交接队列回写（2026-10-03，fresh-queue 判据下沉后的夹具补齐）：
+        # 本夹具用真 CLI 建了 open 条目，却从不写 `exit` 槽 ⇒ fresh-queue 会把它们全报成
+        # 「exit 沉默」。那**不是**判据误报，而是夹具自己没履行交接纪律——真实使用方
+        # 建完条目同样要回写队列段。所以这里显式走一遍 `set exit`，让夹具面与真实纪律
+        # 一致；顺带证明 fresh-queue 在夹具面上确实只看 `exit`/`summary` 的**文本内容**。
+        _open_t = [r["id"] for r in rows("actions") if r.get("id", "").startswith("t")]
+        run("set", "exit", inp="交接队列：\n" + "".join(f"- {i} 待办\n" for i in _open_t))
+        rc, _ = run("check", "--no-log")
+        expect("回写 exit 队列后 fresh-queue 不报（队列段已覆盖所有 open t 型）",
+               rc == 0 or "fresh-queue" not in non_tamper(run("check", "--no-log")[1]))
+
         # 脏行（status=closed）直写 live：refill 不选 + check FAIL
         dirty = rows("actions")[0]
         f = Path(dirty["_file"])
@@ -2505,6 +2608,12 @@ def cmd_selftest(st: Store, a) -> int:
         # 两步修复：edit 回 open → close，check 复绿
         run("edit", dirty["id"], "--status", "open")
         run("close", dirty["id"], "--outcome", "fixed")
+        # close 之后必须更新 `exit` 队列段（2026-10-03，fresh-stale 判据带出的真实纪律）：
+        # 刚关掉的条目若在 `exit` 里仍写成「待办」，fresh-stale 就报「把已闭说成候立」。
+        # 这不是判据误报——**交接文本本来就要跟着条目状态走**，所以这里走一遍改写，
+        # 顺带证明 fresh-stale 只看 `exit` 那一行有没有关闭标记。
+        run("set", "exit", inp=f"交接队列：\n- {dirty['id']}（已闭）\n"
+                                + "".join(f"- {i} 待办\n" for i in _open_t if i != dirty["id"]))
         rc, out2 = run("check", "--no-log")
         expect("两步修复后除已记录的 tamper 外无其它问题", rc == 0 or not non_tamper(out2).strip())
         closed_rows = read_jsonl(Path(cur_store[0]) / "closed" / "t.jsonl")
@@ -2547,6 +2656,11 @@ def cmd_selftest(st: Store, a) -> int:
         subdirs = [q for q in (Path(cur_store[0]) / "actions").iterdir() if q.is_dir()]
         expect("被拒的分区名不留下子目录（幽灵的根因）", not subdirs,
                f"留下 {[q.name for q in subdirs]}")
+        # 上面这批 `ok-*` 条目是**在首次回写 exit 之后**新建的，队列段已覆盖不到它们 ⇒
+        # fresh-queue 会报「exit 沉默」。真实使用方同样会遇到（加了一堆条目却没回写队列），
+        # 所以这里再回写一次：把当前所有 open `t` 型重新扫一遍写进 exit。
+        _open_t2 = [r["id"] for r in rows("actions") if r.get("id", "").startswith("t")]
+        run("set", "exit", inp="交接队列：\n" + "".join(f"- {i} 待办\n" for i in _open_t2))
         rc2, _o = run("check", "--no-log")
         expect("夹具跑完 check 除已记录的 tamper 外无其它问题",
                rc2 == 0 or not non_tamper(_o).strip())
@@ -2623,9 +2737,14 @@ def cmd_selftest(st: Store, a) -> int:
                f"只找到 {dup_ids}（分区文件 {[f.name for f in case_files]}）")
         if len(dup_ids) == 2 and target:
             run("edit", target, "--domain", "casetest-fixed")
+            # 这一组自己建了两条 open 条目（在上面的回写之后），队列段覆盖不到 ⇒
+            # fresh-queue 会报。同理回写一次。
+            _open_t4 = [r["id"] for r in rows("actions") if r.get("id", "").startswith("t")]
+            run("set", "exit", inp="交接队列：\n" + "".join(f"- {i} 待办\n" for i in _open_t4))
             rc2, _o = run("check", "--no-log")
             expect("改掉冲突名后 check 除已记录的 tamper 外无其它问题",
-               rc2 == 0 or not non_tamper(_o).strip())
+               rc2 == 0 or not non_tamper(_o).strip(),
+               (non_tamper(_o).strip()[-300:] if non_tamper(_o).strip() else f"rc={rc2}"))
 
         # ---- pre_tamper 不得把自己的写当外部改动（4.8.0 的真回归点）----
         # **这条是「能区分修没修好」的那条**：第一版修法把 pre_tamper 的快照从
@@ -2680,6 +2799,11 @@ def cmd_selftest(st: Store, a) -> int:
         expect("补位**没选回被关的那条**（exclude 生效；否则关了立刻又成决策点）",
                rc2 == 0 and _nx != _cid["[高] 甲"], f"next={_nx!r}")
         expect("补位选到了乙（next 只写一次、最终值）", _nx == _cid["[中] 乙"], f"next={_nx!r}")
+        # 这个组用的是**另一个 store 面**（崩溃兜底用的 `_fs`），它自建了 open 条目却
+        # 没写 exit ⇒ fresh-queue 会报「exit 沉默」。真实使用方同样要回写，所以这里走一遍。
+        _fs_open = [r["id"] for r in Store(Path(_fs)).load_live()
+                    if r.get("_slot") == "actions" and r.get("id", "").startswith("t")]
+        run("set", "exit", inp="交接队列：\n" + "".join(f"- {i} 待办\n" for i in _fs_open))
         expect("close 后 check 绿", run("check", "--no-log")[0] == 0)
         # B 兜底：崩溃后状态必须被抓到且**给出可执行修法**
         _act = sorted(Path(_fs, "actions").glob("*.jsonl"))[0]
@@ -2947,6 +3071,17 @@ def cmd_selftest(st: Store, a) -> int:
     
     # ---- 写事件对账（p000025，4.7.8）：手改与「补手续」从纪律变判据 ----
         run("add", "pitfall", "--summary", "写事件基线", "--domain", "wtest")
+        # 收尾统一回写一次 `exit` 队列段（2026-10-03，fresh-queue 判据下沉后的夹具纪律）。
+        # 前面各组陆续建了 open 条目，逐处补 `set exit` 会漏——**在收尾处统一按当前
+        # 落盘事实重写一遍**，夹具面才与真实使用方式一致：真实使用方也是收尾时才对账，
+        # 不是每加一条就改一次 exit。
+        _open_t3 = [r["id"] for r in rows("actions") if r.get("id", "").startswith("t")]
+        _exit_prev = (Path(cur_store[0]) / "exit")
+        _kept = []
+        if _exit_prev.is_file():
+            _kept = [ln for ln in _exit_prev.read_text(encoding="utf-8").splitlines()
+                     if "（已闭）" in ln]
+        run("set", "exit", inp="交接队列：\n" + "\n".join(_kept + [f"- {i} 待办" for i in _open_t3]) + "\n")
         rc2, out2 = run("check", "--no-log")
         # 注意：不能断言 rc==0 —— 本夹具**前面的组**就是靠手工注入坏行来造脏件的
         # （不那样造就没有脏行可测），那些 tamper 都已在写事件里记下。判据是
