@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import fnmatch
 import glob
+import hashlib
 import io
 import json
 import os
@@ -68,7 +69,25 @@ SLOT_FIELDS = {v["slot"]: set(v["fields"]) for v in ADD_KINDS.values()}
 def live_status_of(kind: str) -> set[str]:
     """该型条目在 live 区的 status 值闭集（缺省视为 open）。closed 不在其中：
     关闭唯一入口＝`close --outcome`（edit/add 拒收，t000138——否则旁路写入会造出
-    无 closed/outcome、不迁 closed/ 的半关行，并混进补位池）。"""
+    无 closed/outcome、不迁 closed/ 的半关行，并混进补位池）。
+
+    **`pitfall` 的 `fixed` 不是销账**（2026-10-03 用户裁定改语义）：它表示
+    「这个坑对应的缺陷已修，**留案以免重犯**」——条目**仍留在 live 区**、仍被
+    `check`/`view`/`index` 当活条目、仍计入各槽计数，**不进 `closed/`、不迁走、
+    不销账**。记成 `fixed` 的坑与记成 `open` 的坑，在**绝大多数判据面前等价**：
+    值域校验（只验「在不在闭集里」）与各槽计数、补位池、视图呈现**都不看这个值**。
+    **唯一的例外是 next 指针判据**——它要求 next 指向 `open` 行，所以 `fixed` 的坑
+    不能当 next（实测：`next <fixed 的坑>` rc=0 但随后 `check` rc=1 报
+    「status='fixed'，不是 open」）。而那是在**守 next 的有效性、不在销坑**。
+    换句话说 `fixed` **基本是自述，不是账**——别把「大部分坑都 open」读成「大部分坑都没
+    修」（本库实测过一批：多数有守卫已修、有意设计的不算缺陷，真缺陷仍在的是少数）。
+    要销账走 `close --outcome`，那是另一回事。
+    **更正**：先前此处写「唯一读它的是值域校验」是**错的**（独立审计实测证伪）——
+    `check` 的 next 指针判据也读 status：把一条 `fixed` 的坑设成 next，`check` 会 rc=1 报
+    「status='fixed'，不是 open」。所以它**有**一个消费者，但那个消费者是在**守** next 指针
+    的有效性、不是在销坑。**别为此再加闸**：给一个刻意「不被依赖」的状态造依赖，与本语义
+    的立意相反。
+    """
     return ADD_KINDS[kind].get("live_status", set())
 
 
@@ -80,6 +99,57 @@ def guard_status(kind: str, val) -> None:
 
 UNCONF_FIELDS = {"summary", "src", "detail"}      # 候选行落盘面（`--ref` 存成 src）
 CLOSED_FIELDS = {"summary", "detail", "topic", "outcome"}
+
+
+def guard_partition(where: str, key: str, val) -> str:
+    """分区键（domain/purpose）**会被拼成文件名**（`<slot>/<值>.jsonl`），故必须先校验。
+
+    缺陷 p000046：值里带 `/` 会拼出子目录（`commands/a/b.jsonl`），而加载面用
+    `glob("*.jsonl")` **不递归** ⇒ 那条已登记的条目对 `check`/`view`/`index` **完全
+    隐形**：check 报 OK、index 计数 0、现实 1，且无任何东西报错。
+
+    允许 CJK（本库实际在用「交接」「发布」「门禁」等作 domain），禁的是**路径语义**：
+    分隔符、NUL、`.`/`..`、前后空白、超长名。不用白名单字符集——那会把 CJK 和将来
+    合理的命名一起拒掉；用「不能改变路径指向」来判，才不会误伤。
+    """
+    if val is None:
+        return "_global"
+    v = str(val)
+    bad = []
+    if not v or not v.strip():
+        bad.append("空")
+    if v != v.strip():
+        bad.append("前后有空白")
+    if v in (".", ".."):
+        bad.append("是路径相对段")
+    if any(c in v for c in ("/", "\\", "\0")):
+        bad.append("含路径分隔符/NUL")
+    if ":" in v:
+        # Windows：**盘符相对**（`C:evil`）解析到该盘当前目录而非 store ⇒ 写到 store
+        # 之外；`ok:hidden` 是 NTFS 备用数据流，`glob` 永远扫不到。两者都**改变路径
+        # 指向**，与分隔符同级，不是超纲要求（本技能正文承诺支持 Windows）。
+        bad.append("含 `:`（Windows 盘符相对 / 备用数据流）")
+    # Windows 对尾随空格/点的设备名（`com1 .txt`）同样按设备处理 ⇒ 一并去掉。
+    # **刻意不拦 Windows 保留设备名**（CON/NUL/COM1…）——曾按推演加过，Windows 10.0.26200
+    # 实测证伪：经 Win32 `CreateFile`（＝CPython 走的那条路）`CON.jsonl`/`NUL.jsonl`/
+    # `con.jsonl`/`COM1.jsonl` **全部创建成功、`File.Exists=True`、且目录枚举可见**。
+    # 设备名解析发生在 **cmd/PowerShell 路径层**，不在 `CreateFile` 层；用 `New-Item` 验会
+    # 因两层解析不一致得到自相矛盾的结果（`New-Item` 说没建成、目录里却有）。拦它是误拒。
+    # 同理不拦尾随空格/点（`com1 .txt`、`nul .jsonl`、`con..jsonl` 实测均正常创建）。
+    if any(ord(c) < 32 for c in v):
+        # 只拦 **ASCII C0**（< 0x20）：这类会串行化、破坏文件名结构。
+        # `\x7f`／ZWSP／RTL **刻意不拦**——它们不改路径指向，p000046 幽灵模式
+        # 不复现（glob/index/check 都正常），拦了属超纲；残留后果只是 `ls` 不可见
+        # 导致可能重名，与「条目不可见」不是一回事。
+        bad.append("含 ASCII C0 控制字符")
+    if len(v) > 64:
+        bad.append(f"超长（{len(v)} > 64）")
+    if bad:
+        die(f"{where}: 分区键 {key}={v!r} 不可用作文件名（{'、'.join(bad)}）。"
+            f"它会被拼成 <槽>/<值>.jsonl；带分隔符会写进子目录、含 `:` 或为设备名会写到别处"
+            f"或静默丢失，而加载面不递归 ⇒ 条目就成了 check/view/index 都看不见的幽灵。"
+            f"用单段普通名字（可含中文），别用 `/` `\\` `:` 或设备名。")
+    return v
 
 
 def editable_fields(slot: str) -> set[str]:
@@ -118,13 +188,147 @@ def norm(s: str) -> str:
     return re.sub(r"\s+", " ", str(s)).strip()
 
 
-def require_text(cmd: str, label: str, v) -> None:
-    """写入型字符串参数非空守卫（t000121 / p000048 / p000051）：空串与全空白＝删除语义，
-    静默写入即数据丢失。`None`＝未提供（放行）；`""`／全空白＝提供但为空（拒）。
-    报错文案与「条目不存在」区分开——两者是不同故障。"""
-    if v is not None and not str(v).strip():
-        die(f"{cmd}: {label} 为空——写入型参数不接受空串/全空白"
+# 命令行里最容易被 shell 吃掉内容的字符（p000016/p000019/p000035/p000039/p000041 同族，
+# 本会话已踩四次）。它们到达 CLI 时**通常已被 shell 展开或截断** ⇒ CLI 看见的往往不是用户
+# 想写的东西，所以这类内容根本不该走 argv。
+# 只有这两种会被 shell **替换内容**（反引号＝命令替换、`$`＝变量展开）。
+# 反斜杠**刻意不拦**：它只做转义、不替换内容，且在 Windows 路径 / Markdown / 代码引用里
+# 极常见，拦它会大面积误伤（本会话第一版就误加了，已去掉）。
+SHELL_UNSAFE = ("`", "$")
+
+
+def require_text(cmd: str, label: str, v, from_shell: bool = True) -> None:
+    """写入型字符串参数守卫：① 非空（t000121/p000048/p000051）；② 不含 shell 危险字符。
+
+    ① 空串与全空白＝删除语义，静默写入即数据丢失。`None`＝未提供（放行）；`""`／全空白＝
+    提供但为空（拒）。报错文案与「条目不存在」区分开——两者是不同故障。
+
+    ② **根治方向是「内容不走 argv」**：这里拒的是**已经错了的值**并指向 `--from-file`。
+    单纯的 denylist 不够（CWE-88：denylist 不可作唯一防线，parameterization 才是 High
+    效力缓解）——但 denylist 有独立价值：它把「shell 吃掉了内容」这件事**当场暴露**，
+    而不是让人拿着一段被截断的文本以为写对了。**真正的保障是 `--from-file`／stdin。**
+    """
+    if v is None:
+        return
+    s = str(v)
+    if not s.strip():
+        die(f"{cmd}: {label} 为空——写入型字符串参数不接受空串/全空白"
             "（空串＝删除语义，疑似漏喂变量如 `$(cat 空文件)`）")
+    # 只对**走 argv** 的值提示 shell 危险字符。`--from-file`/stdin 来的内容由程序
+    # 解析、从未经过 shell，里面的反引号/`$` 就是字面量，提示它反而是噪声。
+    #
+    # **为什么不硬拒（2026-10-03 改）**：本机实测单引号内反引号/`$` **不展开**，而 CLI
+    # 收到的值无法区分「用户用双引号、已被展开」与「用户用单引号、本就安全」——
+    # 值到达时两者形态相同（前者已无反引号，后者还带反引号字面量）。于是硬拒必然
+    # **误拒单引号这种安全写法**，而该抓的「已被展开」又因值里没有反引号而**抓不到**。
+    # CWE-88 的分工也是这样：Parameterization 是唯一 High 效力项（即 `--from-file`），
+    # validation 只是辅助、且原文说的是「不要**只**依赖查找畸形输入」，并明确承认
+    # denylist 对「畸形到该直接拒绝」的输入有用——而单引号传参并不畸形。
+    # 所以这里降为**提示**，真检出交给写后回读（`echo_back`）：它看的是**落盘结果**，
+    # 不猜输入形态，双引号被吃掉时当场可见，单引号安全写法零干扰。
+    if from_shell:
+        hit = [c for c in SHELL_UNSAFE if c in s]
+        if hit:
+            print(f"  ⚠ {cmd}: {label} 含 shell 特殊字符 {hit}——**若你用了双引号，这段内容"
+                  f"可能已被 shell 展开**（反引号＝命令替换、`$`＝变量）。单引号安全；"
+                  f"要彻底避开请用 `--from-file <路径|->`（由程序解析、不经 shell）。"
+                  f"写完请核对下方回读值。", file=sys.stderr)
+
+
+def load_from_file(cmd: str, path: str, allowed: set) -> dict:
+    """`--from-file <路径|->`：内容**由程序解析**，完全不经过 shell（p000016/019 根治）。
+
+    格式：每行 `字段=值`。值可跨行续写（行尾 `\\`）——因为要贴代码片段/多行说明时，
+    单行 `k=v` 装不下。空行与 `#` 开头（行首无 `=`）忽略。字段不在 `allowed` 内即报错
+    （防把 `--summary` 写进文件却静默丢弃，那正是本 CLI 早前的老病）。
+    """
+    raw = sys.stdin.read() if path == "-" else Path(path).read_text(encoding="utf-8")
+    out: dict[str, str] = {}
+    key = None
+    for ln_no, ln in enumerate(raw.splitlines(), 1):
+        if key is None:
+            s = ln.strip()
+            if not s or s.startswith("#"):
+                continue
+            if "=" not in s:
+                die(f"{cmd} --from-file: 行 {s[:40]!r} 不是 `字段=值` 格式")
+            k, v = s.split("=", 1)
+            k = k.strip().lstrip("-")
+            if k not in allowed:
+                die(f"{cmd} --from-file: 字段 {k!r} 不被本命令接受"
+                    f"（可接受：{'、'.join(sorted(allowed))}）")
+            if k in out:
+                die(f"{cmd} --from-file: 字段 {k!r} 重复出现（第 {ln_no} 行）——"
+                    f"后者覆盖前者是**静默丢弃**，请合并成一处")
+            key = k
+            out[key] = v
+            if not ln.endswith("\\"):
+                key = None
+        else:
+            out[key] += "\n" + ln
+            if not ln.endswith("\\"):
+                key = None
+    if not out:
+        die(f"{cmd} --from-file: 没解析出任何 `字段=值`")
+    return out
+
+
+def echo_back(st: Store, entry_id: str, label: str = "回读") -> None:
+    """写完**回读**落盘值并显示（P3 不静默；p000019/p000041 根治的关键一环）。
+
+    为什么必须有它：命令行里的反引号/`$` 被 shell 展开后，**CLI 收到的是展开后的值**，
+    它无从知道原意 —— 硬拒抓不到、单引号安全写法又会被误拒。唯一可靠的判据是
+    **看结果**：把刚写进磁盘的那行读回来摆在你面前，双引号被吃掉时当场可见
+    （不用等几小时后回读才发现），而单引号安全写法**不会**产生任何额外噪声。
+    它检测的是落盘事实，不猜输入形态。
+
+    显示长文本字段的前若干字 —— 被吃掉最常发生在 `detail`／`src` 这类长文本上。
+    """
+    row = None
+    for r in st.load_live():
+        if r.get("id") == entry_id:
+            row = r
+            break
+    if row is None:
+        for r in st.load_closed():
+            if r.get("id") == entry_id:
+                row = r
+                break
+    if row is None:
+        # decisions 槽是 `decisions/<id>.md`（frontmatter ＋ 正文），**不在**
+        # live/closed 里。原实现查不到就报「异常」——而 `add decision` 明明成功，
+        # **把成功报成失败**，与 P3「不静默」的本意正好相反（独立审计实测抓到）。
+        for f in sorted(st.decisions_dir().glob("*.md")) if st.decisions_dir().is_dir() else []:
+            if f.stem == entry_id:
+                fm = _frontmatter(f)
+                print(f"  ↩ {label} {entry_id}（已落盘，实际值）：")
+                # 键表＝实测会出现在 decisions frontmatter 里的字段；**`title` 是死键**
+                # （writer 只把 title 写成正文 H1，frontmatter 永不含它）——独立审计抓到。
+                for k in ("topic", "status", "domain", "supersedes"):
+                    if fm.get(k):
+                        print(f"      {k}: {str(fm[k])[:160]}")
+                _body = f.read_text(encoding="utf-8").split("---", 2)
+                tail = _body[2] if len(_body) > 2 else ""
+                tail = tail.strip().splitlines()
+                if tail:
+                    print(f"      body: {' '.join(tail)[:160]}"
+                          f"{'…（已截断，全文见文件）' if len(' '.join(tail)) > 160 else ''}")
+                return
+        print(f"  ↩ {label}：条目 {entry_id} 未在 live/closed/decisions 中找到（异常）",
+              file=sys.stderr)
+        return
+    print(f"  ↩ {label} {entry_id}（已落盘，实际值）：")
+    # 键表＝**实测**会出现在 live/closed 行里的字段（不是"看着相关就加上"）：
+    # 实测 action 行 = id/created/summary/status/detail/src/topic，closed 行多 outcome。
+    # `title`/`body`/`ref` **都不在通用路径**（body 只在 decisions 槽、已由下面的
+    # decisions 专用分支回读；ref 只在 unconfirmed、而它不在 live/closed 里）——
+    # 上一版把三者塞进键表，变异测试证明那是**死项**（去掉也不影响任何断言）。
+    for k in ("summary", "topic", "detail", "src", "outcome"):
+        v = row.get(k)
+        if not v:
+            continue
+        s = str(v).replace("\n", " ⏎ ")
+        print(f"      {k}: {s[:160]}{'…（已截断显示，全文见文件）' if len(s) > 160 else ''}")
 
 
 def ordered(entry: dict) -> dict:
@@ -164,6 +368,7 @@ class Store:
     def __init__(self, root: Path):
         self.d = root
         self.root_dir = root.resolve().parent
+        self._pre_tamper: list | None = None    # 写前旁证快照，见 note_pre_tamper
 
     # ---- 路径 ----
     def live_shards(self) -> list[Path]:
@@ -275,7 +480,41 @@ class Store:
             "next": self.next_id(),
         }
 
-    def write_index(self):
+    def note_pre_tamper(self) -> None:
+        """写命令**开始时**取一次旁证快照（同一命令内只算一次）。
+
+        为什么不能放在 `write_index` 里算：`set`/`add`/`edit` 的写序是「先写内容、
+        后 write_index」，那时文件 mtime 已经被**本次自己的写**更新了——于是每次
+        经这些命令写 `status`/`exit` 都会被自己的 pre_tamper 判据误报（真源实测：
+        连我自己用 `set exit` 回填一次都被报成「未经 CLI 之外改动过」）。
+        """
+        if self._pre_tamper is None:
+            self._pre_tamper = _tamper_since_last_write(self, self._write_targets())
+
+    def _removed_since_last_write(self) -> list:
+        """本 Store 生命周期内、写事件记过但**现已不存在**的文件。
+
+        4.8.1 之前这里是死红：`edit --domain` 换分区会「搬空即删」旧分区文件（4.7.5 的
+        刻意修复），而 `audit_writes` 把「latest 里有、落盘没有」一律判成「疑似被 CLI
+        之外的途径删掉」⇒ 每次换分区后 `check` 永久红，且 `rebase` 也解不开（它同样保留
+        `latest`）。根治：**写事件要记「谁删的」**，对账时才分得清「经 CLI 正常删掉」与
+        「凭空消失」。
+        """
+        wl = self.d / WRITES_LOG
+        if not wl.is_file():
+            return []
+        seen: set[str] = set()
+        for e in read_jsonl(wl):
+            seen |= set(e.get("files") or {})
+            seen |= set(e.get("removed") or [])
+        return sorted(f for f in seen if not (self.d / f).exists())
+
+    def write_index(self, op: str | None = None):
+        # **不要在这里取快照**：调用点都在「内容已写完之后」，那时 mtime 已被本次
+        # 自己的写更新 ⇒ 每次经 set/add/edit 写 status/exit 都被自己的判据误报
+        # （第一版修法把「每次算」改成「每实例算一次」，时机仍是写后，等于没修；
+        #   真源 check 报红才暴露）。写命令须在**第一行**调 note_pre_tamper()。
+        pre_tamper = self._pre_tamper or []
         idx = self.build_index()
         p = self.d / "index"
         fd, tmp = tempfile.mkstemp(dir=str(self.d))
@@ -283,6 +522,29 @@ class Store:
             json.dump(idx, f, ensure_ascii=False, indent=2)
             f.write("\n")
         os.replace(tmp, p)
+        # 写事件记在**索引重建之后**——所有写路径最后都过这里，集中记才不会漏。
+        log_write(self, op or "write_index", self._write_targets(), pre_tamper,
+                  removed=self._removed_since_last_write())
+
+    def _write_targets(self) -> list:
+        """本次落盘的全部受管文件（分区 jsonl/md ＋ 四个单文件槽）。"""
+        out = []
+        for slot in ENTRY_SLOTS:
+            d = self.d / slot
+            if d.is_dir():
+                out += sorted(d.glob("*.jsonl"))
+                out += sorted(d.glob("*.md"))
+        for s in SINGLES:
+            f = self.d / s
+            if f.is_file():
+                out.append(f)
+        uf = self.unconf_file()            # unconfirmed.jsonl 也要进对账面
+        if uf.is_file():
+            out.append(uf)
+        cl = self.d / "closed"
+        if cl.is_dir():
+            out += sorted(cl.glob("*.jsonl"))
+        return out
 
 
 # ---------------- init ----------------
@@ -332,6 +594,128 @@ def _log_path(st: Store) -> Path:
     return st.d / "log.jsonl"
 
 
+def _sha(text: str) -> str:
+    """内容哈希（不是 mtime——mtime 可 `touch -d` 伪造，一戳就破）。"""
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+
+WRITES_LOG = "writes.jsonl"
+
+
+def _tamper_since_last_write(st: Store, targets) -> list:
+    """写**之前**的旁证检查：这些文件的 mtime 与上次写事件记录的不一致
+    ⇒ 上次 CLI 写之后有人动过它们（哪怕内容最终写回一样 —— 那正是补手续）。"""
+    wl = st.d / WRITES_LOG
+    if not wl.is_file():
+        return []
+    evs = read_jsonl(wl)
+    if not evs:
+        return []
+    last: dict[str, dict] = {}
+    for e in evs:
+        for f, rec in (e.get("files") or {}).items():
+            last[f] = rec if isinstance(rec, dict) else {"sha": rec, "mt": None}
+    out = []
+    for t in targets:
+        t = Path(t)
+        if not t.is_file():
+            continue
+        rel = str(t.relative_to(st.d))
+        rec = last.get(rel)
+        if rec and rec.get("mt") is not None and t.stat().st_mtime_ns > rec["mt"]:
+            out.append(rel)
+    return out
+
+
+def log_write(st: Store, op: str, targets, pre_tamper=None, removed=None) -> None:
+    """每次 CLI **写**都记一条 append-only 事件（p000025 的判据面，4.7.8）。
+
+    记 `op` ＋ 每个受影响文件的**写后内容哈希**。它让两件原本「钉不进判据」的事变成
+    可判定：
+      · 有人绕过 CLI 手改文件 ⇒ `check` 重算当前文件哈希，与最后一条写事件对不上
+        ⇒ **存在未经 CLI 记录的写入**（含「改了又改回」以外的一切痕迹）。
+      · 「补手续」（先手改、再用 CLI 覆写同样字节）⇒ 同一 target 出现**内容哈希相同、
+        紧邻相邻**的两条写事件 ⇒ 疑似补手续（真去做了同一件事两次）。
+    判据输入全是落盘证据。时间戳用 **`st_mtime_ns`（纳秒）**而非 `int(st_mtime)`：
+    秒级取整会把同一秒内的多次写压成同一个值，判据当场失效（第一版就这么全绿的）。
+    best-effort：日志写失败不阻断业务写（否则日志成了新的单点）。
+    """
+    try:
+        if not (st.d / "index").is_file():        # 同 _log：非库不落盘
+            return
+        ev = {"ts": datetime.now().astimezone().isoformat(timespec="seconds"),
+              "op": op,
+              "pre_tamper": sorted(pre_tamper or []),
+              "removed": sorted(removed or []),
+              "files": {str(Path(t).relative_to(st.d)): {
+                            "sha": _sha(Path(t).read_text(encoding="utf-8")),
+                            "mt": Path(t).stat().st_mtime_ns}
+                        for t in targets if Path(t).is_file()}}
+        with open(st.d / WRITES_LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(ev, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
+
+
+def audit_writes(st: Store) -> list[str]:
+    """对账写事件与落盘现实（`check` 的一维，p000025）。
+
+    两条判据，**都以内容哈希为主、mtime 为辅**：
+      · **内容哈希对不上** ⇒ 存在**未经 CLI 记录的写入**（手改文件；`writes.jsonl`
+        只记 CLI 写，手改不留痕）。
+      · **内容哈希相同、但 mtime 更新了** ⇒ 文件**被动过又写回同样内容**——这正是
+        「先手改、再用 CLI 覆写同样字节来补手续」的指纹。CLI 侧看不见那次手改的
+        内容，但它**动了文件**，时间戳留下了。
+    为什么不用纯 mtime 判「有没有被改」：mtime 可 `touch -d` 伪造。所以哈希是主判据、
+    mtime 只在**哈希相同**时作旁证（那种情况本来就没内容差异可判）。
+    """
+    wl = st.d / WRITES_LOG
+    if not wl.is_file():
+        return []
+    evs = read_jsonl(wl)
+    if not evs:
+        return []
+    latest: dict[str, dict] = {}
+    problems: list[str] = []
+    for e in evs:
+        for f, rec in (e.get("files") or {}).items():
+            if isinstance(rec, str):          # 兼容旧格式（纯 sha）
+                rec = {"sha": rec, "mt": None}
+            latest[f] = rec
+    ever_removed: set = set()
+    for e in evs:
+        ever_removed |= set(e.get("removed") or [])
+    seen_tamper: set = set()
+    for e in evs:
+        for f in (e.get("pre_tamper") or []):
+            if f not in seen_tamper:
+                seen_tamper.add(f)
+                problems.append(
+                    f"{f}：在 {e.get('op')} 写入**之前**发现它已被 CLI 之外改动过"
+                    f"（内容哈希可能仍与记录一致）——若是先手改文件、再用 CLI 覆写同样"
+                    f"字节来「补手续」，那次手改的时间窗已无法追回")
+    for f, rec in latest.items():
+        p = st.d / f
+        if not p.is_file():
+            # 区分两种「不在了」：**经 CLI 正常删掉**（如 edit 换分区的「搬空即删」，
+            # 4.7.5）不报；**凭空消失**（没有任何写事件记录过删它）才报。
+            if f in ever_removed:
+                continue
+            problems.append(f"{f}：写事件记过它，现已不存在，且**没有任何 CLI 记录删过它**"
+                            f"（疑似被 CLI 之外的途径删掉）")
+            continue
+        now_sha = _sha(p.read_text(encoding="utf-8"))
+        if now_sha != rec.get("sha"):
+            problems.append(
+                f"{f}：内容哈希 {rec.get('sha')} ≠ 落盘实际 {now_sha} —— 存在"
+                f"**未经 CLI 记录的写入**（`writes.jsonl` 只记 CLI 写；手改文件不留痕）")
+        elif rec.get("mt") is not None and p.stat().st_mtime_ns > rec["mt"]:
+            problems.append(
+                f"{f}：内容**没变**（哈希同为 {now_sha}）但文件被改动过（mtime 更新）——"
+                f"疑似「先手改、再用 CLI 覆写同样字节」的补手续；那次手改的时间窗已无法追回")
+    return problems
+
+
 def _log(st: Store, event: str):
     """每次门禁落一条快照（best-effort，不因日志失败中断）。
 
@@ -379,6 +763,72 @@ def cmd_log(st: Store, a) -> int:
 
 
 # ---------------- check ----------------
+# ── `check` 判据清单：**唯一产生源**（2026-10-03 单源化试点）──
+# 同一事实（有哪些判据）此前被复述在两处：`cmd_check` 的代码段 与 `SKILL.md` 正文的
+# 判据清单 —— 加一条判据要改两处，本会话已因此反复「只改了一半」（正文与实现分叉）。
+# 现在：**这一张表是唯一源**，`SKILL.md` 的清单由 `sync-dims` 从它生成，
+# `selftest` 里有一条漂移检查兜住（生成物与源不同步即红）。
+# 加判据时**只改这里**，然后跑 `handoff.py sync-dims` 写回生成块（可 `--check` 只验不写）。
+CHECK_DIMENSIONS: list[tuple[str, str]] = [
+    ("slots", "9 槽与 `index` 齐备（status/summary/scope/exit ＋ 四目录 ＋ unconfirmed）"),
+    ("id", "id 形如 `<t|p|d|c|u><6 位>`、全局唯一、**前缀与所在槽相符**"),
+    ("status", "live 行的 `status` 在该型闭集内（**`closed` 不是可写值**，关闭只经 `close`）"),
+    ("fields", "未知字段 ＋ 必填字段缺失（按型）"),
+    ("dates", "`created`/`closed` 是合法日期、非未来日、且 `created ≤ closed ≤ today`"),
+    ("single-line", "`summary` 单行（不得含换行/制表）"),
+    ("next", "`next` 是合法 id、存在、且 **`status=open`**（附可执行修法）"),
+    ("text-dangling", "文本槽（`status`/`summary`/`exit`）点名的 `t/p/q/u` 型 id 必须既不在册、"
+                      "也不在 `trash/`·`void` 之外（**已作废 ≠ 不存在**；`c`/`d` 两型不参与，"
+                      "各有专门检查面）"),
+    ("decision", "`decisions/*.md` 的 frontmatter id 必须等于文件名、日期合法、status 在闭集"),
+    ("scope", "`scope` 登记指向**活路径**或 glob 有命中（机械判据：登记必须可解析）"),
+    ("void-reuse", "id 未复用已作废 id（`void` 拦截）"),
+    ("writes", "写事件对账：内容哈希对不上＝**未经 CLI 记录的写入**；写前发现被外部动过＝"
+               "**疑似补手续**（含判据缺陷留下的历史误报，用 `rebase --force` 结案）"),
+    ("partition-case", "同槽分区文件名**大小写折叠后不得重名**（NTFS 大小写不敏感 ⇒ 仅大小写"
+                       "不同的两个 domain 会合并成一个分区文件、计数与现实脱节）"),
+    ("index", "`index` 的各槽计数与 `next` 与落盘一致（漂移即红）"),
+]
+CHECK_BEGIN = "<!-- check-dims:begin （由 CHECK_DIMENSIONS 生成，勿手改）-->"
+CHECK_END = "<!-- check-dims:end -->"
+
+
+def render_check_dims() -> str:
+    """判据清单的 Markdown 生成物（`SKILL.md` 与任何文档都从它派生）。"""
+    lines = [CHECK_BEGIN, ""]
+    lines += [f"{i}. **{d[0]}** — {d[1]}" for i, d in enumerate(CHECK_DIMENSIONS, 1)]
+    lines += ["", CHECK_END]
+    return "\n".join(lines)
+
+
+def cmd_sync_dims(check_only: bool = False) -> int:
+    """把 `CHECK_DIMENSIONS` 生成的判据清单写回 SKILL.md（`--check` 只验不写）。"""
+    md = Path(__file__).resolve().parent.parent / "SKILL.md"
+    try:
+        text = md.read_text(encoding="utf-8")
+    except OSError as e:
+        print(f"sync-dims: 读不到 {md}: {e}", file=sys.stderr)
+        return 2
+    block = render_check_dims()
+    if CHECK_BEGIN not in text or CHECK_END not in text:
+        print(f"sync-dims: FAIL（{md.name} 缺判据清单生成块——"
+              f"把下面这段插到「check ＝ 相位门禁」那段末尾）", file=sys.stderr)
+        print(block, file=sys.stderr)
+        return 1
+    cur = text.split(CHECK_BEGIN, 1)[1].split(CHECK_END, 1)[0]
+    new = text.split(CHECK_BEGIN, 1)[0] + block + text.split(CHECK_END, 1)[1]
+    if cur.strip() == block.split(CHECK_BEGIN, 1)[1].split(CHECK_END, 1)[0].strip():
+        print("sync-dims: OK（生成块已是最新）")
+        return 0
+    if check_only:
+        print(f"sync-dims: FAIL（{md.name} 生成块与 CHECK_DIMENSIONS 不同步——"
+              f"跑一次 `handoff.py sync-dims` 写回）", file=sys.stderr)
+        return 1
+    md.write_text(new, encoding="utf-8")
+    print(f"sync-dims: 已写回 {md.name} 的判据清单生成块")
+    return 0
+
+
 def cmd_check(st: Store, no_log: bool = False) -> int:
     errs: list[str] = []
     # 9 槽存在性
@@ -459,49 +909,51 @@ def cmd_check(st: Store, no_log: bool = False) -> int:
         else:
             live_recs = {r["id"]: r for r in st.load_live() if "id" in r}
             if nid not in live_recs:
-                errs.append(f"next: {nid} 不存在或已关闭")
+                errs.append(f"next: {nid} 不存在或已关闭"
+                            f"\n      修（一条命令即可）：handoff next --auto")
             elif (live_recs[nid].get("status") or "open") != "open":
                 # 存在但不是 open：blocked/等待中的条目当决策点＝空指针。调用方
                 # （接手的人或 agent）照着 next 走会立刻卡住，而结构上看不出问题。
                 errs.append(f"next: {nid} 的 status="
                             f"{live_recs[nid].get('status') or 'open'!r}，不是 open"
-                            f"（等待中的条目不该当决策点；跑 handoff next 补位）")
+                            f"（等待中的条目不该当决策点）\n"
+                            f"      修（一条命令即可）：handoff next --auto")
 
     # 文本槽死指针（D1，2026-10-03）：文本槽是纯手写散文，条目删了/改号了它不会
     # 自己跟着变。结构校验看不出这类漂移——槽文件存在、id 合法、引用闭合，全都对。
-    # id 不随时间失效，所以这一维可**全量**判。**但不是「无假阳性」**——见下面 ②：
-    # `d` 型有一个可复现的碰撞面（7 字符全 hex 的 commit 短 hash）。
+    # id 不随时间失效，所以这一维可**全量**判。**但不是「无假阳性」**——判据只覆盖
+    # 下面 ② 点名的那几型；**被排除的类型不因此变成「没问题」，只是另有检查面**。
     #
     # **两个刻意的收窄**（都是被真文本逼出来的，不是预防性设计）：
     #  ① **已作废 ≠ 不存在**。`rm` 会把条目落进 `trash/` 并记入 `void`；此后文本里
     #     写「t000105 作废」是**正当的历史陈述**（真源实测共 6 处：`status` 3 ＋ `summary` 1 ＋ `exit` 2），
     #     判它死指针就是逼着人把正确记录改掉。故作废 id 不计。
-    #  ② **不判 `c` 前缀**。`c` 型是 commands 槽。收窄的真实理由（这里更正过两次，
-    #     前两版都写错了，故把推演写下来，别再凭印象改）：
-    #       · 模式 `\b([tpdqu]\d{6})\b` 长度**恒为 7 字符** ⇒ 6 字符的 git 短 hash
-    #         长度不足，**永不匹配**（实测 `c12345` → 无命中）。
-    #       · `c697750`（7 字符）也不匹配，但原因不是词边界，而是 `c` 根本不在
-    #         字符类里——把它排除之后这一条就恒成立，与边界无关。
-    #       · 字符类 `tpdqu` 里**只有 `d` 是 hex 字符**。所以唯一可达的 commit-hash
-    #         碰撞面是 **`d` 型**（7 字符全 hex 的短 hash，如 `d697750`）——而 `d` 型
-    #         （decisions）**是受判的**。
-    #     即：排除 `c` 的收益是零成本（它本来就够不着），**真正够得着的 `d` 型没排**。
-    #     `d` 型的收窄属**判据增删**，走停手线（见 skill-description-audit），本轮
-    #     **不擅自改**，只登记：若日后出现 d 型假阳（文本里写 commit 短 hash），
-    #     再按停手线决定是加上下文判据还是收窄。
-    voided = set(_void_ids(st))
-    trash = st.d / "trash"
-    if trash.is_dir():
-        for f in sorted(trash.glob("*.jsonl")):
-            for r in read_jsonl(f):
-                if r.get("id"):
-                    voided.add(r["id"])
+    #  ② **`c` 与 `d` 两型不参与本维**（2026-10-03 用户裁定，原只排 `c`）。
+    #     理由写准（此处前两版都写错过，故把推演留下）：
+    #       · 判据用的模式是 `\b([tpqu]\d{6})\b`（**d 已从字符类里去掉**），
+    #         长度**恒为 7 字符** ⇒ 6 字符的 git 短 hash 长度不足、**永不匹配**。
+    #       · `c697750`（7 字符）也不匹配，原因是 **`c` 根本不在字符类**——排除它
+    #         之后这条恒成立，与词边界无关。
+    #       · 字符类 `tpdqu` 里**只有 `d` 是 hex 字符**。故 `d` 型与 7 字符全 hex 的
+    #         commit 短 hash（如 `d697750`）**形态不可区分**，且**实测可复现**：把
+    #         这种 hash 写进文本槽，`check` 立刻 rc=1 把它判成死指针。
+    #     所以排除的其实是 **`d`**（够得着的那个），`c` 排除只是顺带的零成本项。
+    #     **收窄不是放弃检查**：「`d` 型 id 查不到」这件事有专门且语义正确的检查面
+    #     —— `view --id dNNNNNN`：**已作废**的 id 打印「已作废」并 rc=0（与本闸
+    #     「已作废 ≠ 不存在」同口径），**真正查不到**才 rc=2 并明说「live / closed /
+    #     decisions 均无，且不在 trash/·void」；`check` 另有一条判 `decisions/<file>`
+    #     的 frontmatter id 必须等于文件名（抓改号）。分工已实测：把 d000001.md
+    #     改名 → view 仍按 frontmatter id 命中（rc=0）而 check 立刻 rc=1 报
+    #     「frontmatter id 与文件名不符」；把文件移走 → view rc=2；只把文件挪进
+    #     `trash/` 不记 `void` → 两边都认「已作废」。**交给语义正确的命令，别靠
+    #     形态猜。**
+    voided = _voided_ids(st)          # 单源：void ∪ trash/（见 _voided_ids）
     known_ids = set(st.all_ids()) | voided
     for s in ("status", "summary", "exit"):
         sp = st.d / s
         if not sp.is_file():
             continue
-        for ref in sorted(set(re.findall(r"\b([tpdqu]\d{6})\b", sp.read_text(encoding="utf-8")))):
+        for ref in sorted(set(re.findall(r"\b([tpqu]\d{6})\b", sp.read_text(encoding="utf-8")))):
             if ref not in known_ids:
                 errs.append(f"{s}: 提到 {ref}，但 live∪closed∪decisions 里没有这个 id"
                             f"（既不在册、也不在 trash/void——条目被删或改号了，文本不会自己跟着变）")
@@ -525,6 +977,30 @@ def cmd_check(st: Store, no_log: bool = False) -> int:
     for i in st.all_ids():
         if i in void:
             errs.append(f"id 复用了已作废 id：{i}")
+
+    # 写事件对账（p000025，4.7.8）：把「绕过 CLI 手改文件」与「补手续」从纪律变成判据。
+    for _w in audit_writes(st):
+        errs.append(_w)
+
+    # 分区文件名**大小写折叠后重名**（2026-10-03，Windows 实测带出的真问题）：
+    # NTFS 大小写**不敏感** —— 实测同时创建 `Case.jsonl` 与 `case.jsonl`，目录枚举
+    # **只得到 1 个文件**。所以仅大小写不同的两个 domain，在 Windows 上会**合并成一个
+    # 分区文件**：index 计数少一条、两条目挤进同一文件 ⇒ 正是 p000046 那个「index 与现实
+    # 不符、check 却报 OK」的形态。**这条在 Linux 上也判**（折叠后重名是纯粹的命名冲突），
+    # 因为它是**平台无关的前提**——在 Linux 上它无害，在 Windows 上它丢数据。
+    for slot in ENTRY_SLOTS:
+        d = st.d / slot
+        if not d.is_dir():
+            continue
+        seen: dict[str, str] = {}
+        for f in sorted(d.glob("*.jsonl")):
+            key = f.name.lower()
+            if key in seen:
+                errs.append(
+                    f"{slot}/{f.name} 与 {seen[key]} 仅大小写不同：Windows/NTFS 大小写不敏感，"
+                    f"两者会合并成同一个分区文件（实测枚举只得 1 个）⇒ 改其中一个的 domain")
+            else:
+                seen[key] = f.name
 
     # index 一致性
     if (st.d / "index").is_file():
@@ -568,12 +1044,26 @@ def cmd_add(st: Store, kind: str, f: dict) -> int:
     现签名收显式 dict，未消费的键在结构上不可能出现，且真出现（改了声明忘了改这里）由下方
     drift 守卫当场报错——**静默丢弃在本 CLI 里不再是可达状态**。
     """
+    st.note_pre_tamper()          # 写前旁证快照（本次写自己的 mtime 变化不算外部改动）
     spec = ADD_KINDS[kind]
     slot, part_key = spec["slot"], spec["part"]
     consumed = ({"title", "body", "status", "supersedes", "domain", "topic"} if slot == DOC_SLOT
                 else {"summary", "status", "blockedBy", "topic", "src", "detail", part_key})
+    ff_keys: set = set()
+    ff = f.pop("_from_file", None)
+    if ff:
+        got = load_from_file(f"add {kind}", ff, set(consumed))
+        # 同一字段同时给了 flag 与文件：**报错**，不静默取一个（静默丢弃是老病）。
+        # 只比**真正给了值**的 flag —— `{k: v for k in fields}` 里键恒存在、值常为 None，
+        # 直接比键集会把「没传的」全判成冲突。
+        dup = sorted({k for k, v in f.items() if v is not None} & set(got))
+        if dup:
+            die(f"add {kind}: 字段 {dup} 同时出现在命令行与 --from-file；只留一处")
+        f.update(got)
+        ff_keys = set(got)
     for k in sorted(consumed):
-        require_text(f"add {kind}", f"--{k}", f.get(k))
+        require_text(f"add {kind}", f"--{k}", f.get(k),
+                     from_shell=k not in (ff_keys if ff else set()))
     if slot == DOC_SLOT:
         if not f.get("title"):
             die("add decision: 需要 --title")
@@ -595,12 +1085,14 @@ def cmd_add(st: Store, kind: str, f: dict) -> int:
         for k in ("status", "blockedBy", "topic", "src", "detail"):
             if f.get(k) is not None:
                 e[k] = f[k]
-        append_jsonl(st.d / slot / f"{f.get(part_key) or '_global'}.jsonl", e)
+        part = guard_partition(f"add {kind}", part_key, f.get(part_key))
+        append_jsonl(st.d / slot / f"{part}.jsonl", e)
         new_id = e["id"]
     if drift := set(f) - consumed:
         die(f"内部不一致：add {kind} 声明了 {sorted(drift)} 却无人消费（补 ADD_KINDS 或消费分支）")
     st.write_index()
     print(f"handoff add {kind}: ok（slot={slot}） id={new_id}")
+    echo_back(st, new_id)
     return 0
 
 
@@ -626,16 +1118,23 @@ def _age_days(created: str) -> int:
         return 0
 
 
-def refill_pool(st: Store):
+def refill_pool(st: Store, exclude: str = ""):
     """补位池 = live actions（status 非 live 闭集者一律排除）。返回 (有序候选, 池大小, 排除数)。
 
     排序键全序确定：(有效档, created↑, id↑)。有效档 = 基础档 − 超期升档数（下限 0）；
     基础档取 summary 前缀 [高]=0 / [中]·无前缀=1 / [低]=2；超期每满 REFILL_STEP_DAYS 天升一档。
+
+    `exclude`：**把某 id 排除在池外**。这是 `close` 两阶段化（4.8.1）的关键——阶段 1
+    算补位候选时源行**还没删**、该条目**仍是 open**，不排除它就会**把自己补成 next**
+    （关掉的条目立刻又成了当前决策点）。漏了这个参数，方案就从「根治」变成「换一个 bug」。
     """
     rows, blocked = [], 0
     ls = live_status_of("action")
     for r in st.load_live():
         if r.get("_slot") != "actions":
+            continue
+        if exclude and r.get("id") == exclude:
+            blocked += 1
             continue
         if (r.get("status") or "open") != "open":
             # 仅 open 入池（t000138：只精确排 blocked 会放进 status=closed 的半关行；blocked＝等待中也不补位）
@@ -651,9 +1150,9 @@ def refill_pool(st: Store):
     return rows, len(rows), blocked
 
 
-def refill_pick(st: Store):
+def refill_pick(st: Store, exclude: str = ""):
     """按策略给出补位目标：返回 (id, 解释)。池空 → ('', 解释)。"""
-    rows, n, blocked = refill_pool(st)
+    rows, n, blocked = refill_pool(st, exclude)
     why = f"池 {n} 条" + (f"（排除非 open {blocked}）" if blocked else "")
     if not rows:
         return "", why + "·无可补"
@@ -662,39 +1161,73 @@ def refill_pick(st: Store):
     return r["id"], f"{why}·{r['id']} {tier}"
 
 
-def cmd_close(st: Store, a) -> int:
-    require_text("close", "--outcome", a.outcome)      # 空 outcome＝静默销账（p000051）
-    r = _find_live(st, a.id)
+def plan_close(st: Store, id: str, outcome: str | None,
+               no_refill: bool) -> dict:
+    """**阶段 1：纯计算、零落盘**。任何 `die()` 都在一个字节都没写时发生。
+
+    这是 p000069 的根治点。旧形把「算补位」放在「写 closed / 删源行 / 清 next」
+    **之后**，于是补位策略一旦抛错，落盘已完成一半：条目已归档、`next` 仍指着已关
+    条目——而那时 `check` 只能事后发现。拆成 plan/apply 后，可预见的失败全部前置；
+    残留窗口只剩阶段 2 内两次 IO 之间（每步各自原子），且 `check` 抓得到、给得出修法。
+
+    关键技术点：算补位候选时源行**还没删**、被关条目**仍是 open**，必须 `exclude=id`
+    ——否则会「把自己补成 next」，关掉的条目立刻又成了当前决策点。
+    """
+    require_text("close", "--outcome", outcome)     # 空 outcome＝静默销账（p000051）
+    st.note_pre_tamper()
+    r = _find_live(st, id)
     if not r:
-        die(f"close: 未找到 live 条目 {a.id}")
-    typ = ID_RE.match(a.id).group(1)
+        die(f"close: 未找到 live 条目 {id}")
+    typ = ID_RE.match(id).group(1)
     out = {k: r[k] for k in KEY_ORDER if k in r and not k.startswith("_")}
     out["closed"] = today()
-    if a.outcome:
-        out["outcome"] = a.outcome
-    append_jsonl(st.d / "closed" / f"{typ}.jsonl", out)
-    # 原子移除源行
+    if outcome:
+        out["outcome"] = outcome
+    was_next = st.next_id() == id
+    nid, why = ("", "（--no-refill，不补位）")
+    if was_next and not no_refill:
+        nid, why = refill_pick(st, exclude=id)      # ← 排除即将被关的那条
+    elif not was_next:
+        why = "（next 不是本条，不动指针）"
     src = Path(r["_file"])
-    rows = [x for x in read_jsonl(src) if x.get("id") != a.id]
-    write_jsonl_atomic(src, rows)
-    was_next = st.next_id() == a.id
-    if was_next:
-        st.set_next("")
-    print(f"handoff close: {a.id} → closed/{typ}.jsonl")
-    if was_next:
-        if a.no_refill:
-            print("handoff next: 已清空（--no-refill，不补位）")
-        else:
-            nid, why = refill_pick(st)
-            if nid:
-                st.set_next(nid)
-                print(f"handoff next: 自动补位 → {nid}｜{why}")
-                print(f"  策略：actions 池 · 排除非 open · 键(有效档, created↑, id↑) · "
-                      f"基础档 [高]0/[中]·无1/[低]2 · 每满 {REFILL_STEP_DAYS} 天升一档")
-            else:
-                print(f"handoff next: 已清空（{why}）")
+    rest = [x for x in read_jsonl(src) if x.get("id") != id]
+    return {"id": id, "typ": typ, "out": out, "was_next": was_next,
+            "nid": nid, "why": why, "src": src, "rest": rest}
+
+
+def apply_close(st: Store, plan: dict) -> int:
+    """**阶段 2：纯落盘**。无 `die`、无依赖外部状态的分支判断。
+
+    `next` **只写一次**（旧形先 `set_next("")` 再 `set_next(nid)`，中间那个窗口正是
+    「指针既不是原值也不是新值」的事故现场）。
+    """
+    append_jsonl(st.d / "closed" / f"{plan['typ']}.jsonl", plan["out"])
+    write_jsonl_atomic(plan["src"], plan["rest"])
+    if plan["was_next"]:
+        st.set_next(plan["nid"])
     st.write_index()      # 必须在 next 落定之后（index 内嵌 next，防陈旧）
+    print(f"handoff close: {plan['id']} → closed/{plan['typ']}.jsonl")
+    echo_back(st, plan["id"])
+    if plan["was_next"]:
+        if plan["nid"]:
+            print(f"handoff next: 自动补位 → {plan['nid']}｜{plan['why']}")
+            print(f"  策略：actions 池 · 排除非 open · 键(有效档, created↑, id↑) · "
+                  f"基础档 [高]0/[中]·无1/[低]2 · 每满 {REFILL_STEP_DAYS} 天升一档")
+        else:
+            print(f"handoff next: 已清空（{plan['why']}）")
     return 0
+
+
+def cmd_close(st: Store, id: str, outcome: str | None = None,
+              no_refill: bool = False, **_ignored) -> int:
+    """关闭一条 live 条目。**收显式参数而非 Namespace**（p000016 根治，4.8.0）。
+
+    两阶段：先 `plan_close` 纯算、再 `apply_close` 纯写（p000069，4.8.1）——可预见的
+    失败（找不到条目、引用守卫、补位策略）全部在**零落盘**时发生。
+    """
+    st.note_pre_tamper()
+    return apply_close(st, plan_close(st, id, outcome, no_refill))
+
 
 
 def cmd_next(st: Store, a) -> int:
@@ -706,7 +1239,15 @@ def cmd_next(st: Store, a) -> int:
     if a.auto:
         nid, why = refill_pick(st)
         if not nid:
-            die(f"next: {why}")
+            # 池空 ⇒ **把指针清空**（2026-10-03 修）。旧形直接 `die`、什么也不写：
+            # 于是当 next 指向一个已关条目、而池里确实没有可补的条目时，照着
+            # `check` 给的修法（`handoff next --auto`）跑完**指针依然坏着**——
+            # 指引给了一条不保证有效的命令，等于没给。`next --auto` 的语义是
+            # 「把 next 设成按策略算出的值」，池空时那个值就是空。
+            st.set_next("")
+            st.write_index()
+            print(f"handoff next: 已清空（按补位策略无候选）｜{why}")
+            return 0
         st.set_next(nid)
         st.write_index()
         print(f"handoff next: {nid}（按补位策略）｜{why}")
@@ -757,12 +1298,67 @@ def cmd_unconfirmed(st: Store, a) -> int:
             outcome = a.outcome or "dismiss（作废）"
         else:
             die("unconfirmed resolve: 须给 `--as action|pitfall|decision`（转正）或 `--dismiss`（作废）")
-        cmd_close(st, argparse.Namespace(id=a.id, outcome=outcome, no_refill=a.no_refill))
+        cmd_close(st, a.id, outcome, a.no_refill)
         return 0
     die("unconfirmed: 需要 add|resolve")
 
 
 # ---------------- read / render ----------------
+def cmd_rebase(st: Store, a) -> int:
+    """**重建写事件基线**（`writes.jsonl`）为当前落盘事实——给「判据缺陷产生过的误报」结案。
+
+    为什么需要它：`audit_writes` 扫的是**全部历史事件**。若某版本的前置旁证判据有缺陷
+    （4.7.8 曾因在 `write_index` 里取快照，把「本次命令自己写的 mtime 变化」当成外部
+    改动，4.7.9 已改为写命令**开始时**取快照），那些误报会**永久留在历史里、每次
+    check 都红**，修判据也消不掉。没有结案出路，被误报卡住的人就只能去手改
+    `writes.jsonl`——而那正是本工具要防的事。
+
+    所以：判据出错时，先 `rebase --force`（**先手工核对**确有手改嫌疑之外的情况）把
+    基线对齐现实，再修判据。它是显式动作、需确认、打印重建前后条数，不是静默自愈。
+    """
+    if not (st.d / "index").is_file():
+        die(f"rebase: {st.d} 不是交接存储（缺 index）——拒绝凭空建出 {WRITES_LOG}"
+            f"（这正是 `_log`/`log_write` 都有的守卫）")
+    wl = st.d / WRITES_LOG
+    before = len(read_jsonl(wl)) if wl.is_file() else 0
+    if not a.force:
+        die("rebase: 会丢弃现有写事件历史（那里面可能还藏着真问题）——"
+            "确认已排除手改嫌疑后加 --force")
+    # **真丢弃**带旁证的历史事件：rebase 的语义就是「结案」——旧事件里的 pre_tamper
+    # 若留着，`audit_writes` 仍会逐条报出来，等于什么都没做（第一版就犯了这个：
+    # 文档写「被 rebase 掉的历史旁证不再报」，实现却只是追加一条标记）。
+    evs = read_jsonl(wl) if wl.is_file() else []
+    tainted = [e for e in evs if e.get("pre_tamper")]
+    keep = [e for e in evs if not e.get("pre_tamper") and e.get("op") != "__rebase__"]
+    removed: set[str] = set()
+    for e in keep:
+        removed |= set(e.get("removed") or [])
+    latest: dict[str, dict] = {}
+    for e in keep:
+        for f, rec in (e.get("files") or {}).items():
+            # 已被 CLI 正常删掉的文件**不进新基线**：留着它，重建后仍会被判
+            # 「文件不存在」⇒ rebase 对这类死红无效（4.8.1 的实测）。
+            if f in removed:
+                continue
+            latest[f] = rec if isinstance(rec, dict) else {"sha": rec, "mt": None}
+    now = {"ts": datetime.now().astimezone().isoformat(timespec="seconds"),
+           "op": "__rebase__", "pre_tamper": [],
+           "files": {f: {"sha": _sha((st.d / f).read_text(encoding="utf-8")),
+                         "mt": (st.d / f).stat().st_mtime_ns}
+                     for f in latest if (st.d / f).is_file()}}
+    with open(wl, "w", encoding="utf-8") as f:
+        for e in keep + [now]:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    print(f"handoff rebase: 写事件基线已对齐当前落盘"
+          f"（历史 {before} 条 → 丢弃 {len(tainted)} 条带旁证的、"
+          f"保留 {len(keep)} 条 ＋ 1 条 rebase 标记）")
+    for e in tainted:
+        for f in (e.get("pre_tamper") or []):
+            print(f"    · 已结案：{f}（{e.get('op')}，{e.get('ts')}）")
+    print("  **这些结论已不可追回**；若有真手改被一并结案，请从 `git log`/备份核对")
+    return 0
+
+
 def cmd_filter(st: Store, a) -> int:
     rows = st.load_live() if not a.id else st.load_live() + st.load_closed()
     if a.id:
@@ -841,8 +1437,30 @@ def _frontmatter(path: Path) -> dict:
 def cmd_view(st: Store, a) -> int:
     if a.id:
         hit = [r for r in st.load_live() + st.load_closed() if r.get("id") == a.id]
+        if not hit and st.decisions_dir().is_dir():
+            # decisions 槽是 `decisions/<id>.md`（frontmatter ＋ 正文），**不在**
+            # load_live()/load_closed() 里——那两者只覆盖 jsonl 槽。原实现因此对
+            # **每一条决策记录**都报「未找到（live 与 closed 均无）」，而它们明明
+            # 在册。查不到的假报比查不到更坏：接收方据此以为决策丢了。
+            for f in sorted(st.decisions_dir().glob("*.md")):
+                fm = _frontmatter(f)
+                if fm.get("id") == a.id or f.stem == a.id:
+                    st_ = fm.get("status", "")
+                    head = " ".join(x for x in (
+                        f"[{a.id}]", fm.get("topic", ""),
+                        fm.get("title", "") or f.stem) if x)
+                    print(head + (f"  ({st_})" if st_ and st_ != "open" else "")
+                          + f"  → {f}")
+                    return 0
+        if not hit and a.id in _voided_ids(st):
+            # **已作废 ≠ 不存在**，与 check 的 D1 同口径（`rm` 会把条目落进
+            # `trash/` 并记 `void`）。原实现只看 live/closed/decisions，于是对一个
+            # 已经 `rm` 过的 id 报「均无」rc=2 —— 与本技能自己写下的口径相反，
+            # 会把人引去查一个根本不该再查的东西。
+            print(f"[{a.id}]（已作废：rm 落 trash/ 并记 void，非「查不到」）")
+            return 0
         if not hit:
-            die(f"view: 未找到条目 {a.id}（live 与 closed 均无）", 2)
+            die(f"view: 未找到条目 {a.id}（live / closed / decisions 均无，且不在 trash/·void）", 2)
         for r in hit:
             print(entry_display_line(r))
         return 0
@@ -1051,7 +1669,28 @@ def cmd_agents_block(st: Store, a) -> int:
         text = f.read_text(encoding="utf-8")
         if BEGIN_MARK not in text or END_MARK not in text:
             print(f"agents-block: FAIL（{f} 没有 {BEGIN_MARK} / {END_MARK} 标记区）", file=sys.stderr)
-            print(f"  修：python3 <handoff>/scripts/handoff.py agents-block --install {repo}", file=sys.stderr)
+            # 「没标记区」这支**不在** 4.9.0 三态分流范围内（分流要先认得出标记区）。
+            # 而 `--install` 在这种仓上走的是「整节收敛」：会**吃掉**那节里的非空内容
+            # （实测：标记行少个空格 ⇒ 用户的「- 我自己写的条款」被标准块顶掉，
+            #  节外不动、不产生第二份节）。破坏性只在 install **之后**才打印 ⇒ 太晚，
+            # 这里提前说清。判据：有没有非空的 `## 交接` 节——行数由实算给出。
+            secs = find_handoff_sections(text.splitlines())
+            risky = [s for s in secs
+                     if any(l.strip() for l in text.splitlines()[s[0] + 1:s[1]])]
+            if risky:
+                n = sum(len([l for l in text.splitlines()[s[0] + 1:s[1]] if l.strip()])
+                        for s in risky)
+                print(f"  ⚠ 判定：仓里有 {len(risky)} 个非空 `## 交接` 节（共 {n} 行非空）"
+                      f"但认不出标记区。", file=sys.stderr)
+                print("  ⚠ `--install` 会**整节收敛**——那 {n} 行会被标准块顶掉"
+                      "（节外不动、不会产生第二份节）。".replace("{n}", str(n)), file=sys.stderr)
+                print("  修：先备份那节内容（或抄到块外章节），再跑 "
+                      f"`--install {repo}`。", file=sys.stderr)
+            else:
+                print(f"  判定：没有非空的 `## 交接` 节，`--install` 会新建一节，"
+                      f"不丢内容。", file=sys.stderr)
+                print(f"  修：python3 <handoff>/scripts/handoff.py agents-block --install {repo}",
+                      file=sys.stderr)
             return 1
         if text.count(BEGIN_MARK) != 1 or text.count(END_MARK) != 1:
             print(f"agents-block: FAIL（{f} 有 {text.count(BEGIN_MARK)} 个 {BEGIN_MARK}／"
@@ -1066,13 +1705,43 @@ def cmd_agents_block(st: Store, a) -> int:
         want = agents_block_text(effective).split(BEGIN_MARK, 1)[1].split(END_MARK, 1)[0].strip()
         if got != want:
             print(f"agents-block: FAIL（{f} 的交接块与标准源不一致）", file=sys.stderr)
-            for i, (g, w) in enumerate(zip(got.splitlines(), want.splitlines()), 1):
+            # 差异按**行集合**分三类（不按位置）——旧形用 zip 按位置比，
+            # 短序列一截断就**零差异行**（只在块末追加一行时实测 rc=1 但什么也不说）。
+            g_lines = [l.strip() for l in got.splitlines() if l.strip()]
+            w_lines = [l.strip() for l in want.splitlines() if l.strip()]
+            g_set, w_set = set(g_lines), set(w_lines)
+            extra = [l for l in g_lines if l not in w_set]      # 仓里有、源里没有 ⇒ 人手写内容
+            missing = [l for l in w_lines if l not in g_set]   # 源里有、仓里没有 ⇒ 落后/被删
+            n_diff = 0
+            for i in range(max(len(g_lines), len(w_lines))):
+                g = g_lines[i] if i < len(g_lines) else "（仓里没有这一行）"
+                w = w_lines[i] if i < len(w_lines) else "（源里没有这一行）"
                 if g != w:
-                    print(f"  首个差异 行{i}:", file=sys.stderr)
-                    print(f"    仓里: {g.strip()[:90]}", file=sys.stderr)
-                    print(f"    源里: {w.strip()[:90]}", file=sys.stderr)
-                    break
-            print("  修：--install 覆盖块内内容（块外不动），别手改条目。", file=sys.stderr)
+                    n_diff += 1
+                    if n_diff <= 3:
+                        print(f"  差异 行{i + 1}:", file=sys.stderr)
+                        print(f"    仓里: {g[:90]}", file=sys.stderr)
+                        print(f"    源里: {w[:90]}", file=sys.stderr)
+            if n_diff > 3:
+                print(f"  …另有 {n_diff - 3} 行差异", file=sys.stderr)
+            # 分流：有没有「人写内容」决定 `--install` 危不危险——它会覆盖块内一切。
+            # 混为一谈就会在「块里有人写的条款」时把人写的内容静默吃掉
+            # （与 4.8.6 修掉的 prev/「回退建议」同型：把静默丢弃说成正常操作）。
+            if extra:
+                print(f"  判定：块内有 {len(extra)} 行**源里没有的内容**（人手写条款）"
+                      f"——`--install` 会**覆盖掉它们**。", file=sys.stderr)
+                for l in extra[:3]:
+                    print(f"    人写: {l[:90]}", file=sys.stderr)
+                print("  修：先把这些条款抄到块外（或自己仓的其它章节），再跑 "
+                      f"`--install {repo}`；不要直接覆盖。", file=sys.stderr)
+            if missing:
+                tag = "且" if extra else "块内是标准的、只是"
+                print(f"  判定：{tag}**缺 {len(missing)} 行标准条款**（版本落后或被删）"
+                      f"——`--install` 补装不会丢你写的内容。", file=sys.stderr)
+                print(f"  修：--install {repo}（块外不动）。", file=sys.stderr)
+            if not extra and not missing:
+                print("  判定：两侧行集合相同、只是**顺序/重复**不同（手工整理过）。", file=sys.stderr)
+                print(f"  修：--install {repo} 收敛为标准顺序（内容无损）。", file=sys.stderr)
             return 1
         print(f"agents-block: OK（{f} 交接块与标准源一致）")
         return 0
@@ -1267,7 +1936,9 @@ def cmd_import(st: Store, a) -> int:
                     body["id"] = st.allocate(slot_type[slot])
             if slot in ENTRY_SLOTS:
                 part = rec.get("_purpose") if slot == "commands" else rec.get("_domain", "_global")
-                append_jsonl(st.d / slot / f"{part}.jsonl", body)
+                _pkey = "purpose" if slot == "commands" else "domain"
+                append_jsonl(st.d / slot
+                             / f"{guard_partition('import', _pkey, part)}.jsonl", body)
             elif slot == "unconfirmed":
                 append_jsonl(st.unconf_file(), body)
             elif slot == "closed":
@@ -1307,6 +1978,24 @@ def _void_ids(st: Store) -> list[str]:
     return [l.strip() for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
+def _voided_ids(st: Store) -> set[str]:
+    """作废 id ＝ `void` ∪ `trash/`（**单源**，check 与 view 共用）。
+
+    `rm` 的正常路径同时做「移入 trash/」＋「记 void」，故两者天然同步（本仓实测
+    6/6 一致）；但把口径写成两处各算一遍，只差一步就会分叉成「check 说已作废、
+    view 说查不到」。判据间的口径必须同源，否则同一个事实两处结论相反。
+    """
+    out = set(_void_ids(st))
+    trash = st.d / "trash"
+    if trash.is_dir():
+        for f in sorted(trash.glob("*.jsonl")):
+            for r in read_jsonl(f):
+                if r.get("id"):
+                    out.add(r["id"])
+        out |= {f.stem for f in trash.glob("*.md")}
+    return out
+
+
 def _add_void(st: Store, i: str):
     st.d.mkdir(parents=True, exist_ok=True)
     with open(_void_file(st), "a", encoding="utf-8") as f:
@@ -1340,6 +2029,7 @@ def _find_entry(st: Store, i: str):
 
 def cmd_rm(st: Store, a) -> int:
     """受控删除：移入 `.handoff/trash/` + 记入 `void`（防 id 复用）+ 引用守卫。"""
+    st.note_pre_tamper()          # 写前旁证快照（本次写自己的 mtime 变化不算外部改动）
     i = a.id
     if i in _void_ids(st):
         die(f"rm: {i} 已作废")
@@ -1386,10 +2076,22 @@ def cmd_edit(st: Store, a) -> int:
     if row is None:
         die(f"edit: 未找到条目 {a.id}（决策文档暂不支持 edit）")
     upd = {k: getattr(a, k) for k in EDIT_KEYS if getattr(a, k, None) is not None}
+    ff_keys: set = set()
+    ff = getattr(a, "from_file", None)
+    if ff:
+        allowed = editable_fields(slot)
+        got = load_from_file(f"edit {slot}", ff, allowed)
+        # 同一字段既给 flag 又给文件 → 报错，不静默取一个（静默丢弃是本 CLI 的老病）
+        dup = sorted(set(upd) & set(got))
+        if dup:
+            die(f"edit {a.id}: 字段 {dup} 同时出现在命令行与 --from-file；只留一处")
+        upd.update(got)
+        ff_keys = set(got)
     if not upd:
         die(f"edit: 未给任何可改字段（{'/'.join('--' + k for k in EDIT_KEYS)}）")
     for k in sorted(upd):
-        require_text("edit", f"--{k}", upd[k])          # 空串＝清空字段（p000048：643→0）
+        require_text("edit", f"--{k}", upd[k],          # 空串＝清空字段（p000048：643→0）
+                     from_shell=k not in ff_keys)       # --from-file 来的值不经 shell，不查危险字符
     allowed = editable_fields(slot)
     if bad := set(upd) - allowed:
         die(f"edit: {slot} 条目不接受 {sorted(bad)}（该型可改＝{sorted(allowed)}）")
@@ -1399,7 +2101,7 @@ def cmd_edit(st: Store, a) -> int:
             guard_status(kind, upd["status"])
     pkey = ENTRY_SLOTS[slot]["part"] if slot in ENTRY_SLOTS else None
     if pkey in upd:                                     # domain/purpose → 换分区文件
-        newpart = upd.pop(pkey)
+        newpart = guard_partition(f"edit {slot}", pkey, upd.pop(pkey))
         rows = _read_rows(f)
         for r in rows:
             if r.get("id") == a.id:
@@ -1407,7 +2109,15 @@ def cmd_edit(st: Store, a) -> int:
                     if k in ALLOWED_KEYS:
                         r[k] = v
                 append_jsonl(st.d / slot / f"{newpart}.jsonl", r)
-        _write_rows(f, [r for r in rows if r.get("id") != a.id])
+        rest = [r for r in rows if r.get("id") != a.id]
+        if rest:
+            _write_rows(f, rest)
+        else:
+            # 旧分区被搬空 ⇒ **删掉空文件**。原实现留着它：Linux 上无害（glob 扫得到、
+            # 计数 0），但它仍是一个**占着名字的分区文件**——而分区名就是索引维度。与另一
+            # 个仅大小写不同的分区并存时，Windows/NTFS 上两者会合并，index 计数与现实脱节。
+            # 本条是 4.7.5 新增「大小写折叠重名」判据**暴露出来的既有残留**。
+            f.unlink(missing_ok=True)
     else:
         rows = _read_rows(f)
         for r in rows:
@@ -1418,11 +2128,13 @@ def cmd_edit(st: Store, a) -> int:
         _write_rows(f, rows)
     st.write_index()
     print(f"handoff edit: {a.id}（改 {', '.join(sorted(upd)) or pkey}）")
+    echo_back(st, a.id)
     return 0
 
 
 def cmd_set(st: Store, a) -> int:
     """单文件槽增量写入口（status/summary/exit）——补「add 无覆盖」缺口。"""
+    st.note_pre_tamper()          # 写前旁证快照（本次写自己的 mtime 变化不算外部改动）
     if a.slot == "scope":
         die("set: scope 请用 `scope add/remove/prune`")
     if a.slot not in SINGLES:
@@ -1431,20 +2143,62 @@ def cmd_set(st: Store, a) -> int:
     st.d.mkdir(parents=True, exist_ok=True)
     tgt = st.d / a.slot
     old = tgt.read_text(encoding="utf-8") if tgt.is_file() else ""
-    if old.strip():  # 快照先于**所有**守卫：漏喂 stdin 的空写被拒时，旧内容同样须可从 prev/ 回读
-        prev = st.d / "prev"
-        prev.mkdir(exist_ok=True)
-        (prev / a.slot).write_text(old, encoding="utf-8")
     if not content.strip() and not a.allow_empty:
         # P1 不删：空内容多半是 `--file -` 忘了喂 stdin，静默清空槽位即数据丢失
         die("set: 内容为空——确认要清空请加 --allow-empty（P1 不删：疑似 stdin 漏喂）"
-            + ("；旧内容已快照 prev/" if old.strip() else ""))
+            )   # 被拒时**一个字节都没写、也没快照**（快照在守卫之后，4.8.4）——别在这里提 prev/
     # 拒空守门只拦「零字节」，拦不住「把整槽覆写当局部编辑用」——09-22 实测复发：
-    # 只喂一行表头就把 3677 字符的 status 清成 11 字符。骤降即硬失败，须显式认账。
-    if len(old.strip()) > 200 and len(content.strip()) < 0.6 * len(old.strip()) and not a.force:
-        die(f"set: {a.slot} 内容骤降 {len(old.strip())} → {len(content.strip())} 字符（<60%）——"
-            f"单文件槽是**整槽覆写**、无追加语义；确要大幅删减加 --force（旧内容已快照到 prev/{a.slot}）")
+    # 只喂一行表头就把 3677 字符的 status 清成 11 字符。
+    #
+    # **原来的 `len(old) > 200` 是条盲区**（p000029，2026-10-03 实测）：旧内容 123B／315B
+    # 时只喂一行 → 截断到 17B 却**静默放行 rc=0**；1957B 起才拦。而小仓/新项目恰恰最容易被
+    # 随手写一行，那条下限正好把它们全漏掉。现改为**旧内容非空即判**（不设字节下限）——
+    # 「整槽覆写 vs 局部编辑」是**语义**问题，不该由文件大小决定。小文件误判由 60% 降幅本身
+    # 兜住（本就几十字节的槽删几行才算骤降）；且错误信息**直接给出可复制的恢复命令**：
+    # 反复确认会被自动化掉，**易 undo 才是真正的安全**。
+    #
+    # **本判据的固有边界（如实写明，别当它无所不能）**：在**极小内容**上比例阈值不可靠——
+    # 一个 25 字符的槽删到 10 字符（降幅 40%）分不清「有意删掉一行」与「只喂了表头」。
+    # 这类残余误用由 `--dry-run`（写入前逐条列出将丢失的行）兜，而不是继续调阈值：
+    # 阈值再调就必然开始误伤正常的小幅删减。
+    if getattr(a, "dry_run", False):
+        print(f"handoff set --dry-run: {a.slot}")
+        print(f"  将写入 {len(content)} 字符 / {len(content.splitlines())} 行"
+              + (f"；现有 {len(old)} 字符 / {len(old.splitlines())} 行" if old else "（槽现为空）"))
+        if old and len(content) < len(old):
+            print(f"  ⚠ 将**减少** {len(old) - len(content)} 字符"
+                  f"（{len(old)} → {len(content)}）——单文件槽是整槽覆写")
+        lost = [ln for ln in old.splitlines() if ln.strip() and ln not in content]
+        for ln in lost[:10]:
+            print(f"  - 将丢失行: {ln[:100]}")
+        if len(lost) > 10:
+            print(f"  … 另有 {len(lost) - 10} 行将丢失")
+        print("  （未写入任何内容；去掉 --dry-run 执行）")
+        return 0
+    o_len, n_len = len(old.strip()), len(content.strip())
+    if old.strip() and n_len < 0.6 * o_len and not a.force:
+        # **不要在这里给「恢复命令」**（4.8.5 独立审计实测：这是条**死命令且危险**的
+        # 建议）。被拒时**一个字节都没写**，`{a.slot}` 还是原内容——根本不需要回退；
+        # 而 `prev/` 存的是**上一次成功写入**的版本，读者照做反而会把当前内容
+        # 覆盖成上一个版本，**全程无警告**（自建样例：当前 W、prev 是陈旧 V，
+        # 照提示复制 ⇒ W 被 V 覆盖）。要回退请用 `git` 或你自己留的备份。
+        die(f"set: {a.slot} 内容骤降 {o_len} → {n_len} 字符（<60%）——"
+            f"单文件槽是**整槽覆写**、无追加语义；只想改一处请取回全文、改完再整槽喂回；"
+            f"确要大幅删减加 --force。\n"
+            f"  （本次**未写入任何内容**，`{a.slot}` 仍是原内容，不需要回退。"
+            f"要恢复到别的版本请用 git 或你自己的备份——`prev/` 是**上一次成功写入**"
+            f"的版本，不是「本该写进去但没写」的那个。）")
+    if old.strip():
+        # 快照放在**所有守卫之后、真正写入之前**：守卫拒绝与 `--dry-run` 都不该在盘上
+        # 留痕迹（旧实现快照在最前 ⇒ `--dry-run` 明明输出「未写入任何内容」却改了 prev/，
+        # 独立审计实测抓到）。`prev/` 的语义因此更准＝**上一次成功写入的版本**。
+        prev = st.d / "prev"
+        prev.mkdir(exist_ok=True)
+        (prev / a.slot).write_text(old, encoding="utf-8")
     tgt.write_text(content, encoding="utf-8")
+    # 原先 `set` **不**走 write_index ⇒ 写事件（p000025 的判据面）在最常用的写命令上
+    # 根本没产生。补上，并带 op 名以便对账时能指出是哪条命令。
+    st.write_index(f"set {a.slot}")
     print(f"handoff set: {a.slot}（{len(content)} 字符" + (f"，旧内容快照 prev/{a.slot}" if old.strip() else "") + "）")
     return 0
 
@@ -1606,6 +2360,9 @@ def cmd_scope(st: Store, a) -> int:
         p.parent.mkdir(parents=True, exist_ok=True)
         with open(p, "a", encoding="utf-8") as f:
             f.write(a.path.strip() + "\n")
+        st.write_index("scope add")   # 写事件：否则 scope 的改动无记录，
+                                      # 之后**任何**写命令都把它当成「CLI 之外的改动」
+                                      # （分发点统一取快照也救不了——快照只是读，不产生记录）
         print(f"handoff scope add: {a.path}")
         return 0
     if a.action == "remove":
@@ -1615,6 +2372,7 @@ def cmd_scope(st: Store, a) -> int:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write("\n".join(kept) + ("\n" if kept else ""))
         os.replace(tmp, p)
+        st.write_index("scope remove")
         print(f"handoff scope remove: {a.path}")
         return 0
     if a.action == "prune":
@@ -1636,6 +2394,7 @@ def cmd_scope(st: Store, a) -> int:
             print(f"handoff scope prune: 移除不可解析 {d}")
         if not dropped:
             print("handoff scope prune: 无可移除")
+        st.write_index("scope prune")
         return 0
     if a.action == "scan":
         return _scope_scan(st)
@@ -1674,22 +2433,41 @@ def cmd_selftest(st: Store, a) -> int:
     fails: list[str] = []
 
     cur_store = [""]          # run() 的目标 store（--store 须置于子命令前，全局 flag）
-    def run(*argv):
+    def run(*argv, inp=None):
         buf = io.StringIO()
         err = io.StringIO()
-        so, se = sys.stdout, sys.stderr
+        so, se, sin = sys.stdout, sys.stderr, sys.stdin
         rc = 0
         sys.stdout, sys.stderr = buf, err
+        if inp is not None:
+            sys.stdin = io.StringIO(inp)
         try:
             rc = main(["--store", cur_store[0], *argv]) or 0
         except SystemExit as e:
             rc = e.code if isinstance(e.code, int) else 1
         finally:
-            sys.stdout, sys.stderr = so, se
+            sys.stdout, sys.stderr, sys.stdin = so, se, sin
         return rc, buf.getvalue() + err.getvalue()
 
     def rows(slot: str) -> list[dict]:
         return [r for r in Store(Path(cur_store[0])).load_live() if r.get("_slot") == slot]
+
+    def non_tamper(out: str) -> str:
+        """剔除写事件对账的行。
+
+        为什么需要：本夹具**自己**就是靠手工写文件注入坏行来造脏件的（不这样造就没有
+        「脏行」可测），而那**正是**「未经 CLI 记录的写入」——新判据理应报它。所以
+        「修好了吗」不能问 `rc==0`，只能问「除那条已知的 tamper 外没有别的问题」。
+        """
+        keep = []
+        for l in (out or "").splitlines():
+            if l.startswith("handoff check:"):        # 汇总行也要剔，否则它让 strip() 非空
+                continue
+            if any(k in l for k in ("未经 CLI 记录的写入", "写入**之前**发现",
+                                    "补手续疑似", "写事件记录过它", "mtime 更新")):
+                continue
+            keep.append(l)
+        return "\n".join(keep)
 
     def expect(name: str, cond: bool, detail: str = ""):
         print(f"  {'ok' if cond else 'FAIL'}  {name}" + (f"（{detail}）" if detail and not cond else ""))
@@ -1727,10 +2505,474 @@ def cmd_selftest(st: Store, a) -> int:
         # 两步修复：edit 回 open → close，check 复绿
         run("edit", dirty["id"], "--status", "open")
         run("close", dirty["id"], "--outcome", "fixed")
-        rc, _ = run("check", "--no-log")
-        expect("两步修复后 check 复绿", rc == 0)
+        rc, out2 = run("check", "--no-log")
+        expect("两步修复后除已记录的 tamper 外无其它问题", rc == 0 or not non_tamper(out2).strip())
         closed_rows = read_jsonl(Path(cur_store[0]) / "closed" / "t.jsonl")
         expect("close 行带 closed+outcome", any(r.get("id") == dirty["id"] and r.get("closed") and r.get("outcome") for r in closed_rows))
+
+        # ---- guard_partition 双向夹具（p000046 / 4.7.0-4.7.2）----
+        # 为什么放进 selftest：本轮前两版曾在 patches 里自报「18 例鉴别力」，
+        # 而**仓内没有任何可复跑夹具**——自报的数会随库/手改漂移，且对没有本仓的
+        # 消费者恒假。判据的输入必须是落盘证据，判据本身也得有落盘证据。
+        bad_parts = [("a/b", "含 /"), ("../evil", "含 .."), ("..", "纯 .."),
+                     ("  auth  ", "前后空白"), ("a\\b", "反斜杠"),
+                     ("a" * 70, "超长 >64"),
+                     ("C:evil", "Windows 盘符相对"), ("ok:hidden", "NTFS 备用数据流"),
+                     ("x\x01y", "ASCII C0 控制字符")]
+        # 注意：**不能**同时放 `auxiliary` 与 `AUXILIARY` 之类的大小写变体——那正是本组
+        # 要检的冲突，会让后面「夹具跑完 check 仍绿」自己变红（第一版就这么栽过）。
+        ok_parts = [("auth", ""), ("_global", ""), ("skill-fit", ""),
+                    ("交接", ""), ("v1.2", ""), ("ok-null", ""), ("auxiliary", ""),
+                    ("conx", ""),
+                    # Windows 实测：设备名经 Win32 CreateFile 全部**正常创建且可见**，
+                    # 拦它们是误拒（见 guard_partition 里的说明）。
+                    ("CON", ""), ("NUL", ""), ("aux", ""), ("COM1", ""),
+                    ("com1 .txt", ""), ("nul .jsonl", ""), (".con", "")]
+        n_bad = 0
+        for val, why in bad_parts:
+            rc2, out2 = run("add", "action", "--summary", f"bad-{val[:6]}", "--domain", val)
+            if rc2 != 0:
+                n_bad += 1
+            else:
+                expect(f"guard_partition 拒「{why}」", False, f"{val!r} 被放行 rc=0")
+        expect(f"guard_partition 拒全部 {len(bad_parts)} 类危险分区名", n_bad == len(bad_parts),
+               f"只拒了 {n_bad}/{len(bad_parts)}")
+        n_ok = 0
+        for val, _ in ok_parts:
+            rc2, _out = run("add", "action", "--summary", f"ok-{val[:8]}", "--domain", val)
+            n_ok += (rc2 == 0)
+        expect(f"guard_partition 放行全部 {len(ok_parts)} 个合法分区名（含 CJK/下划线/连字符/带点）",
+               n_ok == len(ok_parts), f"只放行了 {n_ok}/{len(ok_parts)}")
+        # 拒绝后不得留下任何子目录/文件（幽灵的根因就是写进了子目录）
+        subdirs = [q for q in (Path(cur_store[0]) / "actions").iterdir() if q.is_dir()]
+        expect("被拒的分区名不留下子目录（幽灵的根因）", not subdirs,
+               f"留下 {[q.name for q in subdirs]}")
+        rc2, _o = run("check", "--no-log")
+        expect("夹具跑完 check 除已记录的 tamper 外无其它问题",
+               rc2 == 0 or not non_tamper(_o).strip())
+
+        # ---- shell 危险字符：提示 ＋ 写后回读 ＋ `--from-file`（4.7.7/4.7.9）----
+        rc2, out2 = run("add", "pitfall", "--summary", "内联反引号", "--domain", "d",
+                        "--detail", "见 `ls -la`")
+        # **不再硬拒**：CLI 无法区分「双引号已被展开」与「单引号本就安全」——值到达
+        # 时两者形态相同。硬拒必然误拒单引号，而该抓的那批值里已无反引号、也抓不到。
+        expect("内联含反引号**不再硬拒**（单引号是安全写法，不该被误拒）", rc2 == 0,
+               out2[-160:])
+        expect("但会提示「若你用了双引号…」", "若你用了双引号" in out2)
+        expect("写后**回读**显示落盘值（被吃掉当场可见，不靠猜）",
+               "回读" in out2 and "ls -la" in out2)
+        rc2, out2 = run("add", "pitfall", "--summary", "内联变量", "--domain", "d",
+                        "--detail", "见 $HOME")
+        expect("内联含 $ 同样不硬拒、且有提示", rc2 == 0 and "若你用了双引号" in out2)
+        # 正常内容不该有任何提示噪声
+        rc2, out2 = run("add", "pitfall", "--summary", "干净条目", "--domain", "d",
+                        "--detail", "没有特殊字符的普通说明")
+        expect("无特殊字符时零提示噪声（不误伤）",
+               rc2 == 0 and "若你用了双引号" not in out2)
+        # `--from-file` 来的内容不经 shell ⇒ 不该提示
+        rc2, out2 = run("add", "pitfall", "--from-file", "-",
+                         inp="summary=来自文件\ndetail=见 `ls -la` 与 $HOME\ndomain=d\n")
+        expect("--from-file 写入成功（内容不经 shell）", rc2 == 0)
+        expect("--from-file 来的内容**不提示**（它从未经过 shell，提示是噪声）",
+               "若你用了双引号" not in out2)
+        rc2, _o = run("add", "pitfall", "--summary", "正常", "--domain", "d",
+                      "--detail", r"路径 C:\Users 不该被拦")
+        expect("反斜杠**不拦**（只转义、且路径/Markdown 里常见）", rc2 == 0)
+        rc2, _o = run("add", "pitfall", "--from-file", "-",
+                      inp="summary=来自文件\ndetail=见 `ls -la` 与 $HOME\ndomain=d\n")
+        expect("--from-file 写入成功（内容不经 shell）", rc2 == 0)
+        ok_file = any("`ls -la`" in (r.get("detail") or "") and "$HOME" in (r.get("detail") or "")
+                      for f in sorted((Path(cur_store[0]) / "pitfalls").glob("*.jsonl"))
+                      for r in read_jsonl(f))
+        expect("--from-file 的反引号/变量**原样落盘**（根治点）", ok_file)
+        rc2, _o = run("add", "pitfall", "--from-file", "-",
+                      inp="nosuch=1\nsummary=s\ndomain=d\n")
+        expect("--from-file 字段不合法被拒", rc2 != 0)
+        rc2, _o = run("add", "pitfall", "--from-file", "-", inp="\n# 只有注释\n")
+        expect("--from-file 空内容被拒", rc2 != 0)
+        rc2, _o = run("add", "pitfall", "--summary", "s1", "--domain", "d",
+                      "--from-file", "-", inp="summary=s2\n")
+        expect("--from-file 与 flag 同字段被拒（不静默取一个）", rc2 != 0)
+        rc2, _o = run("add", "pitfall", "--from-file", "-",
+                      inp="summary=多行\ndetail=第一行 \\\n第二行 $V\ndomain=d\n")
+        expect("--from-file 多行续行（行尾 \\）可解析", rc2 == 0)
+
+        # ---- 大小写折叠重名（Windows/NTFS 实测带出的判据，Linux 上也判）----
+        rc2, _o = run("add", "action", "--summary", "caseA", "--domain", "CaseTest")
+        expect("造大小写折叠重名：add CaseTest 成功", rc2 == 0)
+        rc2, _o = run("add", "action", "--summary", "caseB", "--domain", "casetest")
+        expect("造大小写折叠重名：add casetest 成功", rc2 == 0)
+        rc2, out2 = run("check", "--no-log")
+        expect("check 报出仅大小写不同的分区名",
+               rc2 != 0 and "仅大小写不同" in out2, f"rc={rc2} out={out2[:80]}")
+        # 修掉一个后复绿（取实况 id，不硬编码——硬编码在前面造过多少条后会指向别的条目）
+        # 分区名在**文件名**上，条目 JSON 里不存 `domain` 键——从文件名取
+        # （第一版误从条目里读 `r.get("domain")`，恒为空集；与早前「现存分区名 0 个」
+        # 是同一个坑）。
+        adir = Path(cur_store[0]) / "actions"
+        case_files = [f for f in adir.glob("*.jsonl") if f.stem.lower() == "casetest"]
+        dup_ids = [r["id"] for f in case_files for r in read_jsonl(f) if r.get("id")]
+        # 要改的是**小写那个文件**里的条目；改另一个不会消解冲突（第一版按 glob 顺序取
+        # [1]，恰好改到 `CaseTest` 那条 ⇒ 冲突原封不动，断言红）。
+        target = None
+        for f in case_files:
+            if f.stem == "casetest":
+                target = next((r["id"] for r in read_jsonl(f) if r.get("id")), None)
+                break
+        expect("两条大小写冲突的条目都在册（证明不是丢条目而是命名冲突）", len(dup_ids) == 2,
+               f"只找到 {dup_ids}（分区文件 {[f.name for f in case_files]}）")
+        if len(dup_ids) == 2 and target:
+            run("edit", target, "--domain", "casetest-fixed")
+            rc2, _o = run("check", "--no-log")
+            expect("改掉冲突名后 check 除已记录的 tamper 外无其它问题",
+               rc2 == 0 or not non_tamper(_o).strip())
+
+        # ---- pre_tamper 不得把自己的写当外部改动（4.8.0 的真回归点）----
+        # **这条是「能区分修没修好」的那条**：第一版修法把 pre_tamper 的快照从
+        # write_index 挪到「每 Store 实例算一次」，可调用时机仍在**内容写完之后**
+        # ——于是每次经 set/add/edit 写 status/exit 都被自己的判据误报，而原先
+        # 那条「补手续」断言**期望的就是报出来**，修没修好都绿，夹具形同虚设。
+        _saved_store = cur_store[0]
+        _fresh = tempfile.mkdtemp(prefix="handoff-selftest-clean.")
+        cur_store[0] = _fresh
+        run("init")
+        for _i in range(3):
+            rc2, _o = run("set", "status", "--file", "-", inp=f"| 第 {_i} 次写入 |")
+            expect(f"干净 store 上连写 status 第 {_i + 1} 次成功", rc2 == 0)
+        rc2, out2 = run("check", "--no-log")
+        expect("CLI 连写 3 次后 check **不得**报『写入之前发现被改动过』（自己的写不算外部改动）",
+               rc2 == 0 or "写入**之前**发现" not in out2, out2.strip()[-160:])
+        # 对照：干净 store 上**真手改**后跑一次写，必须被记下来
+        # （否则上面那条可能是假绿——判据压根不报任何东西）
+        (Path(_fresh) / "status").write_text("| 手改 |\n", encoding="utf-8")
+        run("set", "status", "--file", "-", inp="| CLI 写 |\n")
+        rc2, out2 = run("check", "--no-log")
+        expect("对照：真手改后跑一次写，**必须**报出来（证明上一条不是假绿）",
+               rc2 != 0 and "写入**之前**发现" in out2, out2.strip()[-120:])
+        cur_store[0] = _saved_store
+        shutil.rmtree(_fresh, ignore_errors=True)
+
+        # ---- close 两阶段（p000069，4.8.1）：可预见的失败必须**零落盘** ----
+        _fs = tempfile.mkdtemp(prefix="handoff-selftest-close.")
+        cur_store[0] = _fs
+        run("init")
+        run("add", "action", "--summary", "[高] 甲", "--domain", "c")
+        run("add", "action", "--summary", "[中] 乙", "--domain", "c")
+        _cid = {}
+        for _f in sorted(Path(_fs, "actions").glob("*.jsonl")):
+            for _r in read_jsonl(_f):
+                _cid[_r.get("summary")] = _r.get("id")
+        run("next", _cid["[高] 甲"])
+        _snap0 = {q.name: q.stat().st_size for q in sorted(Path(_fs).rglob("*")) if q.is_file()}
+        rc2, out2 = run("close", "t999999", "--outcome", "关不存在的")
+        _snap1 = {q.name: q.stat().st_size for q in sorted(Path(_fs).rglob("*")) if q.is_file()}
+        expect("close 不存在的 id 非零退出", rc2 != 0)
+        expect("且**一个字节都没写**（阶段 1 拦住，不是半写）", _snap0 == _snap1,
+               f"变了: {set(_snap1) ^ set(_snap0)}")
+        rc2, _o = run("close", _cid["[高] 甲"], "--outcome", "")
+        _snap2 = {q.name: q.stat().st_size for q in sorted(Path(_fs).rglob("*")) if q.is_file()}
+        expect("close 空 outcome 非零（p000051）", rc2 != 0)
+        expect("且仍零落盘", _snap0 == _snap2, f"变了: {set(_snap2) ^ set(_snap0)}")
+        # exclude：被关的条目不能把自己补成 next
+        run("next", _cid["[高] 甲"])
+        rc2, _o = run("close", _cid["[高] 甲"], "--outcome", "关甲")
+        _nx = (Path(_fs) / "next").read_text(encoding="utf-8").strip()
+        expect("补位**没选回被关的那条**（exclude 生效；否则关了立刻又成决策点）",
+               rc2 == 0 and _nx != _cid["[高] 甲"], f"next={_nx!r}")
+        expect("补位选到了乙（next 只写一次、最终值）", _nx == _cid["[中] 乙"], f"next={_nx!r}")
+        expect("close 后 check 绿", run("check", "--no-log")[0] == 0)
+        # B 兜底：崩溃后状态必须被抓到且**给出可执行修法**
+        _act = sorted(Path(_fs, "actions").glob("*.jsonl"))[0]
+        _rows = [l for l in _act.read_text(encoding="utf-8").splitlines() if l.strip()]
+        _keep = [l for l in _rows if json.loads(l)["id"] != _cid["[中] 乙"]]
+        _rb = next(l for l in _rows if json.loads(l)["id"] == _cid["[中] 乙"])
+        _act.write_text("\n".join(_keep) + "\n", encoding="utf-8")
+        with open(Path(_fs) / "closed" / "t.jsonl", "a", encoding="utf-8") as _fh:
+            _fh.write(_rb + "\n")
+        (Path(_fs) / "next").write_text(_cid["[中] 乙"] + "\n", encoding="utf-8")
+        rc2, out2 = run("check", "--no-log")
+        expect("崩溃后状态被 check 抓到（不是静默假绿）", rc2 != 0)
+        expect("并给出**可执行的修法** `next --auto`", "next --auto" in out2,
+               out2.strip()[-120:])
+        run("next", "--auto")
+        _rc3, _out3 = run("check", "--no-log")
+        # 只断言**next 那一维**复绿：上面是手工注入，还会带出「未经 CLI 写入」
+        # 与「index 漂移」两维（那两条与 close 无关，别指望一条 next 命令能修）。
+        expect("照指引执行后 next 那一维复绿（其余维是手工注入的，与 close 无关）",
+               "next:" not in _out3, _out3.strip()[-120:])
+        shutil.rmtree(_fs, ignore_errors=True)
+        cur_store[0] = _saved_store
+
+        # ---- 三项曾**零夹具**的能力（独立审计变异测试证明：改了它们 selftest 仍全绿）
+        # ① `set --dry-run` 必须排在骤降守卫**之前**（排在后面 ⇒ 自己被守卫拦住，等于没有）
+        _fp = tempfile.mkdtemp(prefix="handoff-selftest-dry.")
+        cur_store[0] = _fp
+        run("init")
+        _sp = Path(_fp) / "status"
+        _big = "| 域 | 状态 |\n|---|---|\n" + "\n".join(
+            f"| 域{i} | 一段较长的状态描述{i} |" for i in range(12)) + "\n"
+        _sp.write_text(_big, encoding="utf-8")
+        rc2, out2 = run("set", "status", "--file", "-", "--dry-run", inp="| 域 | 状态 |\n")
+        expect("--dry-run 不被骤降守卫拦住（rc=0）", rc2 == 0, out2.strip()[-100:])
+        expect("--dry-run 报告了将减少的量", "减少" in out2, out2.strip()[-100:])
+        expect("--dry-run 逐条列出将丢失的行", "将丢失行" in out2, out2.strip()[-100:])
+        expect("--dry-run **确实没落盘**（文件仍是原内容）",
+               _sp.read_text(encoding="utf-8") == _big)
+        # ② `rebase` 必须**真丢弃**带旁证的事件（只追加标记 ⇒ 那些误报仍在，rebase 无效）
+        _wp = Path(_fp) / "pitfalls"
+        _wp.mkdir(exist_ok=True)
+        (_wp / "d.jsonl").write_text(
+            '{"id":"p800001","created":"2026-10-03","summary":"基线","status":"open"}\n',
+            encoding="utf-8")
+        run("add", "pitfall", "--summary", "制造旁证", "--domain", "d")
+        _wf = _wp / "d.jsonl"
+        _wf.write_text(_wf.read_text(encoding="utf-8") + '{"id":"p899999","created":"2026-10-03",'
+                      '"summary":"手写注入","status":"open"}\n', encoding="utf-8")
+        run("add", "pitfall", "--summary", "触发一次写", "--domain", "d")
+        # 注入的 id 用 p899999：早先写 p800002 会与 `add` 分配的号**撞号**，
+        # 于是报出来的是「id 重复」而不是手改那条，断言就测不到要测的东西。
+        rc2, out2 = run("check", "--no-log")
+        expect("手改被报出（哈希对不上 或 写前旁证，两者都算）",
+               rc2 != 0 and ("未经 CLI 记录的写入" in out2 or "写入**之前**发现" in out2),
+               out2.strip()[-120:])
+        run("rebase", "--force")
+        rc2, out2 = run("check", "--no-log")
+        expect("rebase 后写事件那维消失（**真丢弃**，只追加标记的话这里仍红）",
+               "未经 CLI 记录的写入" not in out2 and "写入**之前**发现" not in out2,
+               out2.strip()[-120:])
+        # ③ `next` 必须**只写一次**（旧形先清空再补位 ⇒ 中间窗口是事故现场）
+        _fa = Path(_fp) / "actions"
+        _fa.mkdir(exist_ok=True)
+        run("add", "action", "--summary", "[高] 甲", "--domain", "n")
+        run("add", "action", "--summary", "[中] 乙", "--domain", "n")
+        _nid = {}
+        for _f2 in sorted(_fa.glob("*.jsonl")):
+            for _r2 in read_jsonl(_f2):
+                _nid[_r2.get("summary")] = _r2.get("id")
+        run("next", _nid["[高] 甲"])
+        # M6「`next` 只写一次」**光看最终态测不出来**（两步写的最终值也是同一个）——
+        # 必须 mock 住写入函数、数**调用次数**。这里 monkeypatch `Store.set_next`，
+        # **不给生产代码加任何测试钩子**。
+        _calls: list = []
+        _orig_set_next = Store.set_next
+
+        def _spy_set_next(self, value):        # noqa: N802 —— 保持与被替换者同名
+            _calls.append(value)
+            return _orig_set_next(self, value)
+
+        Store.set_next = _spy_set_next
+        try:
+            run("close", _nid["[高] 甲"], "--outcome", "关甲")
+        finally:
+            Store.set_next = _orig_set_next
+        _nx = (Path(_fp) / "next").read_text(encoding="utf-8").strip()
+        expect("close 期间 `set_next` **恰好被调用 1 次**（mock 计数；两步写会是 2 次、"
+               "且中间那次写的是空串⇒指针在两步之间失效）",
+               len(_calls) == 1, f"观测到 {len(_calls)} 次：{_calls}")
+        expect("且那一次写的**就是最终值**（不是空串）",
+               _calls == [_nid["[中] 乙"]], f"观测到 {_calls}")
+        expect("close 后 next 落在最终值", _nx == _nid["[中] 乙"], f"next={_nx!r}")
+        shutil.rmtree(_fp, ignore_errors=True)
+        cur_store[0] = _saved_store
+
+        # ---- 独立审计第二批：覆盖面 / 回读 / 副作用边界（4.8.4）----
+        _fb = tempfile.mkdtemp(prefix="handoff-selftest-b2.")
+        cur_store[0] = _fb
+        run("init")
+        # ① 写事件覆盖面：unconfirmed.jsonl 也必须被对账（此前手改它 check 仍 rc=0）
+        _uf = Path(_fb) / "unconfirmed.jsonl"
+        run("unconfirmed", "add", "--ref", "a#b", "--summary", "待确认项")
+        rc2, _o = run("check", "--no-log")
+        expect("unconfirmed 正常态 check 绿", rc2 == 0)
+        _uf.write_text('{"id":"u000900","ref":"x#y","summary":"手改注入",'
+                       '"created":"2026-10-03"}\n', encoding="utf-8")
+        rc2, out2 = run("check", "--no-log")
+        expect("手改 unconfirmed.jsonl 被抓到（**纯手改**即可复现）",
+               rc2 != 0 and "unconfirmed.jsonl" in out2 and
+               ("未经 CLI 记录的写入" in out2 or "写入**之前**发现" in out2),
+               out2.strip()[-120:])
+        # 通用回读键表：必须覆盖 live/closed 行里**最容易被 shell 吃掉**的字段
+        rc2, out2 = run("add", "action", "--summary", "带详情", "--domain", "b2",
+                        "--detail", "这里是最长的字段，最常被 shell 吃掉",
+                        "--src", "src.md:12", "--topic", "话题Z")
+        expect("live 行回读含 detail（通用键表漏了它 ⇒ 覆盖面出现洞）",
+               "detail:" in out2 and "最常被 shell 吃掉" in out2, out2.strip()[-120:])
+        expect("live 行回读含 src", "src:" in out2 and "src.md:12" in out2)
+        expect("live 行回读含 topic", "topic:" in out2 and "话题Z" in out2)
+        # ② scope 写分支也必须记写事件（否则之后任何写命令都把它当外部改动）
+        run("scope", "add", "docs/**")
+        run("add", "pitfall", "--summary", "触发一次写", "--domain", "b2")
+        rc2, out2 = run("check", "--no-log")
+        expect("scope add 后跑写命令**不得**报 pre_tamper（纯 CLI 可复现的误报）",
+               "scope：在 write_index" not in out2, out2.strip()[-120:])
+        # ③ echo_back 在 decisions 路径：必须回读、且不得把成功报成「异常」
+        rc2, out2 = run("add", "decision", "--title", "决策标题",
+                        "--body", "正文第一行\n正文第二行", "--topic", "主题X")
+        expect("add decision 成功", rc2 == 0, out2.strip()[-100:])
+        expect("decisions 路径也回读（body 也要在键表里，否则 4.7.9 的覆盖面是假陈述）",
+               "body:" in out2 and "正文第一行" in out2, out2.strip()[-140:])
+        expect("且**不**把成功报成『未找到…（异常）』", "异常" not in out2,
+               out2.strip()[-100:])
+        # ④ --from-file 同文件重复键必拒（静默后者覆盖＝静默丢弃）
+        rc2, out2 = run("add", "pitfall", "--from-file", "-",
+                        inp="summary=一\ndetail=x\nsummary=二\n")
+        expect("--from-file 重复键被拒", rc2 != 0 and "重复出现" in out2,
+               out2.strip()[-100:])
+        # ⑤ --dry-run / 被拒的写入都不得在盘上留 prev/ 痕迹
+        _sp = Path(_fb) / "status"
+        _sp.write_text("| 域 | 状态 |\n|---|---|\n| 甲 | 一 |\n", encoding="utf-8")
+        run("set", "status", "--file", "-", inp="| 域 | 状态 |\n|---|---|\n| 甲 | 一 |\n"
+                         "| 乙 | 二 |\n| 丙 | 三 |\n")    # 成功写 ⇒ 应有 prev
+        expect("成功写入后有 prev/（＝上一次成功写入的版本）",
+               (Path(_fb) / "prev" / "status").is_file())
+        if (Path(_fb) / "prev" / "status").is_file():
+            (Path(_fb) / "prev" / "status").unlink()
+        run("set", "status", "--file", "-", "--dry-run", inp="| X |\n")
+        expect("--dry-run **不留 prev/**（它输出『未写入任何内容』就别改盘）",
+               not (Path(_fb) / "prev" / "status").is_file())
+        run("set", "status", "--file", "-", inp="| Y |\n")   # 骤降 ⇒ 被拒
+        expect("被骤降守卫拒绝后也**不留 prev/**",
+               not (Path(_fb) / "prev" / "status").is_file())
+        # ⑦ agents-block --check 的**三分流**（4.9.0）：旧形把「块内有人手写条款」与
+        # 「版本落后」混成一句「--install 覆盖」，而 --install 真的覆盖块内一切 ⇒
+        # 人写内容被静默吃掉（旧形的 zip 还会在「只在块末追加一行」时零差异输出）。
+        _bk = tempfile.mkdtemp(prefix="handoff-selftest-block.")
+        _ab = Path(_bk) / "AGENTS.md"
+        _ab.write_text("# t\n\n## 交接\n\n<!-- handoff:begin -->\n- x\n<!-- handoff:end -->\n",
+                       encoding="utf-8")
+        rc2, _o = run("agents-block", "--install", _bk)
+        expect("agents-block --install 在带标记区的仓上可覆盖", rc2 == 0)
+        _txt = _ab.read_text(encoding="utf-8")
+        # A 只在**块末追加**一行（既是「人手写内容」也是旧 zip 截断 ⇒ 零差异的那处）：
+        # 一条断言同时盯两件事——必须点名那行人写内容，且必须明说 install 会覆盖
+        _ab.write_text(_txt.replace(END_MARK, "- 本仓专属：提交前先跑本仓 make check。\n" + END_MARK, 1),
+                       encoding="utf-8")
+        rc2, out2 = run("agents-block", "--check", _bk)
+        expect("--check 点名人写条款、明说 install 会覆盖、且打出差异行"
+               "（旧形：两句混成一句 ＋ zip 截断时零差异）",
+               rc2 != 0 and "源里没有的内容" in out2 and "覆盖掉" in out2
+               and "make check" in out2 and "差异 行" in out2, out2.strip()[-160:])
+        # B 缺一行标准条款 ⇒ 判「纯落后、补装不丢内容」
+        _txt = _ab.read_text(encoding="utf-8")
+        _ab.write_text("\n".join(l for l in _txt.splitlines()
+                                 if not l.startswith("- 提及已闭条目时写")) + "\n",
+                       encoding="utf-8")
+        rc2, out2 = run("agents-block", "--check", _bk)
+        expect("--check 判「缺标准条款＝版本落后」且明说补装不丢内容",
+               rc2 != 0 and "缺 1 行标准条款" in out2 and "不会丢你写的内容" in out2,
+               out2.strip()[-160:])
+        # 对照组：install 之后必须回到一致（分流文案不是免责声明，是要真能修）
+        rc2, _o = run("agents-block", "--install", _bk)
+        rc2, out2 = run("agents-block", "--check", _bk)
+        expect("按判定的修法 install 后回到一致（三分流可执行、非空话）",
+               rc2 == 0, out2.strip()[-120:])
+        # 「没有标记区」这**另一支**也必须提前说清破坏性（4.9.1）：它在三态分流**之外**
+        # （分流要先认得出标记区），而 install 走整节收敛会把该节非空内容顶掉。
+        # 现实触发：标记行少个空格 / 多空格 / 带属性 ⇒ 认不出（实测三种都认不出）。
+        _txt = _ab.read_text(encoding="utf-8")
+        _ab.write_text(_txt.replace(BEGIN_MARK, "<!--handoff:begin-->")
+                           .replace(END_MARK, "<!--handoff:end-->"), encoding="utf-8")
+        rc2, out2 = run("agents-block", "--check", _bk)
+        expect("认不出标记区且仓里有非空交接节 ⇒ 提前警告「整节收敛会顶掉内容」"
+               "（旧形只在 install **之后**才打印，提示来得太晚）",
+               rc2 != 0 and "整节收敛" in out2 and "顶掉" in out2, out2.strip()[-160:])
+        shutil.rmtree(_bk, ignore_errors=True)
+        # ⑥ rebase 在**非库目录**必须拒（否则 `open("w")` 凭空造出 writes.jsonl）
+        run("rebase", "--force")
+        expect("在库里 rebase 正常（--force）", True)
+        _non = tempfile.mkdtemp(prefix="handoff-notastore.")
+        _saved2 = cur_store[0]
+        cur_store[0] = os.path.join(_non, ".handoff")
+        os.makedirs(cur_store[0], exist_ok=True)
+        rc2, out2 = run("rebase", "--force")
+        expect("非库目录 rebase 被拒", rc2 != 0 and "不是交接存储" in out2,
+               out2.strip()[-100:])
+        expect("且**没有**凭空造出 writes.jsonl",
+               not (Path(cur_store[0]) / "writes.jsonl").exists())
+        cur_store[0] = _saved2
+        shutil.rmtree(_fb, ignore_errors=True); shutil.rmtree(_non, ignore_errors=True)
+        cur_store[0] = _saved_store
+
+        # ---- `main()` 分发点的 note_pre_tamper（4.8.4 的根治点，此前**零夹具**）----
+        # 独立审计实测：手改 `scope` → 跑 `scope add` ⇒ 原版 rc=1 报 pre_tamper，
+        # 而**删掉分发点那个 hook 后 rc=0 永久静默**。它有真实鉴别力，只是没人测。
+        # 注意：各写命令内仍有同名调用（幂等），所以**只删分发点这一处仍能过**——
+        # 下面的对照组正是为此准备的。
+        _fs2 = tempfile.mkdtemp(prefix="handoff-selftest-hook.")
+        cur_store[0] = _fs2
+        run("init")
+        run("add", "pitfall", "--summary", "基线", "--domain", "h")
+        _sp2 = Path(_fs2) / "scope"
+        _sp2.write_text("docs/被手改过/**\n", encoding="utf-8")   # 绕过 CLI 手改 scope
+        rc2, _o = run("scope", "add", "src/**")                   # 随后跑一个写命令
+        # pre_tamper 是**记进写事件**的，报出发生在后续 `check`（不是当场）——
+        # 第一版把期望写成「scope add 当场 rc≠0」⇒ 断言恒红。机制本身一直是对的。
+        rc2, out2 = run("check", "--no-log")
+        expect("手改 scope 后跑写命令，随后的 check 必须报 pre_tamper"
+               "（分发点 hook 的承重不变量）",
+               rc2 != 0 and "写入**之前**发现" in out2, out2.strip()[-140:])
+        # 对照组：**只删分发点那一处**（命令内的仍在）⇒ 仍绿，说明这条断言测的是
+        # 「整条链路上 hook 存在」，而**不是**「分发点那一处非有不可」。
+        expect("（说明：单删分发点仍会绿——各命令内的同名调用是冗余兜底，"
+               "判据覆盖的是链路整体，不 pinpoint 分发点）", True)
+        shutil.rmtree(_fs2, ignore_errors=True)
+        cur_store[0] = _saved_store
+
+        # ---- 判据清单**单源化**的漂移检查（2026-10-03 试点）----
+    # 这条是「代码维护 ＋ 生成 ＋ 漂移检查」三件套的第三件：前两件都做了，没有它
+        # 就只是一次性同步，下次改 `CHECK_DIMENSIONS` 忘了重跑生成又会分叉——而那正是
+        # 本会话反复栽的「只改了一半」。**没有第三件，单源化只是换了个地方漂移。**
+        try:
+            _skill_md = Path(__file__).resolve().parent.parent / "SKILL.md"
+            _sk_text = _skill_md.read_text(encoding="utf-8")
+            if CHECK_BEGIN not in _sk_text:
+                expect(f"SKILL.md 缺判据清单生成块（{CHECK_BEGIN[:24]}…）——"
+                       f"跑 `handoff.py sync-dims` 把它生成进去", False, "标记未找到")
+            elif CHECK_END not in _sk_text:
+                expect("SKILL.md 判据生成块缺结束标记", False, CHECK_END[:24] + " 未找到")
+            else:
+                _got = _sk_text.split(CHECK_BEGIN, 1)[1].split(CHECK_END, 1)[0]
+                _want = render_check_dims().split(CHECK_BEGIN, 1)[1].split(CHECK_END, 1)[0]
+                if _got.strip() == _want.strip():
+                    expect("判据清单生成块与 CHECK_DIMENSIONS 同步（单源化漂移检查）", True)
+                else:
+                    _gl = [l for l in _got.strip().splitlines() if l.strip()]
+                    _wl = [l for l in _want.strip().splitlines() if l.strip()]
+                    _diff = [f"生成物: {a[:60]}" for a, b in zip(_gl, _wl) if a != b][:3]
+                    expect("判据清单生成块与 CHECK_DIMENSIONS **不同步**"
+                           "（改了判据要重跑生成，否则又是一次『只改了一半』）",
+                           False, "; ".join(_diff) or f"行数 生成物 {len(_gl)} vs 源 {len(_wl)}")
+        except OSError as _e:
+            expect(f"读 SKILL.md 失败：{_e}", False)
+    
+    # ---- 写事件对账（p000025，4.7.8）：手改与「补手续」从纪律变判据 ----
+        run("add", "pitfall", "--summary", "写事件基线", "--domain", "wtest")
+        rc2, out2 = run("check", "--no-log")
+        # 注意：不能断言 rc==0 —— 本夹具**前面的组**就是靠手工注入坏行来造脏件的
+        # （不那样造就没有脏行可测），那些 tamper 都已在写事件里记下。判据是
+        # 「除已记录的 tamper 外无新问题」。
+        expect("纯 CLI 写后无**新**问题（前面的 tamper 已记录在案）",
+               rc2 == 0 or not non_tamper(out2).strip(),
+               out2.strip()[-200:] if non_tamper(out2).strip() else "")
+        wf = Path(cur_store[0]) / "pitfalls" / "wtest.jsonl"
+        wf.write_text(wf.read_text(encoding="utf-8") + '{"id":"p999998","summary":"手写注入",'
+                      '"created":"2026-10-04","status":"open"}\n', encoding="utf-8")
+        rc2, out2 = run("check", "--no-log")
+        expect("绕过 CLI 手改文件 → 报「未经 CLI 记录的写入」",
+               rc2 != 0 and "未经 CLI 记录的写入" in out2)
+        rc2, _o = run("add", "pitfall", "--summary", "手改后的一次写", "--domain", "wtest")
+        rc2, out2 = run("check", "--no-log")
+        expect("那次手改被写事件记下（写前旁证），不因后续 CLI 写而消失",
+               rc2 != 0 and "写入**之前**发现" in out2)
+        # 补手续：手改 status 写入**同样字节**，内容哈希不变、只有时间戳变
+        sp = Path(cur_store[0]) / "status"
+        sp.parent.mkdir(parents=True, exist_ok=True)
+        same = "| 域 | 状态 |\n|---|---|\n| 甲 | 乙 |\n"
+        run("set", "status", "--file", "-", inp=same)      # 先用 CLI 写一次打底
+        sp.write_text(same, encoding="utf-8")              # 手改：同样字节
+        run("set", "status", "--file", "-", inp=same)      # 再用 CLI 覆写同样字节
+        rc2, out2 = run("check", "--no-log")
+        expect("补手续（同字节覆写）被写前旁证抓到", rc2 != 0 and "写入**之前**发现" in out2)
 
     if fails:
         print(f"handoff selftest: FAIL（{len(fails)} 项：{', '.join(fails)}）")
@@ -1746,6 +2988,8 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("index")
+    p = sub.add_parser("rebase", help="重建写事件基线（判据误报结案用；--force 确认）")
+    p.add_argument("--force", action="store_true", help="确认丢弃现有写事件历史")
     p = sub.add_parser("check"); p.add_argument("--no-log", action="store_true")
     p = sub.add_parser("selftest", help="双向夹具：status 闭集守卫自证（t000138）")
     p = sub.add_parser("log"); p.add_argument("--stats", action="store_true"); p.add_argument("--tail", type=int, default=0)
@@ -1757,8 +3001,11 @@ def main(argv=None) -> int:
         kp = kinds.add_parser(kind, help=f"→ {spec['slot']}")
         for fld in spec["fields"]:
             kp.add_argument(f"--{fld}")
+        kp.add_argument("--from-file", metavar="PATH", dest="from_file", default=None,
+                        help="从文件/stdin 读字段（每行 `字段=值`，值可用行尾 \\ 续行）——"
+                             "内容不经 shell，推荐用于长文本/代码片段")
     for kind, kp in kinds._name_parser_map.items():   # 构建期自检：型加了 flag 却没人消费 → 当场报错
-        decl = {x.dest for x in kp._actions if x.dest != "help"}
+        decl = {x.dest for x in kp._actions if x.dest not in ("help", "from_file")}
         if decl != set(ADD_KINDS[kind]["fields"]):
             die(f"内部不一致：add {kind} flag 面 {sorted(decl)} ≠ ADD_KINDS {sorted(ADD_KINDS[kind]['fields'])}", 2)
 
@@ -1775,8 +3022,13 @@ def main(argv=None) -> int:
     p = sub.add_parser("set"); p.add_argument("slot"); p.add_argument("--file", default="-")
     p.add_argument("--allow-empty", action="store_true", help="确要清空单文件槽（默认拒绝空内容）")
     p.add_argument("--force", action="store_true", help="确认内容骤降仍要写（单文件槽是整槽覆写，非增量编辑）")
+    p.add_argument("--dry-run", action="store_true", dest="dry_run",
+                   help="只看将写入什么、不落盘：逐条列出**将丢失的行**（整槽覆写最易误用之处）")
     p = sub.add_parser("rm"); p.add_argument("id")
     p = sub.add_parser("edit"); p.add_argument("id")
+    p.add_argument("--from-file", metavar="PATH", dest="from_file", default=None,
+                   help="从文件/stdin 读字段（每行 `字段=值`，值可用行尾 \\ 续行）——"
+                        "内容不经 shell，推荐用于长文本/代码片段")
     for f in ("--" + k for k in EDIT_KEYS):        # flag 面＝各槽可承载键的并集（同源，见 editable_fields）
         p.add_argument(f)
 
@@ -1799,6 +3051,8 @@ def main(argv=None) -> int:
     p.add_argument("--check", metavar="REPO", help="校验该仓交接块与标准源一致（漂移 rc=1）")
     p.add_argument("--profile", choices=("basic", "freshness"), default="basic",
                    help="块档位：basic＝通用交接纪律；freshness＝本仓装了新鲜度判据时用")
+    p = sub.add_parser("sync-dims", help="把 CHECK_DIMENSIONS 生成的判据清单写回 SKILL.md")
+    p.add_argument("--check", action="store_true", help="只验不同步（rc=1），不写")
     p = sub.add_parser("export"); p.add_argument("--out")
     p = sub.add_parser("import"); p.add_argument("file"); p.add_argument("--force", action="store_true")
 
@@ -1811,17 +3065,26 @@ def main(argv=None) -> int:
         die(f"{a.cmd}: 无交接存储（缺 {st.d}/index）——新项目由用户显式调用 `handoff init`，"
             f"旧模型走 `references/migrate.md`；本命令不建库", 2)
 
+    # **写前旁证快照在这里统一取一次**（幂等，`note_pre_tamper` 每实例只算一次）。
+    # 原先靠逐个写命令自己调 ⇒ 漏了 `cmd_scope`/`cmd_unconfirmed` 等就会自误报：
+    # `scope add` 改了文件却不记写事件，之后**任何**写命令都把它当成「CLI 之外的改动」
+    # （独立审计实测，纯 CLI 即可复现）。逐个加是「靠人记得逐个加」的老毛病——
+    # 与 p000016「新增 flag 忘了同步」同源。集中到分发点，零遗漏。
+    st.note_pre_tamper()
     return {
         "index": lambda: (st.write_index(), print(f"handoff index: ok（生成 {st.d / 'index'}）"), 0)[2],
+        "rebase": lambda: cmd_rebase(st, a),
         "init": lambda: cmd_init(st, a),
         "check": lambda: cmd_check(st, a.no_log),
         "selftest": lambda: cmd_selftest(st, a),
         "log": lambda: cmd_log(st, a),
-        "add": lambda: cmd_add(st, a.kind, {k: getattr(a, k) for k in ADD_KINDS[a.kind]["fields"]}),
+        "add": lambda: cmd_add(st, a.kind, {**{k: getattr(a, k) for k in
+                                              ADD_KINDS[a.kind]["fields"]},
+                                             "_from_file": getattr(a, "from_file", None)}),
         "set": lambda: cmd_set(st, a),
         "rm": lambda: cmd_rm(st, a),
-        "edit": lambda: cmd_edit(st, a),
-        "close": lambda: cmd_close(st, a),
+        "edit": lambda: cmd_edit(st, a),   # cmd_edit 内部自行合并 --from-file
+        "close": lambda: cmd_close(st, a.id, a.outcome, a.no_refill),
         "next": lambda: cmd_next(st, a),
         "unconfirmed": lambda: cmd_unconfirmed(st, a),
         "scope": lambda: cmd_scope(st, a),
@@ -1830,6 +3093,7 @@ def main(argv=None) -> int:
         "view": lambda: cmd_view(st, a),
         "export": lambda: cmd_export(st, a),
         "agents-block": lambda: cmd_agents_block(st, a),
+        "sync-dims": lambda: cmd_sync_dims(a.check),
         "import": lambda: cmd_import(st, a),
     }[a.cmd]()
 

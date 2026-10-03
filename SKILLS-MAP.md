@@ -70,7 +70,7 @@
 |------|------|
 | to-tickets | 需求拆解为 ticket（垂直切片 + 阻塞边 + 逐票验收清单，仅用户调用）|
 
-### ③ 设计（24）—— 领域 / 架构 / 规范 / 视觉
+### ③ 设计（25）—— 领域 / 架构 / 规范 / 视觉
 
 #### 3.1 领域建模 DDD（9）
 
@@ -79,7 +79,7 @@
 | ddd-scope | DDD 范围收敛（问题陈述/目标/约束/术语种子/风险）|
 | ddd-discover | 领域发现（事件流/命令/热点/歧义）|
 | ddd-subdomains | 子域分类（Core/Supporting/Generic）|
-| ddd-contexts | 限界上下文 + 通用语言 + 边界 ADR |
+| ddd-contexts | 限界上下文 + 通用语言 + 边界 ADR|
 | ddd-context-map | 上下文映射（集成模式/契约所有权/失败模式）|
 | ddd-aggregates | 聚合设计（不变量/边界/事务）|
 | ddd-domain-interactions | 领域交互（事件/服务/仓储/工厂）|
@@ -122,7 +122,7 @@
 | ui-typography | 专业排版规则（引号/破折号/间距/层级——ENFORCEMENT+AUDIT 双模式——Butterick）|
 | ui-animation | 设计工程与动效决策（Emil Kowalski——动画框架/组件原则/隐形细节）|
 
-### ④ 交付（20）—— 计划 / 实现 / 测试 / 质量
+### ④ 交付（24）—— 计划 / 实现 / 测试 / 质量
 
 #### 4.1 计划执行（4）
 
@@ -139,7 +139,7 @@
 |------|------|
 | git-workflow | Git 工作流（分支策略/Conventional Commits/CI 集成——37★）|
 
-#### 4.3 测试链（10）
+#### 4.3 测试链（11）
 
 | 技能 | 能力 |
 |------|------|
@@ -186,14 +186,14 @@
 | product-marketing | 产品营销上下文（.agents/product-marketing.md 共享语境）|
 | marketing-copywriting | 营销文案（价值主张/情感/转化——15 节）|
 
-### 贯穿层（17）—— 质量 / 工程 / 协作 / 技能基建
+### 贯穿层（16）—— 质量 / 工程 / 协作 / 技能基建
 
 #### P.1 技能基建 / 审计（4）
 
 | 技能 | 能力 |
 |------|------|
 | skill-description-audit | 技能描述审计（description↔正文交叉验证 + 结构/语言/名称/误触发防护 + **pushy 质量（场景/关键词密度）**——自审只出报告）|
-| skill-eval | **skill 动态评估**（行为 pass-rate：3-5 代表任务 × 有/无 skill N≥3 次 → 对比表；触发率 trigger-eval：~20 查询 ×3 跑、阈值 0.5）＋失败案例反哺 |
+| skill-eval | **skill 动态评估**（行为 pass-rate：3-5 代表任务 × 有/无 skill N≥3 次 → 对比表；触发率 trigger-eval：~20 查询 ×3 跑、阈值 0.5）＋失败案例反哺|
 | skill-fit | **技能需求管家 v2**（从本仓工件推**需求表**（词条×强度×证据串，条数按仓型档限）→ 覆盖四落点（已承载/库内有未挂/不适配/缺口）＋层级与预算提案；重入只报变化；全程只读；**仅用户 `/skill:skill-fit`**）|
 | product-doc-audit | 产品文档集审计（三层 + 就绪度评分 + 四层 go/no-go 最终验收）|
 
@@ -224,6 +224,7 @@
 | workshop-facilitation | 交互工作坊协议（deanpeters 交互技能配对——session 头/单问轮/进度标签）|
 | session-health | 会话健康度评估（压缩/经济/工作性质——继续 vs 新开）**（退役：真源保留、链接已摘——2026-09-25 裁定维持退役 t000093）**|
 
+
 ---
 
 ## 二、分类统计
@@ -232,39 +233,30 @@
 |------|------|------|
 | ① 发现 | 16 | 用户研究 3 + 问题定义 4 + 市场竞品 7 + 调研纪律 2 |
 | ② 定义 | 7 | 定位 2 + 需求规格 4 + 拆解立项 1 |
-| ③ 设计 | 23 | 领域建模 9 + 模型评审 2 + 架构 3 + 编码规范 3 + 视觉 6 |
-| ④ 交付 | 23 | 计划 4 + 工程 1 + 测试链 10 + 质量审查 6 + 质询 2 |
-| ⑤ 上线 | 1 | 发布 |
+| ③ 设计 | 25 | 领域建模 9 + 模型评审 2 + 架构 4 + 编码规范 4 + 视觉 6 |
+| ④ 交付 | 24 | 计划 4 + 工程 1 + 测试链 11 + 质量审查 6 + 质询 2 |
+| ⑤ 上线 | 2 | 发布 |
 | ⑥ 运营 | 2 | 营销 |
 | 贯穿层 | 16 | 审计 4 + 安全 4 + 规则 2 + 协作 6 |
 | **合计** | **92** ✓ | 全部唯一分类（已核对无重复/无遗漏）|
+
 
 ---
 
 ## 三、一图流（子类级）
 
 ```text
-产品 0-1 全生命周期（21 子类 · 92 技能）
+产品 0-1 全生命周期（23 子类 · 92 技能）
 ┌──────────────────────────────────────────────────────────────┐
-│ ① 发现     1.1 用户研究(3)  1.2 问题定义(4)                  │
-│            1.3 市场竞品(7)×8编排  1.4 调研纪律(2)             │
-├──────────────────────────────────────────────────────────────┤
-│ ② 定义     2.1 定位(2)  2.2 需求规格(4·含主入口)              │
-│            2.3 拆解立项(1)                                    │
-├──────────────────────────────────────────────────────────────┤
-│ ③ 设计     3.1 领域建模DDD(9·链式)  3.2 模型评审(2)           │
-│            3.3 架构设计(3)  3.4 编码规范(3)  3.5 视觉设计(6)   │
-├──────────────────────────────────────────────────────────────┤
-│ ④ 交付     4.1 计划执行(4·含 stage-spec)  4.2 工程协作(1)     │
-│            4.3 测试链(10·含 coverage-matrix)  4.4 质量审查(6·含 stage-gate/audit-item)  4.5 质询(2)  │
-├──────────────────────────────────────────────────────────────┤
-│ ⑤ 上线     product-launch · ⑥ 运营  product-marketing · marketing-copywriting  │
-├──────────────────────────────────────────────────────────────┤
-│ 贯穿       P.1 审计(4·含 skill-eval/skill-fit)  P.2 安全(4)  P.3 规则(2·含 core-rules/version-management)  P.4 协作(6·含 decision-log/experiment-handoff) │
+│ ①    1.1 用户研究(3)  1.2 问题定义(4)  1.3 市场竞品(7)  1.4 调研纪律(2)
+│ ②    2.1 定位(2)  2.2 需求规格(4)  2.3 拆解立项(1)
+│ ③    3.1 领域建模 DDD(9)  3.2 模型评审(2)  3.3 架构设计(4)  3.4 编码规范(4)  3.5 视觉设计(6)
+│ ④    4.1 计划执行(4)  4.2 工程协作(1)  4.3 测试链(11)  4.4 质量审查(6)  4.5 质询(2)
+│ ⑤    product-launch  release-pipeline
+│ ⑥    product-marketing  marketing-copywriting
+│ 贯穿层  P.1 技能基建 / 审计(4)  P.2 安全(4)  P.3 全局规则(2)  P.4 协作(6)
 └──────────────────────────────────────────────────────────────┘
 ```
-
----
 
 ## 四、新项目启动引导（0-1 按阶段取用）
 
@@ -355,7 +347,9 @@
 
 ## 八、技能版本索引（frontmatter `version` · SkillHub 发布版本）
 
-> 本表是**版本索引**（版本唯一源仍是各包 frontmatter 顶层 `version`）；一致性由 `bash scripts/check-index.py` 校验，漂移即门禁失败。规则说明见 [`README.md`](README.md)「版本规范」。
+> 本表是**版本索引**（版本唯一源仍是各包 frontmatter 顶层 `version`），
+> 由 `python3 scripts/render-skills-map.py` 从 frontmatter 实算生成，不要手改。
+> 一致性由 `bash scripts/check-index.py` 校验，漂移即门禁失败。
 
 | 技能 | 版本 | 技能 | 版本 | 技能 | 版本 |
 |------|------|------|------|------|------|
@@ -379,7 +373,7 @@
 | `positioning-statement` | 1.1.0 | `positioning-workshop` | 1.2.0 | `prd-development` | 1.2.1 |
 | `prd-driven-ddd` | 4.6.1 | `press-release` | 1.1.1 | `problem-handling` | 1.2.0 |
 | `problem-statement` | 1.1.0 | `product-doc-audit` | 1.1.1 | `product-launch` | 1.1.1 |
-| `product-marketing` | 1.1.0 | `project-handoff` | 4.5.4 | `proto-persona` | 1.1.1 |
+| `product-marketing` | 1.1.0 | `project-handoff` | 4.9.1 | `proto-persona` | 1.1.1 |
 | `react-vite-best-practices` | 1.1.1 | `release-pipeline` | 1.0.1 | `roadmap-planning` | 1.1.1 |
 | `secrets-scan` | 1.1.1 | `security-scan` | 1.2.0 | `session-health` | 1.0.3 |
 | `skill-description-audit` | 1.14.1 | `skill-eval` | 1.2.0 | `skill-fit` | 2.2.0 |
@@ -390,4 +384,5 @@
 | `verification-before-completion` | 1.1.0 | `version-management` | 1.3.1 | `visual-regression-tester` | 1.1.1 |
 | `voice-of-customer-miner` | 1.2.0 | `web-design-guidelines` | 1.0.1 | `workshop-facilitation` | 1.1.1 |
 | `write-spec` | 1.2.0 | `writing-plans` | 1.1.1 |
+
 
